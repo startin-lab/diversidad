@@ -1,16 +1,24 @@
 # Portal 5° Encuentro Diversidades e Inclusión
 
-Portal del 5° Encuentro Diversidades e Inclusión — *Gestión del cambio organizacional para la Inclusión y Equidad*.
-11 de noviembre de 2026 · Universidad El Bosque, HUB iEX · Bogotá.
+**diversidad.startinlab.org** — *Gestión del cambio organizacional para la Inclusión y Equidad*. 11 de noviembre de 2026 · Universidad El Bosque, HUB iEX · Bogotá.
 
-Sitio: https://diversidad.startinlab.org
+Portal construido por Fundación Startin. Hospedado en Hostinger (PHP 8 + MySQL). El agente **Pliego** corre sobre Microsoft Foundry (proyecto `diversidad-pliego`, implementación `pliego`).
 
-- `index.html`: portal completo (HTML, CSS y JS en un solo archivo).
-- `figuras.webp`: figuras de papel tomadas de la pieza oficial del evento.
-- `CNAME`: dominio personalizado para GitHub Pages.
+## Estructura
+- `index.php`, `app.css`, `app.js`: experiencia por escenas (Inicio · Cifras · Pliego · Inscripción · Evento), sin scroll largo, con panel de accesibilidad (tamaño de texto, alto contraste, lectura fácil, pausar movimiento, voz).
+- `api/registro.php`: guarda inscripciones (documento y grupos poblacionales cifrados con AES-256-GCM), genera código `5E-XXXXXX`.
+- `api/correo.php`: envía el correo de confirmación con la escarapela adjunta.
+- `api/agente.php`: proxy del agente Pliego hacia Foundry (la clave vive solo en el servidor); límites diarios y por IP.
+- `api/conocimiento.php`: base de conocimiento verificada (cifras con fuente y fecha) que recibe Pliego.
+- `api/muro.php`: muro de compromisos.
+- `admin/index.php`: panel privado (inscripciones, ajustes razonables, agregados de autorreconocimiento, exportar CSV, marcar asistencia).
+- `verificar.php` (`/v/CODIGO`): verificación del QR de la escarapela.
+- `assets/fig/`: las nueve figuras de papel (ilustraciones generadas para el evento).
 
-Funciones: cifras verificadas por figura, agente de datos **Pliego**, agenda, memoria de ediciones, escarapela en origami con código de registro y QR, muro de compromisos y panel de accesibilidad (texto, alto contraste, lectura fácil, movimiento).
+## Despliegue
+1. Copiar `config.example.php` a `config.php` y completar credenciales (BD, clave de cifrado, hash de contraseña del panel, endpoint/clave de Foundry).
+2. Subir todo a `public_html` del sitio en Hostinger. Las tablas se crean solas en la primera inscripción.
+3. `.htaccess` fuerza HTTPS, protege `config.php`, `lib.php` y `conocimiento.php`, y enruta `/v/CODIGO`.
 
-Pendiente: conectar `window.REG_ENDPOINT` a un backend seguro para guardar inscripciones (incluye datos sensibles, Ley 1581 de 2012) y el agente a Microsoft Foundry mediante proxy de servidor.
-
-Construido por Fundación Startin · startin.org.co
+## Datos personales
+Las inscripciones incluyen datos sensibles (Ley 1581 de 2012). El documento y la pregunta de autorreconocimiento se guardan cifrados; el panel solo muestra el autorreconocimiento de forma agregada. Conservar `config.php` fuera del repositorio.
