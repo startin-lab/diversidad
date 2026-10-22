@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="5° Encuentro Diversidades e Inclusión">
+<meta property="og:description" content="Gestión del cambio organizacional para la Inclusión y Equidad · 11 nov 2026 · Universidad El Bosque, Bogotá">
+<meta property="og:image" content="https://diversidad.startinlab.org/figuras.webp">
+<meta name="theme-color" content="#0C1646">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Pliegues · 5° Encuentro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Portal del 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 de noviembre de 2026, Universidad El Bosque – HUB iEX, Bogotá.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@500;700;800;900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: noche índigo del afiche + facetas de papel; la figura de cada persona es la puerta a su cifra. */
+:root{
+  --ink:#0C1646;        /* fondo: azul noche del afiche */
+  --ink-2:#14215E;      /* superficies */
+  --ink-3:#1D2C74;      /* superficies elevadas */
+  --paper:#F7F4EE;      /* papel origami */
+  --fg:#FFFFFF;
+  --muted:#C9CDEA;
+  --line:rgba(255,255,255,.16);
+  --sun:#FFC20E;        /* amarillo del 5° y la fecha */
+  --flame:#F26A21;      /* naranja del botón Inscríbete */
+  --teal:#13A79A;
+  --violet:#6A47B8;
+  --pink:#EE7DB9;
+  --focus:#FFC20E;
+  --font-display:"Urbanist", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Verdana", system-ui, sans-serif;
+  --radius:14px;
+  color-scheme:dark;
+}
+:root[data-contrast="alto"]{
+  --ink:#000; --ink-2:#000; --ink-3:#111; --fg:#fff; --muted:#fff; --line:#fff;
+  --sun:#FFE600; --flame:#FFE600; --teal:#00FFF0; --violet:#fff; --pink:#fff; --paper:#fff; --focus:#00FFF0;
+}
+*{box-sizing:border-box}
+html{font-size:calc(100% * var(--scale,1));scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--ink);color:var(--fg);font-family:var(--font-body);font-size:1.0625rem;line-height:1.6;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ink)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;line-height:1.02;margin:0}
+h2{font-size:clamp(2rem,5vw,3.4rem);font-weight:500;letter-spacing:-.02em}
+h2 b{font-weight:900}
+.eyebrow{font-family:var(--font-display);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem;color:var(--sun)}
+.lede{color:var(--muted);max-width:62ch;font-size:1.1rem}
+.skip{position:absolute;left:-999px;top:8px;background:var(--sun);color:#000;padding:8px 14px;border-radius:8px;z-index:100;font-weight:700}
+.skip:focus{left:16px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.easy-only{display:none}
+:root[data-easy="si"] .easy-only{display:revert}
+:root[data-easy="si"] .std-only{display:none}
+
+/* ---------- barra superior ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--ink) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;min-height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-display);font-weight:800;line-height:1.05;font-size:.92rem}
+.brand .n{color:var(--sun);font-size:1.9rem;font-weight:900;letter-spacing:-.04em}
+.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav a{text-decoration:none;padding:8px 12px;border-radius:999px;font-weight:700;font-size:.9rem;color:var(--muted)}
+.nav a:hover{color:var(--fg);background:var(--ink-3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:800 1rem/1 var(--font-display);padding:14px 22px;border-radius:999px;text-decoration:none;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--flame);color:#fff}
+:root[data-contrast="alto"] .btn-primary{color:#000}
+.btn-ghost{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 2px var(--line)}
+.a11y-toggle{background:var(--ink-3);color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:700 .9rem var(--font-body);cursor:pointer;display:flex;gap:8px;align-items:center}
+.a11y-panel{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:70px;width:min(340px,calc(100vw - 32px));background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.45);display:grid;gap:12px}
+.a11y-panel h3{font-size:1.1rem}
+.a11y-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.seg{display:flex;gap:4px}
+.seg button,.sw{background:var(--ink-3);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:700 .95rem var(--font-body);cursor:pointer}
+.sw[aria-pressed="true"]{background:var(--sun);color:#000;border-color:var(--sun)}
+.a11y-note{font-size:.85rem;color:var(--muted);margin:0}
+@media (max-width:860px){.nav{display:none}.a11y-toggle{margin-left:auto}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;isolation:isolate;padding-block:28px 56px}
+#facets{position:absolute;inset:0;width:100%;height:100%;z-index:-2}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:40%;z-index:-1;background:linear-gradient(transparent,var(--ink))}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.edition{display:flex;align-items:flex-end;gap:14px;font-family:var(--font-display)}
+.edition .n{font-size:clamp(4.5rem,12vw,7.5rem);font-weight:900;color:var(--sun);line-height:.8;letter-spacing:-.05em}
+.edition .t{font-weight:800;font-size:clamp(1.1rem,2.6vw,1.6rem);line-height:1.05;color:#0C1646}
+.edition .t small{display:block;font-size:.62em;letter-spacing:.06em;text-transform:uppercase}
+:root[data-contrast="alto"] .edition .t{color:var(--fg)}
+.countdown{background:rgba(12,22,70,.55);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:10px 18px;font-weight:700;display:flex;gap:10px;align-items:center}
+.countdown b{font-family:var(--font-display);font-size:1.6rem;color:var(--sun);font-variant-numeric:tabular-nums}
+.stage{position:relative;width:min(100%,820px);margin:0 0 0 auto}
+@media (max-width:860px){.stage{margin-top:0}}
+.figures{position:relative;width:100%;aspect-ratio:725/372;max-width:100%;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(180deg,transparent,#000 12%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-composite:intersect}
+.figures img{width:100%;height:100%;display:block}
+.hot{position:absolute;border:0;background:transparent;cursor:pointer;border-radius:40% 40% 20% 20%;padding:0}
+.hot::after{content:attr(data-label);position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%) scale(.9);opacity:0;background:var(--paper);color:#0C1646;font:800 .78rem var(--font-display);padding:6px 10px;border-radius:999px;white-space:nowrap;transition:.2s;pointer-events:none}
+.hot:hover::after,.hot:focus-visible::after{opacity:1;transform:translate(-50%,-100%) scale(1)}
+.hot:hover,.hot:focus-visible{background:radial-gradient(closest-side,rgba(255,255,255,.18),transparent)}
+.pulse{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 0 rgba(255,194,14,.7);animation:pulse 2.2s infinite;left:50%;top:6%;transform:translateX(-50%)}
+@keyframes pulse{70%{box-shadow:0 0 0 14px rgba(255,194,14,0)}100%{box-shadow:0 0 0 0 rgba(255,194,14,0)}}
+.stage-hint{position:absolute;left:0;top:6%;font-weight:700;font-size:.9rem;background:rgba(12,22,70,.7);border-radius:999px;padding:6px 12px}
+.frame{border:3px solid rgba(255,255,255,.92);padding:clamp(18px,4vw,44px);margin-top:-60px;position:relative}
+@media (max-width:860px){.frame{margin-top:-24px}}
+:root[data-contrast="alto"] .frame{border-color:var(--fg)}
+.hero h1{font-size:clamp(2.5rem,7.4vw,6.2rem);font-weight:500;letter-spacing:-.035em;color:#fff}
+.hero h1 b{font-weight:900}
+.hero-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px 40px;margin-top:28px;align-items:end}
+.meta-k{font-family:var(--font-display);font-weight:800;color:var(--sun);font-size:clamp(1.15rem,2.4vw,1.6rem);line-height:1.1}
+.meta-v{font-size:1.08rem}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- secciones ---------- */
+section.block{padding-block:clamp(56px,9vw,110px)}
+.sec-head{display:grid;gap:14px;margin-bottom:36px}
+.crease{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:0}
+
+/* manifiesto: tres pliegues */
+.folds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+.fold-card{position:relative;background:var(--paper);color:#0C1646;padding:26px 24px 24px;clip-path:polygon(0 0,calc(100% - 46px) 0,100% 46px,100% 100%,0 100%)}
+.fold-card::after{content:"";position:absolute;right:0;top:0;width:46px;height:46px;background:linear-gradient(225deg,transparent 50%,rgba(12,22,70,.16) 50%)}
+.fold-card .k{font-family:var(--font-display);font-weight:900;font-size:3rem;line-height:1;color:var(--violet)}
+:root[data-contrast="alto"] .fold-card{background:#000;color:#fff;border:2px solid #fff}
+.fold-card h3{font-size:1.5rem;margin:8px 0 6px}
+.fold-card p{margin:0}
+
+/* pliegues de datos */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--ink-2);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:9px 14px;font:700 .95rem var(--font-body);cursor:pointer}
+.chip .dot{width:14px;height:14px;border-radius:4px;transform:rotate(45deg);background:var(--c)}
+.chip[aria-selected="true"]{background:var(--fg);color:#0C1646;border-color:var(--fg)}
+:root[data-contrast="alto"] .chip[aria-selected="true"]{background:var(--sun);color:#000}
+.panel{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(20px,4vw,48px);background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(20px,4vw,44px);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0 auto 0 0;width:8px;background:var(--c)}
+@media (max-width:820px){.panel{grid-template-columns:minmax(0,1fr)}}
+.big{font-family:var(--font-display);font-weight:900;font-size:clamp(4rem,11vw,8.4rem);line-height:.9;letter-spacing:-.05em;color:var(--c);font-variant-numeric:tabular-nums;transform-origin:50% 0;display:inline-block}
+.unfold{animation:unfold .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes unfold{0%{transform:perspective(600px) rotateX(-92deg);opacity:0}60%{transform:perspective(600px) rotateX(12deg);opacity:1}100%{transform:none}}
+.statement{font-size:clamp(1.15rem,2.2vw,1.45rem);line-height:1.4;margin:14px 0 18px;font-weight:700}
+.stats{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.stats li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start}
+.stats li::before{content:"";width:12px;height:12px;margin-top:7px;background:var(--c);clip-path:polygon(0 0,100% 0,0 100%)}
+.bars{display:grid;gap:14px;margin:6px 0 20px}
+.bar-l{display:flex;justify-content:space-between;font-size:.92rem;color:var(--muted);gap:10px}
+.bar-l b{color:var(--fg);font-variant-numeric:tabular-nums}
+.bar-t{height:16px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.bar-f{height:100%;background:var(--c);width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar-f.alt{background:rgba(255,255,255,.55)}
+.action{background:var(--ink-3);border-radius:10px;padding:14px 16px;margin-top:18px}
+.action b{font-family:var(--font-display);color:var(--sun);display:block;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+.src{font-size:.82rem;color:var(--muted);margin-top:14px}
+.src a{color:var(--muted)}
+.panel-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.mini{background:transparent;border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:8px 14px;font:700 .9rem var(--font-body);cursor:pointer}
+.mini:hover{background:var(--ink-3)}
+
+/* agente */
+.agent{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:28px;align-items:start}
+@media (max-width:900px){.agent{grid-template-columns:minmax(0,1fr)}}
+.agent-id{display:grid;gap:16px}
+.crane{width:110px;height:110px}
+.modes{display:flex;gap:6px;flex-wrap:wrap}
+.chat{background:var(--paper);color:#0C1646;border-radius:var(--radius);display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:min(640px,82vh);overflow:hidden}
+:root[data-contrast="alto"] .chat{background:#000;color:#fff;border:2px solid #fff}
+.chat-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(12,22,70,.12);font-weight:700}
+.chat-head .live{width:10px;height:10px;border-radius:50%;background:#1BA160}
+.chat-head .sp{margin-left:auto;display:flex;gap:6px}
+.chat-head button{background:#fff;border:1px solid rgba(12,22,70,.2);border-radius:999px;padding:6px 12px;font:700 .82rem var(--font-body);color:#0C1646;cursor:pointer}
+:root[data-contrast="alto"] .chat-head button{background:#000;color:#fff;border-color:#fff}
+.log{overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:88%;padding:12px 16px;border-radius:16px;min-width:0;overflow-wrap:anywhere}
+.msg.bot{background:#fff;border:1px solid rgba(12,22,70,.1);border-bottom-left-radius:4px}
+.msg.me{background:#0C1646;color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+:root[data-contrast="alto"] .msg.bot{background:#000;border-color:#fff}
+:root[data-contrast="alto"] .msg.me{background:#FFE600;color:#000}
+.msg .fig{font-family:var(--font-display);font-weight:900;font-size:2.2rem;line-height:1;color:var(--violet);display:block;margin-bottom:4px}
+:root[data-contrast="alto"] .msg .fig{color:#FFE600}
+.msg .s{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.tag{font-size:.75rem;background:rgba(106,71,184,.12);color:#3B2580;border-radius:999px;padding:4px 10px;font-weight:700;text-decoration:none}
+:root[data-contrast="alto"] .tag{background:#fff;color:#000}
+.say{background:none;border:0;color:inherit;font:700 .8rem var(--font-body);cursor:pointer;text-decoration:underline;padding:0}
+.sugs{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 12px}
+.sugs button{background:#fff;border:1px solid rgba(12,22,70,.2);border-radius:999px;padding:8px 12px;font:700 .85rem var(--font-body);color:#0C1646;cursor:pointer;text-align:left}
+:root[data-contrast="alto"] .sugs button{background:#000;color:#fff;border-color:#fff}
+.ask{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(12,22,70,.12)}
+.ask input{flex:1;min-width:0;border:2px solid rgba(12,22,70,.2);border-radius:999px;padding:12px 16px;font:1rem var(--font-body);background:#fff;color:#0C1646}
+:root[data-contrast="alto"] .ask input{background:#000;color:#fff;border-color:#fff}
+.ask button{background:#0C1646;color:#fff;border:0;border-radius:999px;padding:0 20px;font:800 1rem var(--font-display);cursor:pointer}
+:root[data-contrast="alto"] .ask button{background:#FFE600;color:#000}
+.typing{display:inline-flex;gap:4px}
+.typing i{width:8px;height:8px;background:#6A47B8;transform:rotate(45deg);animation:tp 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{50%{opacity:.25;transform:rotate(45deg) scale(.6)}}
+
+/* agenda */
+.agenda{display:grid;gap:0;border-top:1px solid var(--line)}
+.slot{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.slot time{font-family:var(--font-display);font-weight:800;font-size:1.3rem;color:var(--sun);font-variant-numeric:tabular-nums}
+.slot h3{font-size:1.25rem;font-weight:800}
+.slot p{margin:4px 0 0;color:var(--muted)}
+.pill{font-size:.78rem;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:4px 10px;white-space:nowrap;color:var(--muted)}
+@media (max-width:600px){.slot{grid-template-columns:minmax(0,1fr)}.slot .pill{justify-self:start}}
+.note{display:inline-block;background:rgba(255,194,14,.12);border:1px dashed var(--sun);color:var(--fg);border-radius:10px;padding:10px 14px;font-size:.92rem}
+
+/* memoria */
+.timeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.timeline{grid-template-columns:minmax(0,1fr)}}
+.ed{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;gap:8px;align-content:start;position:relative}
+.ed .num{font-family:var(--font-display);font-weight:900;font-size:3.2rem;line-height:.9;color:var(--muted)}
+.ed.now{background:var(--paper);color:#0C1646;border-color:var(--paper)}
+.ed.now .num{color:var(--flame)}
+.ed.known .num{color:var(--teal)}
+:root[data-contrast="alto"] .ed.now{background:#000;color:#fff;border-color:#FFE600}
+.ed h3{font-size:1.1rem}
+.ed p{margin:0;font-size:.95rem}
+.ed .st{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ed.pending{border-style:dashed}
+.ed.pending .st{color:var(--sun)}
+
+/* escarapela */
+.reg{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,48px);align-items:start}
+@media (max-width:900px){.reg{grid-template-columns:minmax(0,1fr)}}
+form.card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(18px,3vw,30px);display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field label,.legend{font-weight:700}
+.field input,.field select,.field textarea{width:100%;border:2px solid var(--line);background:var(--ink);color:var(--fg);border-radius:10px;padding:12px 14px;font:1rem var(--font-body)}
+.field textarea{min-height:74px;resize:vertical}
+.hint{font-size:.85rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{display:flex;gap:8px;align-items:center;background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:.92rem;cursor:pointer}
+.checks input{accent-color:var(--sun);width:18px;height:18px}
+.colors{display:flex;flex-wrap:wrap;gap:8px}
+.colors label{position:relative;cursor:pointer}
+.colors input{position:absolute;opacity:0;inset:0}
+.colors span{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:999px;padding:7px 12px 7px 8px;font-size:.88rem;font-weight:700}
+.colors span i{width:18px;height:18px;border-radius:5px;background:var(--c);transform:rotate(45deg)}
+.colors input:checked+span{border-color:var(--fg);background:var(--ink-3)}
+.colors input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.consent input{width:20px;height:20px;accent-color:var(--sun);margin-top:2px;flex:none}
+.err{color:#FFB4A8;font-weight:700;font-size:.92rem;margin:0}
+.studio{position:sticky;top:90px;display:grid;gap:16px;justify-items:center;background:radial-gradient(circle at 50% 35%,var(--ink-3),var(--ink-2));border:1px solid var(--line);border-radius:var(--radius);padding:24px;min-height:520px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;list-style:none;margin:0;padding:0}
+.steps li{font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.steps li.on{background:var(--sun);color:#000;border-color:var(--sun)}
+.fold-stage{perspective:900px;width:min(260px,70vw);aspect-ratio:1;display:grid;place-items:center;margin-block:20px}
+.sheet{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.3,.7,.2,1)}
+.sheet .base{position:absolute;inset:0;background:var(--pc,#6A47B8);box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.sheet .base::before{content:"";position:absolute;inset:0;background:
+  linear-gradient(45deg,transparent 49.6%,rgba(255,255,255,.35) 50%,transparent 50.4%),
+  linear-gradient(-45deg,transparent 49.6%,rgba(255,255,255,.35) 50%,transparent 50.4%)}
+.flap{position:absolute;inset:0;background:var(--pc,#6A47B8);filter:brightness(1.12);transition:transform .8s cubic-bezier(.4,.1,.2,1),filter .01s .4s}
+.f1{clip-path:polygon(0 0,50% 0,0 50%);transform-origin:25% 25%}
+.f2{clip-path:polygon(50% 0,100% 0,100% 50%);transform-origin:75% 25%}
+.f3{clip-path:polygon(100% 50%,100% 100%,50% 100%);transform-origin:75% 75%}
+.f4{clip-path:polygon(0 50%,50% 100%,0 100%);transform-origin:25% 75%}
+.f1.down{transform:translateZ(2px) rotate3d(1,-1,0,-180deg);filter:brightness(.86)}
+.f2.down{transform:translateZ(3px) rotate3d(1,1,0,-180deg);filter:brightness(.8)}
+.f3.down{transform:translateZ(4px) rotate3d(-1,1,0,-180deg);filter:brightness(.86)}
+.f4.down{transform:translateZ(5px) rotate3d(-1,-1,0,-180deg);filter:brightness(.8)}
+.sheet.turn{transform:rotate(45deg) scale(.82)}
+.sheet .seal{position:absolute;inset:25%;display:grid;place-items:center;transform:translateZ(8px) rotate(-45deg);opacity:0;transition:opacity .5s .3s;font-family:var(--font-display);font-weight:900;color:#fff;font-size:2.4rem;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.sheet.turn .seal{opacity:1}
+.studio-msg{text-align:center;max-width:40ch;color:var(--muted);margin:0}
+.badge-out{width:min(100%,380px);display:grid;gap:12px}
+.badge-out img{width:100%;border-radius:12px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.badge-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* muro */
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px;margin-top:20px}
+.note-card{position:relative;background:var(--paper);color:#0C1646;padding:18px 18px 16px;clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,0 100%);border-top:6px solid var(--c)}
+.note-card::after{content:"";position:absolute;right:0;top:0;width:28px;height:28px;background:linear-gradient(225deg,transparent 50%,rgba(12,22,70,.18) 50%)}
+.note-card p{margin:0 0 8px;font-weight:700}
+.note-card small{color:#4B537F}
+:root[data-contrast="alto"] .note-card{background:#000;color:#fff;border:2px solid #fff}
+:root[data-contrast="alto"] .note-card small{color:#fff}
+.ex{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:rgba(12,22,70,.08);padding:2px 8px;border-radius:999px;margin-left:6px}
+.wall-form{display:flex;gap:8px;flex-wrap:wrap}
+.wall-form input{flex:1 1 260px;min-width:0;border:2px solid var(--line);background:var(--ink-2);color:var(--fg);border-radius:999px;padding:12px 16px;font:1rem var(--font-body)}
+
+/* aliados + pie */
+.allies{display:flex;flex-wrap:wrap;gap:10px}
+.allies span{border:1px solid var(--line);border-radius:999px;padding:10px 16px;font-weight:700;font-size:.95rem}
+footer{border-top:1px solid var(--line);padding-block:36px 48px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:grid;gap:18px}
+.sources{columns:2 320px;column-gap:32px;margin:0;padding-left:18px}
+.sources li{break-inside:avoid;margin-bottom:6px}
+.credit{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.credit a{color:var(--fg)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+:root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation:none!important;transition:none!important}
+</style>
+</head>
+<body>
+
+
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="5° Encuentro Diversidades e Inclusión, inicio"><span class="n">5°</span><span>Encuentro<br>Diversidades e Inclusión</span></a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#pliegues">Cifras</a><a href="#agente">Agente Pliego</a><a href="#agenda">Agenda</a><a href="#memoria">Memoria</a><a href="#escarapela">Escarapela</a>
+    </nav>
+    <button class="a11y-toggle" id="a11yBtn" aria-expanded="false" aria-controls="a11yPanel">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="2" fill="currentColor"/><path d="M4 8l8 1.5L20 8M12 9.5V15m0 0l-3.5 6M12 15l3.5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Accesibilidad
+    </button>
+    <div class="a11y-panel" id="a11yPanel" role="region" aria-label="Ajustes de accesibilidad" hidden>
+      <h3>Ajusta el portal a ti</h3>
+      <div class="a11y-row"><span id="lblSize">Tamaño de texto</span><div class="seg" role="group" aria-labelledby="lblSize"><button id="sMinus" aria-label="Reducir texto">A−</button><button id="sReset" aria-label="Texto normal">A</button><button id="sPlus" aria-label="Aumentar texto">A+</button></div></div>
+      <div class="a11y-row"><span>Alto contraste</span><button class="sw" id="tContrast" aria-pressed="false">No</button></div>
+      <div class="a11y-row"><span>Lectura fácil</span><button class="sw" id="tEasy" aria-pressed="false">No</button></div>
+      <div class="a11y-row"><span>Pausar movimiento</span><button class="sw" id="tMotion" aria-pressed="false">No</button></div>
+      <p class="a11y-note">El evento contará con ajustes razonables: indícalos al inscribirte (interpretación en Lengua de Señas Colombiana, movilidad, subtítulos y más).</p>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<!-- ================= HERO ================= -->
+<section class="hero" id="inicio" aria-labelledby="hTitle">
+  <canvas id="facets" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div class="hero-top">
+      <div class="edition" aria-hidden="true"><span class="n">5°</span><span class="t"><small>Encuentro</small>Diversidades<br>e Inclusión</span></div>
+      <div class="countdown" role="status"><span>Faltan</span><b id="cdDays">—</b><span id="cdLabel">días</span></div>
+    </div>
+    <div class="stage">
+      <div class="figures" id="figures">
+        <img src="figuras.webp" alt="Siete figuras de papel plegado: una persona mayor con bastón, una mujer gestante, una niña leyendo, un hombre con gafas oscuras y perro guía, un hombre en silla de ruedas, una mujer afrodescendiente y una persona de figura estilizada en morado.">
+      </div>
+      <span class="stage-hint std-only">Toca una figura: cada pliegue guarda una cifra</span>
+      <span class="stage-hint easy-only">Toca una persona para ver su dato</span>
+    </div>
+    <div class="frame">
+      <h1 id="hTitle"><b>Gestión</b><br>del <b>cambio</b> organizacional para la <b>Inclusión</b> y <b>Equidad</b></h1>
+      <div class="hero-meta">
+        <div><div class="meta-k">Universidad El Bosque · HUB iEX</div><div class="meta-v">Cra. 7b Bis No. 132-28, Bogotá, Colombia</div></div>
+        <div><div class="meta-k">11 de noviembre de 2026</div><div class="meta-v">8:00 a.m. – 1:00 p.m.</div></div>
+        <div class="hero-cta"><a class="btn btn-primary" href="#escarapela">Inscríbete y arma tu escarapela</a><a class="btn btn-ghost" href="#agente">Pregúntale a Pliego</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MANIFIESTO ================= -->
+<section class="block" aria-labelledby="hFold">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">La metáfora del origami</span>
+      <h2 id="hFold">Doblar <b>no es romper</b></h2>
+      <p class="lede std-only">Un pliegue no le quita papel a la hoja: reorganiza lo que ya está ahí para que sostenga una forma nueva. Así funciona el cambio organizacional para la inclusión. Nadie sobra; la estructura se ajusta para que todas las personas quepan.</p>
+      <p class="lede easy-only">Doblar un papel no lo daña. Solo cambia su forma. Una empresa también puede cambiar para que todas las personas tengan un lugar.</p>
+    </div>
+    <div class="folds">
+      <article class="fold-card"><div class="k">1</div><h3>Marcar</h3><p>Reconocer dónde está la organización hoy: datos de su gente, barreras, sesgos y obligaciones legales. Sin línea base no hay pliegue.</p></article>
+      <article class="fold-card"><div class="k">2</div><h3>Doblar</h3><p>Ajustar procesos: selección accesible, ajustes razonables, corresponsabilidad en el cuidado y liderazgo diverso. Cada doblez tiene responsable y fecha.</p></article>
+      <article class="fold-card"><div class="k">3</div><h3>Sostener</h3><p>Volver cultura lo que se ajustó: medir, comunicar y celebrar. Una figura de papel se mantiene porque cada pliegue sostiene al siguiente.</p></article>
+    </div>
+  </div>
+</section>
+<hr class="crease">
+
+<!-- ================= PLIEGUES DE DATOS ================= -->
+<section class="block" id="pliegues" aria-labelledby="hData">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Siete figuras, siete realidades</span>
+      <h2 id="hData">Los <b>pliegues</b> en cifras</h2>
+      <p class="lede">Cada figura del afiche abre un dato verificado sobre Colombia, con su fuente y una acción concreta para tu organización.</p>
+    </div>
+    <div class="chips" role="tablist" aria-label="Dimensiones de la diversidad" id="chips"></div>
+    <div class="panel" id="panel" role="tabpanel" aria-live="polite"></div>
+  </div>
+</section>
+<hr class="crease">
+
+<!-- ================= AGENTE ================= -->
+<section class="block" id="agente" aria-labelledby="hAgent">
+  <div class="wrap agent">
+    <div class="agent-id">
+      <svg class="crane" viewBox="0 0 120 120" aria-hidden="true">
+        <polygon points="60,18 100,62 60,52" fill="#EE7DB9"/><polygon points="60,18 60,52 20,62" fill="#6A47B8"/>
+        <polygon points="20,62 60,52 60,100" fill="#13A79A"/><polygon points="100,62 60,52 60,100" fill="#FFC20E"/>
+        <polygon points="60,100 74,86 92,104" fill="#F26A21"/>
+      </svg>
+      <span class="eyebrow">Agente de datos inclusivo</span>
+      <h2 id="hAgent">Conversa con <b>Pliego</b></h2>
+      <p class="lede">Pliego responde con cifras verificadas y te dice de dónde salen. También te ayuda con el lenguaje: escríbele una palabra como «discapacitado» o «abuelitos» y te propone una forma más respetuosa.</p>
+      <div class="modes">
+        <button class="sw" id="chatEasy" aria-pressed="false">Respuestas en lectura fácil</button>
+        <button class="sw" id="chatVoice" aria-pressed="false">Leer respuestas en voz alta</button>
+      </div>
+      <p class="note">Mockup: las respuestas salen de una base curada con fuentes oficiales. En producción, Pliego se conecta a un agente de Microsoft Foundry mediante un proxy del servidor.</p>
+    </div>
+    <div class="chat" aria-label="Chat con Pliego">
+      <div class="chat-head"><span class="live" aria-hidden="true"></span>Pliego · cifras de diversidad e inclusión<span class="sp"><button id="newChat">Nuevo chat</button></span></div>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+      <div class="sugs" id="sugs"></div>
+      <form class="ask" id="askForm" autocomplete="off">
+        <label for="askInput" class="sr">Escribe tu pregunta para Pliego</label>
+        <input id="askInput" placeholder="Pregunta por una cifra o una palabra…" maxlength="300">
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+</section>
+<hr class="crease">
+
+<!-- ================= AGENDA ================= -->
+<section class="block" id="agenda" aria-labelledby="hAgenda">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">11 de noviembre · 8:00 a.m. – 1:00 p.m.</span>
+      <h2 id="hAgenda">La <b>ruta</b> de la mañana</h2>
+      <p class="note">Agenda propuesta para el mockup, basada en el formato de la 4ª edición (tres conferencias y mesas de cocreación). Por confirmar con el comité organizador.</p>
+    </div>
+    <div class="agenda">
+      <div class="slot"><time>8:00</time><div><h3>Registro y bienvenida</h3><p>Entrega de escarapelas y activación de ajustes razonables solicitados.</p></div><span class="pill">HUB iEX</span></div>
+      <div class="slot"><time>8:30</time><div><h3>Apertura: doblar no es romper</h3><p>Universidad El Bosque y DiversidadES.</p></div><span class="pill">Plenaria</span></div>
+      <div class="slot"><time>8:50</time><div><h3>Conferencia 1 · Marcar</h3><p>Lo que dicen los datos: brechas de diversidad en Colombia y lo que exige la Ley 2466 de 2025.</p></div><span class="pill">Conferencia</span></div>
+      <div class="slot"><time>9:35</time><div><h3>Conferencia 2 · Doblar</h3><p>Gestión del cambio: cómo rediseñar procesos de talento sin dejar a nadie atrás.</p></div><span class="pill">Conferencia</span></div>
+      <div class="slot"><time>10:20</time><div><h3>Conferencia 3 · Sostener</h3><p>Cultura, liderazgo y medición para que la inclusión dure.</p></div><span class="pill">Conferencia</span></div>
+      <div class="slot"><time>11:00</time><div><h3>Taller de pliegues</h3><p>Mesas de cocreación interseccional: cada mesa dobla un reto real en un plan con responsable, fecha e indicador.</p></div><span class="pill">Mesas</span></div>
+      <div class="slot"><time>12:20</time><div><h3>Muro de compromisos</h3><p>Cada organización deja su pliegue público.</p></div><span class="pill">Plenaria</span></div>
+      <div class="slot"><time>12:45</time><div><h3>Cierre y foto de comunidad</h3><p>Aliados del 5° Encuentro.</p></div><span class="pill">Cierre</span></div>
+    </div>
+  </div>
+</section>
+<hr class="crease">
+
+<!-- ================= MEMORIA ================= -->
+<section class="block" id="memoria" aria-labelledby="hMem">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Memoria del Encuentro</span>
+      <h2 id="hMem">Cinco ediciones, <b>una comunidad</b></h2>
+      <p class="lede">El Encuentro reúne a líderes empresariales, academia, agentes de cambio y organizaciones sociales que trabajan en diversidad, equidad e inclusión.</p>
+    </div>
+    <div class="timeline">
+      <article class="ed pending"><span class="num">1ª</span><span class="st">Por documentar</span><h3>Primera edición</h3><p>Fecha, sede y tema por confirmar con el comité organizador.</p></article>
+      <article class="ed pending"><span class="num">2ª</span><span class="st">Por documentar</span><h3>Segunda edición</h3><p>Fecha, sede y tema por confirmar con el comité organizador.</p></article>
+      <article class="ed pending"><span class="num">3ª</span><span class="st">Por documentar</span><h3>Tercera edición</h3><p>Fecha, sede y tema por confirmar con el comité organizador.</p></article>
+      <article class="ed known"><span class="num">4ª</span><span class="st">3 dic 2025</span><h3>De los desafíos a las soluciones</h3><p>Auditorio Fundadores, Universidad El Bosque. Tres conferencias sobre el marco normativo de diversidades y mesas de cocreación con metodologías de innovación. Más de 70 participantes: expertos en discapacidad, bienestar, liderazgos LGBTIQ+, academia, talento humano, estudiantes y juristas.</p></article>
+      <article class="ed now"><span class="num">5ª</span><span class="st">11 nov 2026</span><h3>Gestión del cambio organizacional para la Inclusión y Equidad</h3><p>Universidad El Bosque, HUB iEX. Del diagnóstico a la transformación de la organización.</p></article>
+    </div>
+  </div>
+</section>
+<hr class="crease">
+
+<!-- ================= ESCARAPELA ================= -->
+<section class="block" id="escarapela" aria-labelledby="hReg">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Inscripción</span>
+      <h2 id="hReg">Dobla tu <b>escarapela</b></h2>
+      <p class="lede">Inscríbete y mira cómo tu hoja se convierte, pliegue a pliegue, en la escarapela que te identifica el 11 de noviembre. Elige el color del pliegue con el que te comprometes.</p>
+    </div>
+    <div class="reg">
+      <form class="card" id="regForm" novalidate>
+        <div class="field"><label for="fName">1. Nombres y apellidos</label><input id="fName" required autocomplete="name" maxlength="50"></div>
+        <div class="field"><label for="fDoc">2. Documento de identidad</label><input id="fDoc" required inputmode="text" maxlength="20" autocomplete="off"><span class="hint">No aparece en tu escarapela. Se usa para validar tu ingreso.</span></div>
+        <div class="field"><label for="fOrg">3. Institución/organización</label><input id="fOrg" required autocomplete="organization" maxlength="50"></div>
+        <div class="field"><label for="fMail">4. Correo electrónico</label><input id="fMail" type="email" required autocomplete="email"></div>
+        <fieldset><span class="legend" id="lgGroup">5. ¿Se identifica con alguno de los siguientes grupos?</span>
+          <span class="hint">Respuesta voluntaria. Es un dato sensible (Ley 1581 de 2012): no es obligatorio responder, se usa solo de forma agregada para medir la diversidad del Encuentro y nunca aparece en tu escarapela.</span>
+          <div class="checks" role="radiogroup" aria-labelledby="lgGroup" id="groupPick">
+            <label><input type="radio" name="grp" value="Persona con discapacidad">Persona con discapacidad</label>
+            <label><input type="radio" name="grp" value="Pueblos indígenas">Persona perteneciente a pueblos indígenas</label>
+            <label><input type="radio" name="grp" value="NARP">Persona afrodescendiente, negra, raizal o palenquera</label>
+            <label><input type="radio" name="grp" value="ROM">Persona ROM</label>
+            <label><input type="radio" name="grp" value="Migrante o refugiada">Persona migrante o refugiada</label>
+            <label><input type="radio" name="grp" value="LGBTIQ+">Persona LGBTIQ+</label>
+            <label><input type="radio" name="grp" value="Víctima del conflicto">Víctima del conflicto armado</label>
+            <label><input type="radio" name="grp" value="Ninguno">Ninguno de los anteriores</label>
+            <label><input type="radio" name="grp" value="Prefiero no responder">Prefiero no responder</label>
+            <label><input type="radio" name="grp" value="Otras" id="grpOther">Otras</label>
+          </div>
+          <div class="field" id="grpOtherWrap" hidden><label for="fGrpOther">¿Cuál?</label><input id="fGrpOther" maxlength="40"></div>
+        </fieldset>
+        <fieldset><span class="legend" id="lgAj">6. ¿Requiere algún ajuste razonable o apoyo para participar plenamente en el evento?</span>
+          <div class="checks" role="radiogroup" aria-labelledby="lgAj">
+            <label><input type="radio" name="ajq" value="si">Sí</label>
+            <label><input type="radio" name="ajq" value="no">No</label>
+          </div>
+          <div id="ajWrap" hidden style="display:grid;gap:8px">
+            <span class="hint">Cuéntanos cuál para tenerlo listo el día del evento:</span>
+            <div class="checks">
+              <label><input type="checkbox" name="aj" value="Intérprete de LSC">Intérprete de LSC</label>
+              <label><input type="checkbox" name="aj" value="Movilidad y accesos">Movilidad y accesos</label>
+              <label><input type="checkbox" name="aj" value="Subtítulos en vivo">Subtítulos en vivo</label>
+              <label><input type="checkbox" name="aj" value="Material en lectura fácil">Material en lectura fácil</label>
+              <label><input type="checkbox" name="aj" value="Espacio de calma sensorial">Espacio de calma sensorial</label>
+              <label><input type="checkbox" name="aj" value="Acompañante">Asisto con acompañante</label>
+            </div>
+            <div class="field"><label for="fAjOther">Otro apoyo</label><input id="fAjOther" maxlength="80"></div>
+          </div>
+        </fieldset>
+        <fieldset style="border-top:1px solid var(--line);padding-top:16px"><span class="legend">Personaliza tu escarapela <span class="hint">(opcional)</span></span>
+          <span class="legend" id="lgColor" style="font-weight:400">Tu pliegue: ¿con qué dimensión te comprometes?</span><div class="colors" id="colorPick" role="radiogroup" aria-labelledby="lgColor"></div>
+        </fieldset>
+        <div class="field"><label for="fPledge">Mi compromiso para 2027</label><textarea id="fPledge" maxlength="90" placeholder="Ej.: Haremos accesibles todas nuestras vacantes."></textarea></div>
+        <div class="field"><label for="fPhoto">Tu foto <span class="hint">(solo se usa para dibujar tu escarapela en tu dispositivo)</span></label><input id="fPhoto" type="file" accept="image/*"></div>
+        <label class="consent"><input type="checkbox" id="fConsent"><span>Autorizo el tratamiento de mis datos para gestionar mi inscripción, según la <a href="https://startin.org.co/privacidad/" target="_blank" rel="noopener">política de tratamiento de datos</a> (Ley 1581 de 2012).</span></label>
+        <p class="err" id="regErr" role="alert" hidden></p>
+        <button class="btn btn-primary" type="submit">Doblar mi escarapela</button>
+      </form>
+      <div class="studio" aria-live="polite">
+        <ol class="steps" id="steps"><li data-s="0">Hoja</li><li data-s="1">Marcar</li><li data-s="2">Doblar</li><li data-s="3">Sostener</li><li data-s="4">Escarapela</li></ol>
+        <div class="fold-stage" id="foldStage">
+          <div class="sheet" id="sheet"><div class="base"></div><div class="flap f1"></div><div class="flap f2"></div><div class="flap f3"></div><div class="flap f4"></div><div class="seal" id="seal">5°</div></div>
+        </div>
+        <p class="studio-msg" id="studioMsg">Tu hoja está lista. Completa el formulario y la doblaremos juntos.</p>
+        <div class="badge-out" id="badgeOut" hidden>
+          <img id="badgeImg" alt="">
+          <div class="badge-actions">
+            <a class="btn btn-primary" id="dlBtn" download="escarapela-5-encuentro.png" href="#">Descargar PNG</a>
+            <a class="btn btn-ghost" id="waBtn" href="#" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+            <button class="btn btn-ghost" id="againBtn" type="button">Doblar otra</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:56px">
+      <h3 style="font-size:1.6rem">Muro de compromisos</h3>
+      <p class="lede">Lo que las organizaciones asistentes se comprometen a doblar este año.</p>
+      <form class="wall-form" id="wallForm"><label for="wallIn" class="sr">Tu compromiso</label><input id="wallIn" maxlength="90" placeholder="Mi organización se compromete a…"><button class="btn btn-ghost" type="submit">Pegar en el muro</button></form>
+      <div class="wall" id="wall"></div>
+    </div>
+  </div>
+</section>
+<hr class="crease">
+
+<section class="block" aria-labelledby="hAllies">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Hacen posible el 5° Encuentro</span><h2 id="hAllies">Aliados</h2></div>
+    <div class="allies">
+      <span>Universidad El Bosque</span><span>DiversidadES</span><span>Claro</span><span>Umanos Lab</span><span>Bancamía</span><span>Fundación BBVA Microfinanzas</span><span>Equilatera</span><span>Fundación CIREC</span><span>Cámara de la Diversidad</span><span>Pride Connection Colombia</span><span>Escuela Colombiana de Rehabilitación</span><span>101ideas.co</span><span>Nuestro Flow</span><span>Evas &amp; Adanes</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <strong style="color:var(--fg)">Fuentes de las cifras</strong>
+    <ol class="sources">
+      <li>DANE, GEIH · Mercado laboral de la población LGBT, año móvil jul 2025 – jun 2026. <a href="https://www.dane.gov.co/files/operaciones/GEIH/bol-GEIHMLLGBT-jul2025-jun2026.pdf" target="_blank" rel="noopener">Boletín</a></li>
+      <li>DANE, GEIH jul–sep 2025 · Mercado laboral de personas con discapacidad, vía <a href="https://radionacional.co/actualidad/salud/dia-internacional-de-las-personas-con-discapacidad-2025-cifras-en-colombia-y-el" target="_blank" rel="noopener">Radio Nacional</a> (dic 2025).</li>
+      <li>LEE, Universidad Javeriana (SIMAT 2023 y ENCV 2024), vía <a href="https://www.portafolio.co/economia/colombia-tiene-200-334-estudiantes-con-discapacidad-pero-solo-el-2-llega-al-sistema-educativo-formal-495503" target="_blank" rel="noopener">Portafolio</a> (jun 2026).</li>
+      <li>Ley 2466 de 2025 (reforma laboral), cuota de contratación, vía <a href="https://www.infobae.com/colombia/2026/03/13/por-que-las-empresas-colombianas-deberan-contratar-al-menos-dos-personas-en-situacion-de-discapacidad-por-cada-cien-empleados/" target="_blank" rel="noopener">Infobae</a> (mar 2026).</li>
+      <li>Fundación Saldarriaga Concha, <a href="https://www.saldarriagaconcha.org/wp-content/uploads/2025/02/2025-02-Febrero18_ColombiaEnvejece-LasOportunidadesDeUnaSociedadLongeva.pdf" target="_blank" rel="noopener">Colombia envejece</a> (feb 2025), con datos DANE; DANE vía <a href="https://www.rtvcnoticias.com/colombia/dane-proyecta-que-en-2036-habra-mas-adultos-mayores-que-ninos-en-colombia" target="_blank" rel="noopener">RTVC</a> (jul 2025).</li>
+      <li>Observatorio Laboral U. del Rosario (LaboUR), vía <a href="https://www.valoraanalitik.com/alertan-brechas-laborales-genero-colombia/" target="_blank" rel="noopener">Valora Analitik</a> (mar 2026).</li>
+      <li>DANE, CNPV 2018 y estimación NARP 2019, vía <a href="https://www.portafolio.co/economia/poblacion-afro-4-6-millones-535344" target="_blank" rel="noopener">Portafolio</a>.</li>
+      <li>McKinsey &amp; Company, Diversity Matters Even More (2023), vía <a href="https://internationalwim.org/iwim-reports/diversity-matters-even-more-the-case-for-holistic-impact/" target="_blank" rel="noopener">IWIM</a>.</li>
+      <li>4° Encuentro: <a href="https://www.lasillavacia.com/red-de-expertos/de-los-desafios-a-las-soluciones-encuentro-de-diversidades/" target="_blank" rel="noopener">La Silla Vacía</a> y <a href="https://confidencialnoticias.com/opinion/liderazgos-que-construyen-futuro-en-el-4-o-encuentro-de-diversidades/" target="_blank" rel="noopener">Confidencial Noticias</a> (2025).</li>
+    </ol>
+    <div class="credit"><span>5° Encuentro Diversidades e Inclusión · Bogotá, 2026</span><span>Portal by <a href="https://startin.org.co" target="_blank" rel="noopener">Startin.org.co</a></span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const root=document.documentElement;
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const reduced=()=>matchMedia("(prefers-reduced-motion: reduce)").matches||root.dataset.motion==="off";
+
+/* ---------- DATOS ---------- */
+const P=[
+ {id:"mayores",label:"Personas mayores",c:"#F0A04B",hot:[1.5,18,15.5,62],
+  big:"15 %",st:"de la población de Colombia tiene 60 años o más: 7,9 millones de personas en 2024. En 1985 eran el 6 %.",
+  easy:"Hoy, 15 de cada 100 personas en Colombia tienen 60 años o más.",
+  stats:["En 2036 habrá más personas de 60 años o más que menores de 15 (DANE).","En 2070 serán el 36 % de la población: cerca de 20 millones de personas.","1 de cada 4 personas mayores no tiene ingresos en la vejez."],
+  bars:[["1985",6],["2024",15],["2070 (proyección)",36]],barMax:40,unit:" %",
+  act:"Diseña rutas de talento intergeneracional: mentoría inversa, reentrenamiento y planes de retiro flexibles.",
+  src:"Fundación Saldarriaga Concha con datos DANE (feb 2025); DANE vía RTVC (jul 2025)."},
+ {id:"genero",label:"Género y cuidado",c:"#E6DDBF",hot:[17.2,14,9.2,64],
+  big:"11,4 %",st:"fue la tasa de desempleo de las mujeres en 2025. La de los hombres fue 7,0 %.",
+  easy:"Más mujeres que hombres buscan trabajo y no lo encuentran.",
+  stats:["La participación laboral de las mujeres está 24 puntos por debajo de la de los hombres.","Con título universitario, una mujer gana en promedio 82 centavos por cada peso de un hombre.","El 35 % de las mujeres que quieren trabajar y no buscan empleo lo atribuye a responsabilidades familiares."],
+  bars:[["Desempleo mujeres",11.44],["Desempleo hombres",6.99]],barMax:15,unit:" %",
+  act:"Corresponsabilidad real: licencias parentales equivalentes, horarios flexibles y retorno acompañado después de la licencia.",
+  src:"Observatorio Laboral de la Universidad del Rosario (LaboUR), vía Valora Analitik (mar 2026)."},
+ {id:"ninez",label:"Educación inclusiva",c:"#5DBB52",hot:[26,45,13.4,42],
+  big:"2 %",st:"de la matrícula escolar corresponde a estudiantes con discapacidad: 200.334 de cerca de 9,8 millones.",
+  easy:"Muy pocos estudiantes con discapacidad llegan al colegio.",
+  stats:["Asisten al colegio el 72,9 % de niñas, niños y jóvenes con discapacidad, frente al 95,4 % sin discapacidad.","Analfabetismo entre 5 y 16 años: 34,2 % con discapacidad frente a 9,2 % sin discapacidad.","El 5,8 % de la población tiene dificultad para al menos una actividad básica cotidiana (ENCV 2024)."],
+  bars:[["Asistencia con discapacidad",72.9],["Asistencia sin discapacidad",95.4]],barMax:100,unit:" %",
+  act:"El talento de 2035 se está quedando fuera del aula hoy: crea alianzas con instituciones educativas y prácticas accesibles.",
+  src:"Laboratorio de Economía de la Educación, U. Javeriana (SIMAT 2023, ENCV 2024), vía Portafolio (jun 2026)."},
+ {id:"discapacidad",label:"Discapacidad y trabajo",c:"#E0736B",hot:[37.5,16,13.8,68],
+  big:"17,9 %",st:"de las personas con discapacidad tiene empleo. Entre las personas sin discapacidad, la cifra es 60,9 %.",
+  easy:"Solo 18 de cada 100 personas con discapacidad tienen trabajo.",
+  stats:["Solo el 20,2 % participa en el mercado laboral, frente al 66,6 % de quienes no tienen discapacidad.","Su desocupación es 11,4 %, frente a 8,5 %.","El 55,8 % de quienes trabajan lo hace por cuenta propia."],
+  bars:[["Ocupación con discapacidad",17.9],["Ocupación sin discapacidad",60.9]],barMax:100,unit:" %",
+  act:"Selección accesible: vacantes en formatos legibles, pruebas adaptadas y entrevistas con ajustes razonables.",
+  src:"DANE, GEIH jul–sep 2025, vía Radio Nacional de Colombia (dic 2025)."},
+ {id:"ley",label:"La ley ya cambió",c:"#62C3CA",hot:[49,30,22,68],
+  big:"2 de 100",st:"trabajadores deben ser personas con discapacidad en las empresas privadas, según la Ley 2466 de 2025. La fiscalización empezó el 1 de julio de 2026.",
+  easy:"Por ley, en una empresa de 100 personas, al menos 2 deben ser personas con discapacidad.",
+  stats:["Las empresas de más de 500 empleados suman al menos una persona más por cada tramo de 100.","Quien cumple puede deducir el 200 % de salarios y prestaciones en su declaración de renta.","También obtiene 50 % de reducción en la cuota de aprendices SENA y puntaje adicional en licitaciones."],
+  bars:null,
+  act:"Haz hoy el diagnóstico: cuántas personas con certificado de discapacidad tienes, qué ajustes razonables faltan y quién responde.",
+  src:"Ley 2466 de 2025 y Ministerio del Trabajo, vía Infobae (mar 2026)."},
+ {id:"etnia",label:"Diversidad étnica",c:"#C98A57",hot:[70.6,17,13.8,62],
+  big:"9,34 %",st:"de la población se estima negra, afrocolombiana, raizal o palenquera: 4,67 millones de personas.",
+  easy:"Casi 1 de cada 10 personas en Colombia es afrodescendiente.",
+  stats:["El censo de 2018 registró 2.982.224 personas que se autorreconocieron; el DANE ajustó la cifra con la Encuesta de Calidad de Vida.","1.905.617 personas se reconocieron indígenas en el censo de 2018 (4,4 %).","El autorreconocimiento es la base de la medición: preguntar bien también es incluir."],
+  bars:[["Población NARP (estimación)",9.34],["Población indígena (CNPV 2018)",4.4]],barMax:12,unit:" %",
+  act:"Incluye la variable étnica (voluntaria y por autorreconocimiento) en tu caracterización de talento para medir brechas reales.",
+  src:"DANE, CNPV 2018 y estimación NARP 2019, vía Portafolio."},
+ {id:"lgbt",label:"Personas LGBTIQ+",c:"#9B6AE0",hot:[85.8,3,10.8,80],
+  big:"496 mil",st:"personas mayores de 18 años se reconocen LGBT en Colombia: el 1,3 % de la población adulta.",
+  easy:"Casi medio millón de personas adultas en Colombia se reconocen LGBT.",
+  stats:["Su tasa de ocupación es 73,8 %, frente a 62,1 % de la población no LGBT.","Aun así, su desocupación es mayor: 10,3 % frente a 8,4 %.","En 23 ciudades y áreas metropolitanas son 349 mil personas (1,8 %)."],
+  bars:[["Desocupación LGBT",10.3],["Desocupación no LGBT",8.4]],barMax:12,unit:" %",
+  act:"Protocolos contra la discriminación, uso del nombre identitario en sistemas internos y beneficios para todas las familias.",
+  src:"DANE, GEIH, año móvil jul 2025 – jun 2026."}
+];
+
+/* ---------- ACCESIBILIDAD ---------- */
+const a11yBtn=$("#a11yBtn"),panelA=$("#a11yPanel");
+a11yBtn.addEventListener("click",()=>{const o=panelA.hidden;panelA.hidden=!o;a11yBtn.setAttribute("aria-expanded",String(o));});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!panelA.hidden){panelA.hidden=true;a11yBtn.setAttribute("aria-expanded","false");a11yBtn.focus();}});
+let scale=parseFloat(store.get("pl-scale")||"1");
+const applyScale=()=>{root.style.setProperty("--scale",scale);store.set("pl-scale",scale);};
+$("#sMinus").onclick=()=>{scale=Math.max(.9,+(scale-.1).toFixed(2));applyScale();};
+$("#sPlus").onclick=()=>{scale=Math.min(1.5,+(scale+.1).toFixed(2));applyScale();};
+$("#sReset").onclick=()=>{scale=1;applyScale();};
+applyScale();
+function toggle(btn,key,attr,onVal,cb){
+  const set=(v,init)=>{btn.setAttribute("aria-pressed",String(v));btn.textContent=btn.dataset.lbl?btn.dataset.lbl:(v?"Sí":"No");if(v)root.dataset[attr]=onVal;else delete root.dataset[attr];store.set(key,v?"1":"0");if(!init&&cb)cb(v);};
+  btn.addEventListener("click",()=>set(btn.getAttribute("aria-pressed")!=="true"));
+  set(store.get(key)==="1",true);
+}
+toggle($("#tContrast"),"pl-hc","contrast","alto",()=>drawFacets());
+toggle($("#tEasy"),"pl-easy","easy","si",v=>{$("#chatEasy").setAttribute("aria-pressed",String(v));easyChat=v;renderPanel();});
+toggle($("#tMotion"),"pl-motion","motion","off");
+
+/* ---------- FACETAS DE PAPEL (canvas) ---------- */
+const cv=$("#facets"),cx=cv.getContext("2d");
+const stops=[[0,[238,125,185]],[.35,[106,71,184]],[.62,[19,167,154]],[1,[12,22,70]]];
+function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t));}
+function grad(t){t=Math.max(0,Math.min(1,t));for(let i=1;i<stops.length;i++){if(t<=stops[i][0]){const a=stops[i-1],b=stops[i];return mix(a[1],b[1],(t-a[0])/(b[0]-a[0]));}}return stops[stops.length-1][1];}
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+var mesh=null,light={x:.75,y:.2},target={x:.75,y:.2};
+function buildMesh(w,h,cell,seed){
+  const r=rng(seed),cols=Math.ceil(w/cell)+3,rows=Math.ceil(h/cell)+3,pts=[];
+  for(let j=0;j<rows;j++){pts[j]=[];for(let i=0;i<cols;i++){pts[j][i]=[(i-1)*cell+(r()-.5)*cell*.7,(j-1)*cell+(r()-.5)*cell*.7];}}
+  const tris=[];
+  for(let j=0;j<rows-1;j++)for(let i=0;i<cols-1;i++){
+    const a=pts[j][i],b=pts[j][i+1],c=pts[j+1][i],d=pts[j+1][i+1];
+    if(r()>.5){tris.push([a,b,d,r()],[a,d,c,r()]);}else{tris.push([a,b,c,r()],[b,d,c,r()]);}
+  }
+  return tris;
+}
+function paint(ctx,w,h,tris,lt,hc){
+  ctx.clearRect(0,0,w,h);
+  for(const t of tris){
+    const mx=(t[0][0]+t[1][0]+t[2][0])/3,my=(t[0][1]+t[1][1]+t[2][1])/3;
+    let col;
+    if(hc){const g=10+t[3]*22;col=[g,g,g];}
+    else{
+      const along=(my/h)*.7+(1-mx/w)*.15+(mx/w>.6?-(mx/w-.6)*.5:0)+.05;
+      col=grad(along+.25*(my/h));
+      const dx=mx/w-lt.x,dy=my/h-lt.y,dist=Math.sqrt(dx*dx+dy*dy);
+      const k=(t[3]-.5)*.22+Math.max(0,.28-dist)*.9;
+      col=col.map(v=>Math.max(0,Math.min(255,Math.round(v*(1+k)))));
+    }
+    ctx.fillStyle=`rgb(${col[0]},${col[1]},${col[2]})`;
+    ctx.beginPath();ctx.moveTo(t[0][0],t[0][1]);ctx.lineTo(t[1][0],t[1][1]);ctx.lineTo(t[2][0],t[2][1]);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=1;ctx.stroke();
+  }
+}
+function sizeCanvas(){
+  const r=cv.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.max(1,r.width*dpr);cv.height=Math.max(1,r.height*dpr);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  mesh=buildMesh(r.width,r.height,Math.max(70,r.width/14),7);
+  drawFacets();
+}
+function drawFacets(){if(!mesh)return;const r=cv.getBoundingClientRect();paint(cx,r.width,r.height,mesh,light,root.dataset.contrast==="alto");}
+let raf=null;
+function tick(){light.x+=(target.x-light.x)*.08;light.y+=(target.y-light.y)*.08;drawFacets();
+  if(Math.abs(target.x-light.x)>.002||Math.abs(target.y-light.y)>.002)raf=requestAnimationFrame(tick);else raf=null;}
+$(".hero").addEventListener("pointermove",e=>{if(reduced())return;const r=cv.getBoundingClientRect();target={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};if(!raf)raf=requestAnimationFrame(tick);});
+window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(sizeCanvas,120);});
+sizeCanvas();
+
+/* ---------- CUENTA REGRESIVA ---------- */
+(function(){const target=new Date("2026-11-11T08:00:00-05:00").getTime(),now=Date.now(),d=Math.ceil((target-now)/864e5);
+  if(d>1){$("#cdDays").textContent=d;}else if(d===1){$("#cdDays").textContent="1";$("#cdLabel").textContent="día";}
+  else{$(".countdown").innerHTML="<span>¡Gracias por doblar con nosotros!</span>";}})();
+
+/* ---------- HOTSPOTS + PLIEGUES ---------- */
+const fig=$("#figures");
+P.forEach((p,i)=>{
+  const b=document.createElement("button");b.className="hot";b.dataset.label=p.label;
+  b.setAttribute("aria-label","Ver la cifra: "+p.label);
+  const [l,t,w,h]=p.hot;Object.assign(b.style,{left:l+"%",top:t+"%",width:w+"%",height:h+"%"});
+  if(i===3){const s=document.createElement("span");s.className="pulse";b.appendChild(s);}
+  b.onclick=()=>{select(i);document.getElementById("pliegues").scrollIntoView({behavior:reduced()?"auto":"smooth"});};
+  fig.appendChild(b);
+});
+const chips=$("#chips");
+P.forEach((p,i)=>{const c=document.createElement("button");c.className="chip";c.setAttribute("role","tab");c.id="tab-"+p.id;c.style.setProperty("--c",p.c);
+  c.innerHTML=`<span class="dot" aria-hidden="true"></span>${p.label}`;c.onclick=()=>select(i);
+  c.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=(i+(e.key==="ArrowRight"?1:-1)+P.length)%P.length;select(n);chips.children[n].focus();}});
+  chips.appendChild(c);});
+let cur=3;
+function select(i){cur=i;[...chips.children].forEach((c,j)=>{c.setAttribute("aria-selected",String(j===i));c.tabIndex=j===i?0:-1;});renderPanel(true);}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
+function renderPanel(anim){
+  const p=P[cur],pn=$("#panel"),easy=root.dataset.easy==="si";
+  pn.style.setProperty("--c",p.c);pn.setAttribute("aria-labelledby","tab-"+p.id);
+  const bars=p.bars?`<div class="bars">${p.bars.map((b,k)=>`<div><div class="bar-l"><span>${esc(b[0])}</span><b>${String(b[1]).replace(".",",")}${p.unit}</b></div><div class="bar-t"><div class="bar-f${k?" alt":""}" data-w="${(b[1]/p.barMax*100).toFixed(1)}"></div></div></div>`).join("")}</div>`:"";
+  pn.innerHTML=`<div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div>
+    <p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
+    <div><ul class="stats">${p.stats.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
+    <div class="action"><b>Qué puede hacer tu organización</b>${esc(p.act)}</div>
+    <p class="src">Fuente: ${esc(p.src)}</p>
+    <div class="panel-tools"><button class="mini" id="pSay">Escuchar este dato</button><button class="mini" id="pAsk">Preguntarle a Pliego</button></div></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$$(".bar-f").forEach(f=>f.style.width=f.dataset.w+"%")));
+  $("#pSay").onclick=()=>speak(p.big.replace("%"," por ciento")+". "+(easy?p.easy:p.st));
+  $("#pAsk").onclick=()=>{document.getElementById("agente").scrollIntoView({behavior:reduced()?"auto":"smooth"});ask("Cuéntame sobre "+p.label.toLowerCase());};
+}
+select(3);
+
+/* ---------- VOZ ---------- */
+function speak(text){
+  try{const s=window.speechSynthesis;if(!s){return false;}s.cancel();const u=new SpeechSynthesisUtterance(text.replace(/\s*\([^)]*\)/g,""));u.lang="es-CO";u.rate=.98;
+    const v=s.getVoices().find(v=>/^es/i.test(v.lang));if(v)u.voice=v;s.speak(u);return true;}catch(e){return false;}
+}
+
+/* ---------- AGENTE PLIEGO ---------- */
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const LEX=[
+ [["discapacitado","discapacitada","discapacitados","minusvalido","invalido","lisiado"],"persona con discapacidad","La Convención de la ONU sobre los derechos de las personas con discapacidad pone primero a la persona: la discapacidad no la define."],
+ [["confinado a silla","postrado en silla","en silla de ruedas sufre"],"persona usuaria de silla de ruedas","La silla de ruedas da autonomía; no confina."],
+ [["sufre de discapacidad","padece discapacidad","victima de discapacidad"],"tiene una discapacidad","«Sufrir» o «padecer» asume tragedia; describe sin juzgar."],
+ [["abuelitos","viejitos","ancianos","tercera edad"],"personas mayores","Es el término de la Ley 1251 de 2008 y evita el diminutivo infantilizante."],
+ [["sordomudo","sordomuda"],"persona sorda","La mayoría de las personas sordas puede hablar; muchas se comunican en Lengua de Señas Colombiana."],
+ [["cieguito","invidente"],"persona ciega o con discapacidad visual","Nombra la condición sin diminutivos."],
+ [["opcion sexual"],"orientación sexual","La orientación sexual no es una elección."],
+ [["los trabajadores","los empleados","los colaboradores"],"las personas trabajadoras / el equipo","Un genérico que incluye a todas las personas sin duplicar cada palabra."],
+ [["normales"],"personas sin discapacidad","Decir «normales» implica que lo diferente es anormal."]
+];
+const KB=[
+ {k:["discapacidad","empleo","trabajo","ocupacion","laboral","contratar"],p:3},
+ {k:["ley","2466","cuota","reforma","obligacion","incentivo","sena","fiscalizacion"],p:4},
+ {k:["mayor","mayores","envejecimiento","vejez","edad","60","adulto"],p:0},
+ {k:["mujer","mujeres","genero","brecha","salarial","cuidado","maternidad","desempleo"],p:1},
+ {k:["educacion","colegio","estudiante","escuela","nina","ninos","matricula","inclusiva"],p:2},
+ {k:["etnia","etnica","afro","afrocolombiana","negra","indigena","raizal","palenquera","racial"],p:5},
+ {k:["lgbt","lgbti","lgbtiq","trans","gay","lesbiana","diversidad sexual","orientacion"],p:6},
+];
+const EXTRA=[
+ {k:["negocio","rentabilidad","financiero","mckinsey","por que","vale la pena","beneficio","resultados"],
+  fig:"39 %",t:"Las empresas en el cuartil superior de diversidad de género en sus equipos directivos tienen 39 % más probabilidad de superar financieramente a las del cuartil inferior.",
+  e:"Las empresas con más mujeres en la dirección suelen tener mejores resultados.",src:"McKinsey, Diversity Matters Even More (2023)"},
+ {k:["cuando","fecha","hora","donde","lugar","sede","direccion","llegar","evento"],
+  fig:"11 nov",t:"El 5° Encuentro es el miércoles 11 de noviembre de 2026, de 8:00 a.m. a 1:00 p.m., en el HUB iEX de la Universidad El Bosque: Cra. 7b Bis No. 132-28, Bogotá.",
+  e:"Es el 11 de noviembre de 2026, de 8 de la mañana a 1 de la tarde, en la Universidad El Bosque.",src:"Pieza oficial del evento"},
+ {k:["inscrib","registro","inscripcion","escarapela","cupo"],
+  fig:"→",t:"Puedes inscribirte en la sección «Dobla tu escarapela». Al final se arma tu escarapela en origami y puedes descargarla o compartirla.",
+  e:"Ve a la parte de abajo, llena tus datos y recibe tu escarapela.",src:"Este portal",go:"#escarapela"},
+ {k:["anterior","historia","edicion","ediciones","cuarto","4","pasado","memoria"],
+  fig:"4ª",t:"La 4ª edición fue el 3 de diciembre de 2025 en el Auditorio Fundadores de la Universidad El Bosque, con el lema «De los desafíos a las soluciones»: tres conferencias, mesas de cocreación y más de 70 participantes. De la 1ª a la 3ª no hay registro público; el comité organizador las documentará.",
+  e:"El año pasado se hizo la 4ª edición, en diciembre, con más de 70 personas.",src:"La Silla Vacía y Confidencial Noticias (2025)"},
+ {k:["ajuste razonable","ajustes razonables","accesibilidad","accesible","interprete","senas"],
+  fig:"Ajustes",t:"Un ajuste razonable es una adaptación necesaria y proporcionada para que una persona con discapacidad participe en igualdad: un intérprete de Lengua de Señas Colombiana, un software lector de pantalla, un horario adaptado. Negarlo sin justificación es discriminación (Ley 1618 de 2013).",
+  e:"Es un cambio pequeño que permite que una persona participe igual que las demás.",src:"Ley 1618 de 2013 y Convención ONU"},
+ {k:["origami","pliegue","doblar","metafora","cambio organizacional","gestion del cambio"],
+  fig:"1·2·3",t:"El origami es la metáfora del Encuentro: un pliegue no quita papel, reorganiza lo que existe. Proponemos tres pasos: Marcar (diagnóstico y línea base), Doblar (ajustar procesos con responsable y fecha) y Sostener (medir y volverlo cultura).",
+  e:"Cambiar una empresa es como doblar papel: marcar, doblar y sostener.",src:"Concepto del portal"}
+];
+const log=$("#log"),sugs=$("#sugs");
+let easyChat=root.dataset.easy==="si",voice=false;
+const SUG=["¿Cuántas personas con discapacidad tienen empleo?","¿Qué exige la Ley 2466 sobre discapacidad?","¿Por qué la diversidad es buen negocio?","¿Cómo digo «discapacitado» de forma respetuosa?","¿Cuál es la brecha de género en el empleo?","¿Qué pasó en el encuentro anterior?"];
+function addMsg(html,who){const d=document.createElement("div");d.className="msg "+who;d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+function renderSugs(){sugs.innerHTML="";SUG.forEach(s=>{const b=document.createElement("button");b.type="button";b.textContent=s;b.onclick=()=>ask(s);sugs.appendChild(b);});}
+function hello(){log.innerHTML="";addMsg(`<span class="fig">Hola</span>Soy Pliego, el agente de datos del 5° Encuentro. Pregúntame por cifras de discapacidad, género, edad, etnia o diversidad sexual en Colombia, o pídeme ayuda con una palabra. Siempre te digo la fuente.`,"bot");renderSugs();}
+function answer(q){
+  const n=norm(q);
+  const lex=LEX.filter(L=>L[0].some(w=>n.includes(norm(w))));
+  if(lex.length){const L=lex[0];
+    return {fig:"Mejor dicho",t:`En lugar de «${L[0].find(w=>n.includes(norm(w)))}», te propongo: «${L[1]}». ${L[2]}`,e:`Mejor di: «${L[1]}».`,src:"Guías de lenguaje incluyente (ONU, Ley 1618 de 2013, Ley 1251 de 2008)"};}
+  let best=null,score=0;
+  KB.forEach(K=>{const s=K.k.reduce((a,w)=>a+(n.includes(w)?(w.length>5?2:1):0),0);if(s>score){score=s;best={p:K.p};}});
+  EXTRA.forEach(X=>{const s=X.k.reduce((a,w)=>a+(n.includes(w)?(w.length>5?2:1):0),0);if(s>score){score=s;best={x:X};}});
+  if(best&&best.p!==undefined){const p=P[best.p];return {fig:p.big,t:p.st+" "+p.stats[0],e:p.easy,src:p.src,pl:best.p};}
+  if(best&&best.x)return {fig:best.x.fig,t:best.x.t,e:best.x.e,src:best.x.src,go:best.x.go};
+  return {fig:"Aún no",t:"Todavía no tengo una cifra verificada sobre eso y prefiero no inventarla. Puedo contarte sobre discapacidad y empleo, la Ley 2466, personas mayores, brechas de género, educación inclusiva, diversidad étnica o población LGBTIQ+.",e:"No tengo ese dato todavía. Pregúntame por otro tema.",src:null};
+}
+function ask(q){
+  q=q.trim();if(!q)return;addMsg(esc(q),"me");sugs.innerHTML="";
+  const typing=addMsg(`<span class="typing" aria-label="Pliego está escribiendo"><i></i><i></i><i></i></span>`,"bot");
+  setTimeout(()=>{typing.remove();const a=answer(q);const txt=easyChat?a.e:a.t;
+    const m=addMsg(`<span class="fig">${esc(a.fig)}</span>${esc(txt)}<div class="s">${a.src?`<span class="tag">Fuente: ${esc(a.src)}</span>`:""}${a.pl!==undefined?`<a class="tag" href="#pliegues" data-pl="${a.pl}">Ver el pliegue</a>`:""}${a.go?`<a class="tag" href="${a.go}">Ir</a>`:""}<button class="say" type="button">Escuchar</button></div>`,"bot");
+    m.querySelector(".say").onclick=()=>speak(txt);
+    const pl=m.querySelector("[data-pl]");if(pl)pl.onclick=()=>select(+pl.dataset.pl);
+    if(voice)speak(txt);renderSugs();},reduced()?50:650);
+}
+$("#askForm").addEventListener("submit",e=>{e.preventDefault();const i=$("#askInput");ask(i.value);i.value="";});
+$("#newChat").onclick=hello;
+$("#chatEasy").addEventListener("click",function(){easyChat=this.getAttribute("aria-pressed")!=="true";this.setAttribute("aria-pressed",String(easyChat));});
+$("#chatEasy").setAttribute("aria-pressed",String(easyChat));
+$("#chatVoice").addEventListener("click",function(){voice=this.getAttribute("aria-pressed")!=="true";this.setAttribute("aria-pressed",String(voice));});
+hello();
+
+/* ---------- ESCARAPELA ORIGAMI ---------- */
+const picker=$("#colorPick");
+P.forEach((p,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="radio" name="pl" value="${i}" ${i===3?"checked":""}><span style="--c:${p.c}"><i></i>${esc(p.label)}</span>`;picker.appendChild(l);});
+const sheet=$("#sheet"),flaps=$$(".flap"),stepEls=$$("#steps li"),msg=$("#studioMsg");
+function setColor(){const i=+(document.querySelector('input[name="pl"]:checked')||{value:3}).value;sheet.style.setProperty("--pc",P[i].c);}
+picker.addEventListener("change",setColor);setColor();
+function step(n){stepEls.forEach((s,i)=>s.classList.toggle("on",i===n));}
+step(0);
+let photo=null;
+$("#fPhoto").addEventListener("change",e=>{const f=e.target.files[0];if(!f){photo=null;return;}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>photo=im;im.src=r.result;};r.readAsDataURL(f);});
+const wait=ms=>new Promise(r=>setTimeout(r,reduced()?0:ms));
+function resetSheet(){flaps.forEach(f=>f.classList.remove("down"));sheet.classList.remove("turn");$("#badgeOut").hidden=true;$("#foldStage").hidden=false;step(0);msg.textContent="Tu hoja está lista. Completa el formulario y la doblaremos juntos.";}
+$("#againBtn").onclick=()=>{resetSheet();$("#fName").focus();};
+$("#regForm").addEventListener("submit",async e=>{
+  e.preventDefault();const err=$("#regErr");
+  const name=$("#fName").value.trim(),org=$("#fOrg").value.trim(),mail=$("#fMail").value.trim(),doc=$("#fDoc").value.replace(/[^0-9A-Za-z]/g,"");
+  const grp=document.querySelector('input[name="grp"]:checked'),ajq=document.querySelector('input[name="ajq"]:checked');
+  const miss=[];if(!name)miss.push("tus nombres y apellidos");if(doc.length<5)miss.push("tu documento de identidad");if(!org)miss.push("tu institución u organización");if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail))miss.push("un correo válido");
+  if(!grp)miss.push("la pregunta 5 (puedes elegir «Prefiero no responder»)");if(!ajq)miss.push("la pregunta 6 sobre ajustes razonables");if(!$("#fConsent").checked)miss.push("la autorización de datos");
+  if(miss.length){err.hidden=false;err.textContent="Para doblar tu escarapela falta: "+miss.join(", ")+".";return;}
+  err.hidden=true;resetSheet();
+  const aj=ajq.value==="si"?$$('input[name="aj"]:checked').map(x=>x.value).concat($("#fAjOther").value.trim()?[$("#fAjOther").value.trim()]:[]):[];
+  const d={name,org,code:regCode(doc,mail),pledge:$("#fPledge").value.trim(),pl:+(document.querySelector('input[name="pl"]:checked')||{value:3}).value,aj,
+    /* registro para el backend (no se pinta en la escarapela) */
+    record:{nombres:name,documento:doc,organizacion:org,correo:mail,grupo:grp.value==="Otras"?("Otras: "+$("#fGrpOther").value.trim()):grp.value,requiereAjuste:ajq.value,ajustes:aj,consentimiento:true,fecha:new Date().toISOString()}};
+  d.record.codigo=d.code;
+  $("#seal").textContent=initials(name);
+  document.querySelector(".studio").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"});
+  step(1);msg.textContent="Marcar: reconocemos quién eres y lo que traes.";await wait(700);
+  flaps[0].classList.add("down");await wait(600);flaps[2].classList.add("down");await wait(700);
+  step(2);msg.textContent="Doblar: ajustamos la forma para que quepas tal como eres.";
+  flaps[1].classList.add("down");await wait(600);flaps[3].classList.add("down");await wait(900);
+  step(3);msg.textContent="Sostener: cada pliegue sostiene al siguiente.";sheet.classList.add("turn");await wait(1300);
+  const url=renderBadge(d);$("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${name}, ${org}`;
+  $("#dlBtn").href=url;
+  const share=`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque.${d.pledge?" Mi compromiso: "+d.pledge:""} #DoblarNoEsRomper`;
+  $("#waBtn").href="https://wa.me/?text="+encodeURIComponent(share+" "+location.href.split("#")[0]);
+  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;
+  msg.textContent=`¡Listo, ${name.split(" ")[0]}! Tu escarapela está doblada. Tu código de registro es ${d.code}.${d.aj.length?" Registramos tus ajustes: "+d.aj.join(", ")+".":""}`;
+  if(window.REG_ENDPOINT){fetch(window.REG_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d.record)}).catch(()=>{});}
+  addNote(d.pledge||"Me sumo a doblar la organización para la inclusión.",org,P[d.pl].c,false);
+});
+$("#groupPick").addEventListener("change",()=>{$("#grpOtherWrap").hidden=!$("#grpOther").checked;});
+$$('input[name="ajq"]').forEach(r=>r.addEventListener("change",()=>{$("#ajWrap").hidden=!(document.querySelector('input[name="ajq"]:checked')||{}).value||document.querySelector('input[name="ajq"]:checked').value!=="si";}));
+function regCode(doc,mail){let h=2166136261>>>0;const s=doc+"|"+mail.toLowerCase();for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let o="";for(let i=0;i<6;i++){o+=A[h%32];h=Math.floor(h/32)^(i*2654435761>>>0);h>>>=0;}return "5E-"+o;}
+function drawQR(x,text,X,Y,S){
+  try{if(typeof qrcode!=="function")return false;const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),cell=S/(n+4);
+    x.fillStyle="#fff";x.fillRect(X,Y,S,S);x.fillStyle="#0C1646";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))x.fillRect(X+(c+2)*cell,Y+(r+2)*cell,Math.ceil(cell),Math.ceil(cell));return true;}catch(e){return false;}
+}
+function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join("")||"5°";}
+function wrapText(ctx,text,maxW){const words=text.split(/\s+/),lines=[];let line="";words.forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);return lines;}
+function renderBadge(d){
+  const W=1080,H=1750,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  paint(x,W,H,buildMesh(W,H,120,d.name.length*31+7),{x:.8,y:.15},false);
+  const p=P[d.pl];
+  // tarjeta de papel con esquina doblada
+  const m=70,top=430,fold=110;
+  x.fillStyle="#F7F4EE";x.beginPath();x.moveTo(m,top);x.lineTo(W-m-fold,top);x.lineTo(W-m,top+fold);x.lineTo(W-m,H-m);x.lineTo(m,H-m);x.closePath();x.fill();
+  x.fillStyle="rgba(12,22,70,.18)";x.beginPath();x.moveTo(W-m-fold,top);x.lineTo(W-m-fold,top+fold);x.lineTo(W-m,top+fold);x.closePath();x.fill();
+  x.fillStyle=p.c;x.fillRect(m,top,W-2*m-fold,18);
+  // encabezado
+  x.fillStyle="#FFC20E";x.font="900 190px Urbanist, sans-serif";x.textBaseline="alphabetic";x.fillText("5°",m,250);
+  x.fillStyle="#0C1646";x.font="800 46px Urbanist, sans-serif";x.fillText("ENCUENTRO",m+240,150);
+  x.font="800 56px Urbanist, sans-serif";x.fillText("Diversidades",m+240,208);x.fillText("e Inclusión",m+240,266);
+  x.fillStyle="#fff";x.font="700 34px Urbanist, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,350,W-2*m);
+  // foto o iniciales
+  const cxp=W/2,cyp=top+230,rad=150;
+  x.save();x.beginPath();x.moveTo(cxp,cyp-rad);x.lineTo(cxp+rad,cyp);x.lineTo(cxp,cyp+rad);x.lineTo(cxp-rad,cyp);x.closePath();x.clip();
+  if(photo){const s=Math.max(2*rad/photo.width,2*rad/photo.height);const pw=photo.width*s,ph=photo.height*s;x.drawImage(photo,cxp-pw/2,cyp-ph/2,pw,ph);}
+  else{x.fillStyle=p.c;x.fillRect(cxp-rad,cyp-rad,2*rad,2*rad);x.fillStyle="rgba(255,255,255,.25)";x.beginPath();x.moveTo(cxp-rad,cyp);x.lineTo(cxp,cyp-rad);x.lineTo(cxp,cyp+rad);x.closePath();x.fill();
+    x.fillStyle="#0C1646";x.font="900 120px Urbanist, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(initials(d.name),cxp,cyp+6);}
+  x.restore();x.textAlign="center";x.textBaseline="alphabetic";
+  // nombre
+  x.fillStyle="#0C1646";let fs=86;x.font=`900 ${fs}px Urbanist, sans-serif`;while(x.measureText(d.name).width>W-2*m-80&&fs>48){fs-=4;x.font=`900 ${fs}px Urbanist, sans-serif`;}
+  let y=top+480+fs*.3;x.fillText(d.name,W/2,y);
+  if(d.pron){y+=50;x.font="700 34px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
+  y+=64;x.fillStyle="#0C1646";x.font="700 44px 'Atkinson Hyperlegible', sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
+  if(d.role){y+=52;x.font="400 36px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#4B537F";x.fillText(d.role,W/2,y,W-2*m-60);}
+  // pliegue elegido
+  y+=80;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="800 30px Urbanist, sans-serif";const lw=x.measureText(label).width+60;
+  x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);
+  if(d.pledge){y+=80;x.font="italic 400 36px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
+  // código y QR de ingreso
+  const qy=H-m-150-250,qs=220;
+  const hasQR=drawQR(x,"5EDI2026|"+d.code+"|"+d.name,W-m-60-qs,qy,qs);
+  x.textAlign=hasQR?"left":"center";const cx0=hasQR?m+60:W/2;
+  x.fillStyle="#4B537F";x.font="800 28px Urbanist, sans-serif";x.fillText("CÓDIGO DE REGISTRO",cx0,qy+70);
+  x.fillStyle="#0C1646";x.font="900 92px Urbanist, sans-serif";x.fillText(d.code,cx0,qy+165);
+  x.fillStyle="#4B537F";x.font="400 26px 'Atkinson Hyperlegible', sans-serif";x.fillText("Preséntalo en el registro el 11 de noviembre",cx0,qy+208);
+  // pie
+  x.fillStyle="#0C1646";x.fillRect(m,H-m-150,W-2*m,150);
+  x.textAlign="left";x.fillStyle="#FFC20E";x.font="800 40px Urbanist, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,H-m-86);
+  x.fillStyle="#fff";x.font="400 30px 'Atkinson Hyperlegible', sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,H-m-38);
+  x.textAlign="right";x.fillStyle="#C9CDEA";x.font="700 24px 'Atkinson Hyperlegible', sans-serif";x.fillText("By Startin.org.co",W-m-30,H-m-38);
+  x.fillStyle="#F26A21";x.font="900 36px Urbanist, sans-serif";x.fillText("ASISTENTE",W-m-30,H-m-86);
+  return c.toDataURL("image/png");
+}
+
+/* ---------- MURO ---------- */
+const wall=$("#wall");
+function addNote(t,who,c,ex){const n=document.createElement("article");n.className="note-card";n.style.setProperty("--c",c);n.innerHTML=`<p>${esc(t)}</p><small>${esc(who)}${ex?'<span class="ex">Ejemplo</span>':""}</small>`;wall.prepend(n);}
+[["Publicaremos todas nuestras vacantes en formatos accesibles y con lectura fácil.","Organización de ejemplo",P[3].c],["Mediremos la brecha salarial de género y la cerraremos con metas anuales.","Organización de ejemplo",P[1].c],["Crearemos un programa de mentoría intergeneracional.","Organización de ejemplo",P[0].c]].forEach(e=>addNote(e[0],e[1],e[2],true));
+$("#wallForm").addEventListener("submit",e=>{e.preventDefault();const v=$("#wallIn").value.trim();if(!v)return;addNote(v,"Tu organización",P[cur].c,false);$("#wallIn").value="";});
+})();
+</script>
+
+</body>
+</html>
