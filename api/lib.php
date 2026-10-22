@@ -93,6 +93,11 @@ function admin_logged(): bool {
   if (session_status() !== PHP_SESSION_ACTIVE) { session_name(cfg()['session_name']); session_start(); }
   return !empty($_SESSION['admin']);
 }
+/** Personal de la mesa de entrada (clave corta) o administración. */
+function puerta_logged(): bool {
+  if (session_status() !== PHP_SESSION_ACTIVE) { session_name(cfg()['session_name']); session_start(); }
+  return !empty($_SESSION['admin']) || !empty($_SESSION['puerta']);
+}
 
 /** Envía un correo HTML con adjunto opcional (PNG en base64). */
 function send_mail(string $to, string $subject, string $html, ?string $pngB64 = null, string $pngName = 'escarapela.png'): bool {
