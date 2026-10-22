@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22e'; ?><!doctype html>
+<?php $v = '2026.10.22g'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -22,6 +22,7 @@
   <a class="brand" href="#inicio" data-go="inicio" aria-label="5° Encuentro Diversidades e Inclusión, inicio"><span class="n">5°</span><span>Encuentro<br>Diversidades e Inclusión</span></a>
   <nav class="tabs" aria-label="Secciones del portal" role="tablist">
     <a role="tab" href="#inicio" data-go="inicio"><i aria-hidden="true">◇</i>Inicio</a>
+    <a role="tab" href="#pliegue" data-go="pliegue"><i aria-hidden="true">▱</i>El pliegue</a>
     <a role="tab" href="#cifras" data-go="cifras"><i aria-hidden="true">◈</i>Cifras</a>
     <a role="tab" href="#pliego" data-go="pliego"><i aria-hidden="true">◆</i>Pliego</a>
     <a role="tab" href="#inscripcion" data-go="inscripcion" class="cta"><i aria-hidden="true">✦</i>Inscríbete</a>
@@ -57,13 +58,36 @@
         <div><b>Universidad El Bosque · HUB iEX</b><span>Cra. 7b Bis No. 132-28, Bogotá</span></div>
         <div class="countdown" role="status"><b id="cdDays">—</b><span id="cdLabel">días</span></div>
       </div>
-      <div class="ctas"><a class="btn btn-primary" href="#inscripcion" data-go="inscripcion">Inscríbete y dobla tu escarapela</a><a class="btn btn-ghost" href="#pliego" data-go="pliego">Pregúntale a Pliego</a></div>
+      <div class="ctas"><a class="btn btn-primary" href="#inscripcion" data-go="inscripcion">Inscríbete y dobla tu escarapela</a><a class="btn btn-ghost" href="#pliegue" data-go="pliegue">¿Por qué pliegues?</a></div>
     </div>
     <div class="row-wrap">
       <p class="row-hint std-only">Toca una persona: cada una guarda una cifra del país.</p>
       <p class="row-hint easy-only">Toca una persona para ver su dato.</p>
       <div class="row" id="row" role="list"></div>
       <div class="floor" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== EL PLIEGUE (manifiesto) ===== -->
+<section class="scene scroll" id="s-pliegue" data-scene="pliegue" aria-labelledby="hFold" hidden>
+  <div class="manif">
+    <div class="manif-head">
+      <span class="eyebrow">La metáfora del Encuentro</span>
+      <h2 id="hFold">Doblar <b>no es romper</b></h2>
+      <p class="lede std-only">Un pliegue no le quita papel a la hoja: reorganiza lo que ya está ahí para que sostenga una forma nueva. Así funciona el cambio organizacional para la inclusión y la equidad. Nadie sobra; la estructura se ajusta para que todas las personas quepan.</p>
+      <p class="lede easy-only">Doblar un papel no lo daña. Solo cambia su forma. Una empresa también puede cambiar para que todas las personas tengan un lugar.</p>
+      <svg class="crane big" viewBox="0 0 120 120" aria-hidden="true"><polygon points="60,18 100,62 60,52" fill="#EE7DB9"/><polygon points="60,18 60,52 20,62" fill="#6A47B8"/><polygon points="20,62 60,52 60,100" fill="#13A79A"/><polygon points="100,62 60,52 60,100" fill="#FFC20E"/><polygon points="60,100 74,86 92,104" fill="#F26A21"/></svg>
+    </div>
+    <div class="folds">
+      <article class="fold-card"><div class="k">1</div><h3>Marcar</h3><p class="std-only">Reconocer dónde está la organización hoy: datos de su gente, barreras, sesgos y obligaciones legales. Sin línea base no hay pliegue.</p><p class="easy-only">Primero miramos cómo está la empresa hoy.</p><small>Herramientas: diagnóstico de talento, cuota de la Ley 2466, mapa de ajustes razonables.</small></article>
+      <article class="fold-card"><div class="k">2</div><h3>Doblar</h3><p class="std-only">Ajustar procesos: selección accesible, ajustes razonables, corresponsabilidad en el cuidado y liderazgo diverso. Cada doblez tiene responsable y fecha.</p><p class="easy-only">Después cambiamos lo que hace falta, con una persona responsable y una fecha.</p><small>Herramientas: vacantes accesibles, protocolos contra la discriminación, licencias equivalentes.</small></article>
+      <article class="fold-card"><div class="k">3</div><h3>Sostener</h3><p class="std-only">Volver cultura lo que se ajustó: medir, comunicar y celebrar. Una figura de papel se mantiene porque cada pliegue sostiene al siguiente.</p><p class="easy-only">Al final medimos y contamos lo que cambió, para que dure.</p><small>Herramientas: indicadores, muro de compromisos, comunidad del Encuentro.</small></article>
+    </div>
+    <div class="manif-foot">
+      <p><b>Por eso nueve figuras de papel abren el portal:</b> cada una es una persona real del país con una cifra que exige un pliegue distinto. Tócalas en el Inicio, pregúntale a Pliego, y el 11 de noviembre dobla tu compromiso con tu organización.</p>
+      <div class="ctas"><a class="btn btn-primary" href="#cifras" data-go="cifras">Ver las cifras</a><a class="btn btn-ghost" href="#inscripcion" data-go="inscripcion">Dobla tu escarapela</a></div>
     </div>
   </div>
 </section>
@@ -148,7 +172,8 @@
         <div class="field"><label for="fPron">¿Cómo quieres que te nombremos?</label><input id="fPron" placeholder="Ej.: ella · él · elle" maxlength="40"></div>
         <fieldset><legend>Tu pliegue: ¿con qué dimensión te comprometes?</legend><div class="colors" id="colorPick" role="radiogroup" aria-label="Pliegue"></div></fieldset>
         <div class="field"><label for="fPledge">Mi compromiso para 2027</label><textarea id="fPledge" maxlength="140" placeholder="Ej.: Publicaremos todas nuestras vacantes en formatos accesibles."></textarea></div>
-        <div class="field"><label for="fPhoto">Tu foto</label><input id="fPhoto" type="file" accept="image/*"><span class="hint">Solo se usa para dibujar tu escarapela en tu dispositivo; no la subimos.</span></div>
+        <div class="field"><label for="fPhoto">Tu foto</label><input id="fPhoto" type="file" accept="image/*"><span class="hint">Solo se usa para dibujar tu escarapela en tu dispositivo; no la subimos.</span>
+          <div class="crop" id="cropBox" hidden><canvas id="cropCv" width="240" height="240" aria-label="Encuadre de tu foto: arrastra para mover"></canvas><div class="crop-tools"><label for="cropZoom">Acercar</label><input type="range" id="cropZoom" min="1" max="3" step="0.02" value="1"><button type="button" class="mini" id="cropReset">Centrar</button><span class="hint">Arrastra la foto para encuadrar tu rostro.</span></div></div></div>
       </details>
       <label class="consent"><input type="checkbox" id="fConsent"><span>Autorizo el tratamiento de mis datos para gestionar mi inscripción y los ajustes razonables, según la <a href="https://startin.org.co/privacidad/" target="_blank" rel="noopener">política de tratamiento de datos</a> (Ley 1581 de 2012).</span></label>
       <p class="err" id="regErr" role="alert" hidden></p>
@@ -220,6 +245,7 @@
 
 <nav class="dock" aria-label="Secciones (móvil)">
   <a href="#inicio" data-go="inicio"><i aria-hidden="true">◇</i>Inicio</a>
+  <a href="#pliegue" data-go="pliegue"><i aria-hidden="true">▱</i>Pliegue</a>
   <a href="#cifras" data-go="cifras"><i aria-hidden="true">◈</i>Cifras</a>
   <a href="#pliego" data-go="pliego"><i aria-hidden="true">◆</i>Pliego</a>
   <a href="#inscripcion" data-go="inscripcion" class="cta"><i aria-hidden="true">✦</i>Inscríbete</a>

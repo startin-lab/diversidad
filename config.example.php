@@ -14,6 +14,7 @@ return [
   'enc_key_hex' => '__ENC_KEY__',
   // Panel privado
   'admin_pass_hash' => '__ADMIN_HASH__',
+  'puerta_pass_hash' => '__PUERTA_HASH__',
   'session_name' => 'dvs_admin',
   // Correo
   'mail_from' => 'no-reply@diversidad.startinlab.org',

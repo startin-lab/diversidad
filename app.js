@@ -75,7 +75,7 @@ const P=[
 ];
 
 /* ================= NAVEGACIÓN POR ESCENAS ================= */
-const SCENES=["inicio","cifras","pliego","inscripcion","evento"];
+const SCENES=["inicio","pliegue","cifras","pliego","inscripcion","evento"];
 let current="";
 function go(name,push=true){
   if(!SCENES.includes(name))name="inicio";
@@ -195,7 +195,17 @@ const sheet=$("#sheet"),flaps=$$(".flap"),stepEls=$$("#steps li"),msg=$("#studio
 const pickIdx=()=>+(document.querySelector('input[name="pl"]:checked')||{value:3}).value;
 function setColor(){sheet.style.setProperty("--pc",P[pickIdx()].c);}picker.addEventListener("change",setColor);setColor();
 function step(n){stepEls.forEach((s,i)=>s.classList.toggle("on",i===n));}step(0);
-let photo=null;$("#fPhoto").addEventListener("change",e=>{const f=e.target.files[0];if(!f){photo=null;return;}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>photo=im;im.src=r.result;};r.readAsDataURL(f);});
+let photo=null,crop={zoom:1,ox:0,oy:0};
+const cropBox=$("#cropBox"),cropCv=$("#cropCv"),cropZoom=$("#cropZoom");
+function drawCrop(){if(!photo)return;const R=cropCv.width/2,x=cropCv.getContext("2d");x.clearRect(0,0,cropCv.width,cropCv.height);x.save();x.beginPath();x.arc(R,R,R-2,0,Math.PI*2);x.clip();drawPhotoIn(x,R,R,R-2);x.restore();x.strokeStyle="#FFC20E";x.lineWidth=3;x.beginPath();x.arc(R,R,R-2,0,Math.PI*2);x.stroke();}
+function drawPhotoIn(x,cx,cy,R){const s0=Math.max(2*R/photo.width,2*R/photo.height)*crop.zoom;const w=photo.width*s0,h=photo.height*s0;const maxX=Math.max(0,(w-2*R)/2)/R,maxY=Math.max(0,(h-2*R)/2)/R;crop.ox=Math.max(-maxX,Math.min(maxX,crop.ox));crop.oy=Math.max(-maxY,Math.min(maxY,crop.oy));x.drawImage(photo,cx-w/2+crop.ox*R,cy-h/2+crop.oy*R,w,h);}
+$("#fPhoto").addEventListener("change",e=>{const f=e.target.files[0];if(!f){photo=null;cropBox.hidden=true;return;}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{photo=im;crop={zoom:1,ox:0,oy:0};cropZoom.value=1;cropBox.hidden=false;drawCrop();};im.src=r.result;};r.readAsDataURL(f);});
+cropZoom.addEventListener("input",()=>{crop.zoom=+cropZoom.value;drawCrop();});
+(function(){let drag=null;const R=()=>cropCv.width/2;
+  cropCv.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,ox:crop.ox,oy:crop.oy};cropCv.setPointerCapture(e.pointerId);});
+  cropCv.addEventListener("pointermove",e=>{if(!drag)return;const k=cropCv.width/cropCv.getBoundingClientRect().width;crop.ox=drag.ox+(e.clientX-drag.x)*k/R();crop.oy=drag.oy+(e.clientY-drag.y)*k/R();drawCrop();});
+  cropCv.addEventListener("pointerup",()=>drag=null);cropCv.addEventListener("pointercancel",()=>drag=null);
+  $("#cropReset").onclick=()=>{crop={zoom:1,ox:0,oy:0};cropZoom.value=1;drawCrop();};})();
 // pregunta 5: exclusivas
 $("#groupPick").addEventListener("change",e=>{const t=e.target;if(!t.matches('input[name="grp"]'))return;const excl=t.closest("label").classList.contains("excl");
   if(t.checked){$$('input[name="grp"]').forEach(o=>{if(o===t)return;const oe=o.closest("label").classList.contains("excl");if(excl||oe)o.checked=false;});}
@@ -237,26 +247,37 @@ $("#regForm").addEventListener("submit",async e=>{
 function wrapText(ctx,text,maxW){const words=text.split(/\s+/),lines=[];let line="";words.forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);return lines;}
 function drawQR(x,text,X,Y,S){try{if(typeof qrcode!=="function")return false;const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),cell=S/(n+4);x.fillStyle="#fff";x.fillRect(X,Y,S,S);x.fillStyle="#0C1646";for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))x.fillRect(X+(c+2)*cell,Y+(r+2)*cell,Math.ceil(cell),Math.ceil(cell));return true;}catch(e){return false;}}
 function renderBadge(d){
-  const W=1080,H=1750,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const W=1080,H=1860,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   paint(x,W,H,buildMesh(W,H,120,d.name.length*31+7),{x:.8,y:.15},false);
-  const p=P[d.pl],m=70,top=430,fold=110;
+  const p=P[d.pl],m=70,top=520,fold=110;
+  // ojal para el cordón (transparente de verdad)
+  const sw=190,sh=46,sx=W/2-sw/2,sy=44;
+  x.save();x.globalCompositeOperation="destination-out";x.beginPath();x.roundRect?x.roundRect(sx,sy,sw,sh,23):x.rect(sx,sy,sw,sh);x.fill();x.restore();
+  x.strokeStyle="rgba(255,255,255,.85)";x.lineWidth=5;x.beginPath();x.roundRect?x.roundRect(sx,sy,sw,sh,23):x.rect(sx,sy,sw,sh);x.stroke();
+  x.strokeStyle="rgba(12,22,70,.35)";x.lineWidth=2;x.beginPath();x.roundRect?x.roundRect(sx+6,sy+6,sw-12,sh-12,18):x.rect(sx+6,sy+6,sw-12,sh-12);x.stroke();
+  // encabezado
+  x.fillStyle="#FFC20E";x.font="900 190px Urbanist, sans-serif";x.textBaseline="alphabetic";x.fillText("5°",m,330);
+  x.fillStyle="#0C1646";x.font="800 46px Urbanist, sans-serif";x.fillText("ENCUENTRO",m+240,230);x.font="800 56px Urbanist, sans-serif";x.fillText("Diversidades",m+240,288);x.fillText("e Inclusión",m+240,346);
+  x.fillStyle="#fff";x.font="700 34px Urbanist, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,430,W-2*m);
+  // tarjeta de papel con esquina doblada
   x.fillStyle="#F7F4EE";x.beginPath();x.moveTo(m,top);x.lineTo(W-m-fold,top);x.lineTo(W-m,top+fold);x.lineTo(W-m,H-m);x.lineTo(m,H-m);x.closePath();x.fill();
   x.fillStyle="rgba(12,22,70,.18)";x.beginPath();x.moveTo(W-m-fold,top);x.lineTo(W-m-fold,top+fold);x.lineTo(W-m,top+fold);x.closePath();x.fill();
   x.fillStyle=p.c;x.fillRect(m,top,W-2*m-fold,18);
-  x.fillStyle="#FFC20E";x.font="900 190px Urbanist, sans-serif";x.textBaseline="alphabetic";x.fillText("5°",m,250);
-  x.fillStyle="#0C1646";x.font="800 46px Urbanist, sans-serif";x.fillText("ENCUENTRO",m+240,150);x.font="800 56px Urbanist, sans-serif";x.fillText("Diversidades",m+240,208);x.fillText("e Inclusión",m+240,266);
-  x.fillStyle="#fff";x.font="700 34px Urbanist, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,350,W-2*m);
-  const cxp=W/2,cyp=top+230,rad=150;x.save();x.beginPath();x.moveTo(cxp,cyp-rad);x.lineTo(cxp+rad,cyp);x.lineTo(cxp,cyp+rad);x.lineTo(cxp-rad,cyp);x.closePath();x.clip();
-  if(photo){const s=Math.max(2*rad/photo.width,2*rad/photo.height);const pw=photo.width*s,ph=photo.height*s;x.drawImage(photo,cxp-pw/2,cyp-ph/2,pw,ph);}
-  else{x.fillStyle=p.c;x.fillRect(cxp-rad,cyp-rad,2*rad,2*rad);x.fillStyle="rgba(255,255,255,.25)";x.beginPath();x.moveTo(cxp-rad,cyp);x.lineTo(cxp,cyp-rad);x.lineTo(cxp,cyp+rad);x.closePath();x.fill();x.fillStyle="#0C1646";x.font="900 120px Urbanist, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(initials(d.name),cxp,cyp+6);}
+  // foto circular con anillo
+  const cxp=W/2,cyp=top+250,rad=175;
+  x.fillStyle=p.c;x.beginPath();x.arc(cxp,cyp,rad+14,0,Math.PI*2);x.fill();
+  x.fillStyle="#fff";x.beginPath();x.arc(cxp,cyp,rad+6,0,Math.PI*2);x.fill();
+  x.save();x.beginPath();x.arc(cxp,cyp,rad,0,Math.PI*2);x.clip();
+  if(photo){drawPhotoIn(x,cxp,cyp,rad);}
+  else{x.fillStyle=p.c;x.fillRect(cxp-rad,cyp-rad,2*rad,2*rad);x.fillStyle="rgba(255,255,255,.22)";x.beginPath();x.moveTo(cxp-rad,cyp+rad);x.lineTo(cxp+rad,cyp-rad);x.lineTo(cxp+rad,cyp+rad);x.closePath();x.fill();x.fillStyle="#0C1646";x.font="900 130px Urbanist, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(initials(d.name),cxp,cyp+8);}
   x.restore();x.textAlign="center";x.textBaseline="alphabetic";
   x.fillStyle="#0C1646";let fs=86;x.font=`900 ${fs}px Urbanist, sans-serif`;while(x.measureText(d.name).width>W-2*m-80&&fs>44){fs-=4;x.font=`900 ${fs}px Urbanist, sans-serif`;}
-  let y=top+480+fs*.3;x.fillText(d.name,W/2,y);
-  if(d.pron){y+=50;x.font="700 34px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
-  y+=64;x.fillStyle="#0C1646";x.font="700 44px 'Atkinson Hyperlegible', sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
-  y+=80;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="800 30px Urbanist, sans-serif";const lw=x.measureText(label).width+60;
+  let y=cyp+rad+110;x.fillText(d.name,W/2,y);
+  if(d.pron){y+=48;x.font="700 32px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
+  y+=62;x.fillStyle="#0C1646";x.font="700 44px 'Atkinson Hyperlegible', sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
+  y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="800 30px Urbanist, sans-serif";const lw=x.measureText(label).width+60;
   x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);
-  if(d.pledge){y+=80;x.font="italic 400 36px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
+  if(d.pledge){y+=78;x.font="italic 400 36px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
   const qy=H-m-150-250,qs=220;const hasQR=drawQR(x,location.origin+"/v/"+d.code,W-m-60-qs,qy,qs);
   x.textAlign=hasQR?"left":"center";const cx0=hasQR?m+60:W/2;
   x.fillStyle="#4B537F";x.font="800 28px Urbanist, sans-serif";x.fillText("CÓDIGO DE REGISTRO",cx0,qy+70);

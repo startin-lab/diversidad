@@ -5,14 +5,15 @@
 Portal construido por Fundación Startin. Hospedado en Hostinger (PHP 8 + MySQL). El agente **Pliego** corre sobre Microsoft Foundry (proyecto `diversidad-pliego`, implementación `pliego`).
 
 ## Estructura
-- `index.php`, `app.css`, `app.js`: experiencia por escenas (Inicio · Cifras · Pliego · Inscripción · Evento), sin scroll largo, con panel de accesibilidad (tamaño de texto, alto contraste, lectura fácil, pausar movimiento, voz).
+- `index.php`, `app.css`, `app.js`: experiencia por escenas (Inicio · El pliegue · Cifras · Pliego · Inscripción · Evento), sin scroll largo, con panel de accesibilidad (tamaño de texto, alto contraste, lectura fácil, pausar movimiento, voz).
 - `api/registro.php`: guarda inscripciones (documento y grupos poblacionales cifrados con AES-256-GCM), genera código `5E-XXXXXX`.
 - `api/correo.php`: envía el correo de confirmación con la escarapela adjunta.
 - `api/agente.php`: proxy del agente Pliego hacia Foundry (la clave vive solo en el servidor); límites diarios y por IP.
 - `api/conocimiento.php`: base de conocimiento verificada (cifras con fuente y fecha) que recibe Pliego.
 - `api/muro.php`: muro de compromisos.
 - `admin/index.php`: panel privado (inscripciones, ajustes razonables, agregados de autorreconocimiento, exportar CSV, marcar asistencia).
-- `verificar.php` (`/v/CODIGO`): verificación del QR de la escarapela.
+- `verificar.php` (`/v/CODIGO`): verificación pública del QR de la escarapela.
+- `ingreso/index.php` + `api/ingreso.php`: mesa de entrada del evento (clave corta para el personal): escanea el QR con la cámara, o valida por código o cédula, y marca la asistencia; avisa si la persona ya ingresó y muestra sus ajustes razonables.
 - `assets/fig/`: las nueve figuras de papel (ilustraciones generadas para el evento).
 
 ## Despliegue
