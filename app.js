@@ -9,35 +9,35 @@ const wait=ms=>new Promise(r=>setTimeout(r,reduced()?0:ms));
 
 /* ================= DATOS: nueve pliegues ================= */
 const P=[
- {id:"mayores",img:"mayor",h:1,label:"Personas mayores",c:"#F0A04B",
+ {id:"mayores",img:"mayor",h:.88,label:"Personas mayores",c:"#F0A04B",
   big:"15 %",st:"de la población de Colombia tiene 60 años o más: 7,9 millones de personas en 2024. En 1985 eran el 6 %.",
   easy:"Hoy, 15 de cada 100 personas en Colombia tienen 60 años o más.",
   stats:["En 2036 habrá más personas de 60 años o más que menores de 15 (DANE).","En 2070 serán el 36 % de la población: cerca de 20 millones.","1 de cada 4 personas mayores no tiene ingresos en la vejez.","Cerca de la mitad de los hombres y una cuarta parte de las mujeres de 60+ trabajan o quieren trabajar."],
   bars:[["1985",6],["2024",15],["2070 (proyección)",36]],barMax:40,unit:" %",
   act:"Rutas de talento intergeneracional: mentoría en dos vías, reentrenamiento y retiro flexible. Y lenguaje: «personas mayores», no «abuelitos».",
   src:"Fundación Saldarriaga Concha con datos DANE (feb 2025); DANE vía RTVC (jul 2025)."},
- {id:"genero",img:"gestante",h:.97,label:"Género y cuidado",c:"#E6DDBF",
+ {id:"genero",img:"gestante",h:.91,label:"Género y cuidado",c:"#E6DDBF",
   big:"11,4 %",st:"fue la tasa de desempleo de las mujeres en 2025. La de los hombres fue 7,0 %.",
   easy:"Más mujeres que hombres buscan trabajo y no lo encuentran.",
   stats:["La participación laboral de las mujeres está 24 puntos por debajo de la de los hombres.","Con título universitario, una mujer gana 82 centavos por cada peso de un hombre.","El 35 % de las mujeres que quieren trabajar y no buscan empleo lo atribuye a responsabilidades familiares."],
   bars:[["Desempleo mujeres",11.44],["Desempleo hombres",6.99]],barMax:15,unit:" %",
   act:"Corresponsabilidad real: licencias parentales equivalentes, horarios flexibles y retorno acompañado después de la licencia.",
   src:"Observatorio Laboral de la Universidad del Rosario (LaboUR), vía Valora Analitik (mar 2026)."},
- {id:"ninez",img:"nina",h:.5,label:"Educación inclusiva",c:"#5DBB52",
+ {id:"ninez",img:"nina",h:.46,label:"Educación inclusiva",c:"#5DBB52",
   big:"2 %",st:"de la matrícula escolar corresponde a estudiantes con discapacidad: 200.334 de cerca de 9,8 millones.",
   easy:"Muy pocos estudiantes con discapacidad llegan al colegio.",
   stats:["Asisten al colegio el 72,9 % de niñas, niños y jóvenes con discapacidad, frente al 95,4 % sin discapacidad.","Analfabetismo entre 5 y 16 años: 34,2 % con discapacidad frente a 9,2 % sin discapacidad.","El 5,8 % de la población tiene dificultad para al menos una actividad básica cotidiana (ENCV 2024)."],
   bars:[["Asistencia con discapacidad",72.9],["Asistencia sin discapacidad",95.4]],barMax:100,unit:" %",
   act:"El talento de 2035 se está quedando fuera del aula hoy: alianzas con instituciones educativas y prácticas accesibles.",
   src:"Laboratorio de Economía de la Educación, U. Javeriana (SIMAT 2023, ENCV 2024), vía Portafolio (jun 2026)."},
- {id:"discapacidad",img:"ciego",h:1.03,label:"Discapacidad y trabajo",c:"#E0736B",
+ {id:"discapacidad",img:"ciego",h:1,label:"Discapacidad y trabajo",c:"#E0736B",
   big:"17,9 %",st:"de las personas con discapacidad tiene empleo. Entre las personas sin discapacidad, la cifra es 60,9 %.",
   easy:"Solo 18 de cada 100 personas con discapacidad tienen trabajo.",
   stats:["Solo el 20,2 % participa en el mercado laboral, frente al 66,6 % de quienes no tienen discapacidad.","Su desocupación es 11,4 %, frente a 8,5 %.","El 55,8 % de quienes trabajan lo hace por cuenta propia."],
   bars:[["Ocupación con discapacidad",17.9],["Ocupación sin discapacidad",60.9]],barMax:100,unit:" %",
   act:"Selección accesible: vacantes en formatos legibles, pruebas adaptadas y entrevistas con ajustes razonables.",
   src:"DANE, GEIH jul–sep 2025, vía Radio Nacional de Colombia (dic 2025)."},
- {id:"ley",img:"silla",h:.82,label:"La ley ya cambió",c:"#62C3CA",
+ {id:"ley",img:"silla",h:.79,label:"La ley ya cambió",c:"#62C3CA",
   big:"2 de 100",st:"trabajadores deben ser personas con discapacidad en las empresas privadas (Ley 2466 de 2025). La fiscalización empezó el 1 de julio de 2026.",
   easy:"Por ley, en una empresa de 100 personas, al menos 2 deben ser personas con discapacidad.",
   stats:["Las empresas de más de 500 empleados suman al menos una persona más por cada tramo de 100.","Quien cumple deduce el 200 % de salarios y prestaciones en renta.","50 % menos de cuota de aprendices SENA y puntaje adicional en licitaciones.","Negar un ajuste razonable sin justificación es discriminación (Ley 1618 de 2013)."],
@@ -51,21 +51,21 @@ const P=[
   bars:[["NARP (estimación DANE)",9.34],["Autorreconocidas en CNPV 2018",5.8]],barMax:12,unit:" %",
   act:"Incluye la variable étnica (voluntaria, por autorreconocimiento) en tu caracterización de talento para medir brechas reales.",
   src:"DANE, CNPV 2018 y estimación NARP 2019, vía Portafolio."},
- {id:"indigena",img:"indigena",h:1,label:"Pueblos indígenas y Rrom",c:"#9B6AE0",
+ {id:"indigena",img:"indigena",h:1.04,label:"Pueblos indígenas y Rrom",c:"#E2A93B",
   big:"1,9 M",st:"personas se reconocieron indígenas en el censo de 2018: el 4,4 % de la población. El pueblo Rrom suma 2.649 personas.",
   easy:"Casi 2 millones de personas en Colombia son indígenas.",
   stats:["115 pueblos indígenas y 65 lenguas nativas vivas conviven en Colombia (Ministerio de Cultura).","El pueblo Rrom (gitano) se organiza en nueve kumpanias; 710 personas Rrom están reconocidas como víctimas del conflicto.","Entre las víctimas del conflicto registradas, el 16,3 % pertenece a un grupo étnico."],
   bars:[["Indígena (CNPV 2018)",4.4],["NARP (estimación)",9.34]],barMax:12,unit:" %",
   act:"Enfoque diferencial en selección y bienestar: reconocer lenguas, calendarios y formas propias de organización.",
   src:"DANE, CNPV 2018; Publimetro con datos DANE (nov 2025); Unidad para las Víctimas (2026)."},
- {id:"lgbt",img:"pareja",h:.93,label:"Personas LGBTIQ+",c:"#D9578F",
+ {id:"lgbt",img:"lgbt",h:1.03,label:"Personas LGBTIQ+",c:"#9B63D6",
   big:"496 mil",st:"personas mayores de 18 años se reconocen LGBT en Colombia: el 1,3 % de la población adulta.",
   easy:"Casi medio millón de personas adultas en Colombia se reconocen LGBT.",
   stats:["Su tasa de ocupación es 73,8 %, frente a 62,1 % de la población no LGBT.","Aun así, su desocupación es mayor: 10,3 % frente a 8,4 %.","En 23 ciudades y áreas metropolitanas son 349 mil personas (1,8 %)."],
   bars:[["Desocupación LGBT",10.3],["Desocupación no LGBT",8.4]],barMax:12,unit:" %",
   act:"Protocolos contra la discriminación, nombre identitario en los sistemas internos y beneficios para todas las familias.",
   src:"DANE, GEIH, año móvil jul 2025 – jun 2026 (el DANE usa la sigla LGBT)."},
- {id:"migracion",img:"migrante",h:1.12,label:"Migración y conflicto",c:"#5B8DEF",
+ {id:"migracion",img:"migrante",h:1.09,label:"Migración y conflicto",c:"#5B8DEF",
   big:"2,8 M",st:"personas venezolanas viven en Colombia (corte marzo 2025). Y más de 10 millones de personas están en el Registro Único de Víctimas del conflicto.",
   easy:"Casi 3 millones de personas venezolanas viven en Colombia. Y 2 de cada 10 personas del país son víctimas del conflicto.",
   stats:["El 70,4 % de las personas migrantes venezolanas tiene Permiso por Protección Temporal (PPT).","Cerca del 78 % de las víctimas de desplazamiento forzado (más de 6 millones) no ha superado su situación de vulnerabilidad.","Entre las víctimas registradas, el 20,3 % son personas con discapacidad."],
@@ -154,19 +154,19 @@ window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setT
 const row=$("#row");
 P.forEach((p,i)=>{const b=document.createElement("button");b.className="fig in";b.setAttribute("role","listitem");b.dataset.label=p.label;b.setAttribute("aria-label","Ver la cifra: "+p.label);
   b.style.setProperty("--d",(i*.4)+"s");b.style.setProperty("--h",p.h);b.style.animationDelay=(i*.4)+"s,"+(i*.08)+"s";
-  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=q" alt="" loading="eager" decoding="async">`;
+  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=r" alt="" loading="eager" decoding="async">`;
   b.onclick=()=>{select(i,true);go("cifras");};row.appendChild(b);});
 
 /* ================= CIFRAS ================= */
 const chips=$("#chips");let cur=3;
 P.forEach((p,i)=>{const c=document.createElement("button");c.className="chip";c.setAttribute("role","tab");c.id="tab-"+p.id;c.style.setProperty("--c",p.c);
-  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=q" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
+  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=r" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
   c.addEventListener("keydown",e=>{if(e.key==="ArrowDown"||e.key==="ArrowUp"||e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=(i+((e.key==="ArrowDown"||e.key==="ArrowRight")?1:-1)+P.length)%P.length;select(n,true);chips.children[n].focus();}});
   chips.appendChild(c);});
 function select(i,anim){cur=i;[...chips.children].forEach((c,j)=>{c.setAttribute("aria-selected",String(j===i));c.tabIndex=j===i?0:-1;});renderPanel(anim);}
 function renderPanel(anim){const p=P[cur],pn=$("#panel"),easy=root.dataset.easy==="si";pn.style.setProperty("--c",p.c);pn.setAttribute("aria-labelledby","tab-"+p.id);
   const bars=p.bars?`<div class="bars">${p.bars.map((b,k)=>`<div><div class="bar-l"><span>${esc(b[0])}</span><b>${String(b[1]).replace(".",",")}${p.unit}</b></div><div class="bar-t"><div class="bar-f${k?" alt":""}" data-w="${(b[1]/p.barMax*100).toFixed(1)}"></div></div></div>`).join("")}</div>`:"";
-  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=q" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
+  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=r" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
     <div><ul class="stats">${p.stats.map(s=>`<li>${esc(s)}</li>`).join("")}</ul><div class="action"><b>Qué puede doblar tu organización</b>${esc(p.act)}</div><p class="src">Fuente: ${esc(p.src)}</p>
     <div class="panel-tools"><button class="mini" id="pSay">Escuchar</button><button class="mini" id="pAsk">Preguntarle a Pliego</button><button class="mini" id="pNext">Siguiente pliegue →</button></div></div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>$$(".bar-f").forEach(f=>f.style.width=f.dataset.w+"%")));

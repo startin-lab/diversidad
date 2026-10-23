@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22q'; ?><!doctype html>
+<?php $v = '2026.10.22r'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
