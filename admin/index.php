@@ -33,10 +33,10 @@ if ($logged && isset($_GET['csv'])) {
 function h(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 ?><!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
-<title>Panel · 5° Encuentro</title>
+<link rel="stylesheet" href="https://use.typekit.net/rcv2qny.css"><title>Panel · 5° Encuentro</title>
 <style>
 :root{--ink:#0C1646;--bg:#F4F3FA;--line:#DDE0F0;--sun:#FFC20E;--flame:#F26A21}
-*{box-sizing:border-box}body{margin:0;font:15px/1.5 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 "elza","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
 .wrap{max-width:1240px;margin:0 auto;padding:24px 16px}
 h1{font-size:1.6rem;margin:0 0 4px}h2{font-size:1.15rem;margin:28px 0 10px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
