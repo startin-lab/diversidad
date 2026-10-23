@@ -154,19 +154,19 @@ window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setT
 const row=$("#row");
 P.forEach((p,i)=>{const b=document.createElement("button");b.className="fig in";b.setAttribute("role","listitem");b.dataset.label=p.label;b.setAttribute("aria-label","Ver la cifra: "+p.label);
   b.style.setProperty("--d",(i*.4)+"s");b.style.setProperty("--h",p.h);b.style.animationDelay=(i*.4)+"s,"+(i*.08)+"s";
-  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=k" alt="" loading="eager" decoding="async">`;
+  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=m" alt="" loading="eager" decoding="async">`;
   b.onclick=()=>{select(i,true);go("cifras");};row.appendChild(b);});
 
 /* ================= CIFRAS ================= */
 const chips=$("#chips");let cur=3;
 P.forEach((p,i)=>{const c=document.createElement("button");c.className="chip";c.setAttribute("role","tab");c.id="tab-"+p.id;c.style.setProperty("--c",p.c);
-  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=k" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
+  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=m" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
   c.addEventListener("keydown",e=>{if(e.key==="ArrowDown"||e.key==="ArrowUp"||e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=(i+((e.key==="ArrowDown"||e.key==="ArrowRight")?1:-1)+P.length)%P.length;select(n,true);chips.children[n].focus();}});
   chips.appendChild(c);});
 function select(i,anim){cur=i;[...chips.children].forEach((c,j)=>{c.setAttribute("aria-selected",String(j===i));c.tabIndex=j===i?0:-1;});renderPanel(anim);}
 function renderPanel(anim){const p=P[cur],pn=$("#panel"),easy=root.dataset.easy==="si";pn.style.setProperty("--c",p.c);pn.setAttribute("aria-labelledby","tab-"+p.id);
   const bars=p.bars?`<div class="bars">${p.bars.map((b,k)=>`<div><div class="bar-l"><span>${esc(b[0])}</span><b>${String(b[1]).replace(".",",")}${p.unit}</b></div><div class="bar-t"><div class="bar-f${k?" alt":""}" data-w="${(b[1]/p.barMax*100).toFixed(1)}"></div></div></div>`).join("")}</div>`:"";
-  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=k" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
+  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=m" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
     <div><ul class="stats">${p.stats.map(s=>`<li>${esc(s)}</li>`).join("")}</ul><div class="action"><b>Qué puede doblar tu organización</b>${esc(p.act)}</div><p class="src">Fuente: ${esc(p.src)}</p>
     <div class="panel-tools"><button class="mini" id="pSay">Escuchar</button><button class="mini" id="pAsk">Preguntarle a Pliego</button><button class="mini" id="pNext">Siguiente pliegue →</button></div></div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>$$(".bar-f").forEach(f=>f.style.width=f.dataset.w+"%")));
