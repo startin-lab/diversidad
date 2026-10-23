@@ -15,6 +15,7 @@ Portal construido por Fundación Startin. Hospedado en Hostinger (PHP 8 + MySQL)
 - `verificar.php` (`/v/CODIGO`): verificación pública del QR de la escarapela.
 - `ingreso/index.php` + `api/ingreso.php`: mesa de entrada del evento (clave corta para el personal): escanea el QR con la cámara, o valida por código o cédula, y marca la asistencia; avisa si la persona ya ingresó y muestra sus ajustes razonables.
 - `assets/fig/`: las nueve figuras de papel (ilustraciones generadas para el evento).
+- Tipografía: **Elza** (la de la pieza gráfica), servida por Adobe Fonts, kit `rcv2qny` (dominios diversidad.startinlab.org y localhost). También en la escarapela (canvas). El modo lectura fácil cambia a Atkinson Hyperlegible.
 
 ## Despliegue
 1. Copiar `config.example.php` a `config.php` y completar credenciales (BD, clave de cifrado, hash de contraseña del panel, endpoint/clave de Foundry).

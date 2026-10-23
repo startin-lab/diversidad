@@ -238,6 +238,7 @@ $("#regForm").addEventListener("submit",async e=>{
   flaps[0].classList.add("down");await wait(600);flaps[2].classList.add("down");await wait(700);
   step(2);msg.textContent="Doblar: ajustamos la forma para que quepas tal como eres.";flaps[1].classList.add("down");await wait(600);flaps[3].classList.add("down");await wait(900);
   step(3);msg.textContent="Sostener: cada pliegue sostiene al siguiente.";sheet.classList.add("turn");await wait(1300);
+  try{await Promise.race([Promise.all(["900 80px elza","700 40px elza","500 30px elza","400 30px elza","italic 400 30px elza"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
   const url=renderBadge({name,org,pron:d.pronombre,pledge:d.compromiso,pl:pickIdx(),code});
   $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${name}, ${org}, código ${code}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${code}.png`;
   const share=`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque.${d.compromiso?" Mi compromiso: "+d.compromiso:""} #DoblarNoEsRomper ${location.origin}`;
@@ -262,9 +263,9 @@ function renderBadge(d){
   x.strokeStyle="rgba(255,255,255,.85)";x.lineWidth=5;x.beginPath();x.roundRect?x.roundRect(sx,sy,sw,sh,23):x.rect(sx,sy,sw,sh);x.stroke();
   x.strokeStyle="rgba(12,22,70,.35)";x.lineWidth=2;x.beginPath();x.roundRect?x.roundRect(sx+6,sy+6,sw-12,sh-12,18):x.rect(sx+6,sy+6,sw-12,sh-12);x.stroke();
   // encabezado
-  x.fillStyle="#FFC20E";x.font="900 190px Urbanist, sans-serif";x.textBaseline="alphabetic";x.fillText("5°",m,330);
-  x.fillStyle="#0C1646";x.font="800 46px Urbanist, sans-serif";x.fillText("ENCUENTRO",m+240,230);x.font="800 56px Urbanist, sans-serif";x.fillText("Diversidades",m+240,288);x.fillText("e Inclusión",m+240,346);
-  x.fillStyle="#fff";x.font="700 34px Urbanist, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,430,W-2*m);
+  x.fillStyle="#FFC20E";x.font="900 190px elza, sans-serif";x.textBaseline="alphabetic";x.fillText("5°",m,330);
+  x.fillStyle="#0C1646";x.font="700 46px elza, sans-serif";x.fillText("ENCUENTRO",m+240,230);x.font="700 56px elza, sans-serif";x.fillText("Diversidades",m+240,288);x.fillText("e Inclusión",m+240,346);
+  x.fillStyle="#fff";x.font="700 34px elza, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,430,W-2*m);
   // tarjeta de papel con esquina doblada
   x.fillStyle="#F7F4EE";x.beginPath();x.moveTo(m,top);x.lineTo(W-m-fold,top);x.lineTo(W-m,top+fold);x.lineTo(W-m,H-m);x.lineTo(m,H-m);x.closePath();x.fill();
   x.fillStyle="rgba(12,22,70,.18)";x.beginPath();x.moveTo(W-m-fold,top);x.lineTo(W-m-fold,top+fold);x.lineTo(W-m,top+fold);x.closePath();x.fill();
@@ -275,25 +276,25 @@ function renderBadge(d){
   x.fillStyle="#fff";x.beginPath();x.arc(cxp,cyp,rad+6,0,Math.PI*2);x.fill();
   x.save();x.beginPath();x.arc(cxp,cyp,rad,0,Math.PI*2);x.clip();
   if(photo){drawPhotoIn(x,cxp,cyp,rad);}
-  else{x.fillStyle=p.c;x.fillRect(cxp-rad,cyp-rad,2*rad,2*rad);x.fillStyle="rgba(255,255,255,.22)";x.beginPath();x.moveTo(cxp-rad,cyp+rad);x.lineTo(cxp+rad,cyp-rad);x.lineTo(cxp+rad,cyp+rad);x.closePath();x.fill();x.fillStyle="#0C1646";x.font="900 130px Urbanist, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(initials(d.name),cxp,cyp+8);}
+  else{x.fillStyle=p.c;x.fillRect(cxp-rad,cyp-rad,2*rad,2*rad);x.fillStyle="rgba(255,255,255,.22)";x.beginPath();x.moveTo(cxp-rad,cyp+rad);x.lineTo(cxp+rad,cyp-rad);x.lineTo(cxp+rad,cyp+rad);x.closePath();x.fill();x.fillStyle="#0C1646";x.font="900 130px elza, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(initials(d.name),cxp,cyp+8);}
   x.restore();x.textAlign="center";x.textBaseline="alphabetic";
-  x.fillStyle="#0C1646";let fs=86;x.font=`900 ${fs}px Urbanist, sans-serif`;while(x.measureText(d.name).width>W-2*m-80&&fs>44){fs-=4;x.font=`900 ${fs}px Urbanist, sans-serif`;}
+  x.fillStyle="#0C1646";let fs=86;x.font=`900 ${fs}px elza, sans-serif`;while(x.measureText(d.name).width>W-2*m-80&&fs>44){fs-=4;x.font=`900 ${fs}px elza, sans-serif`;}
   let y=cyp+rad+110;x.fillText(d.name,W/2,y);
-  if(d.pron){y+=48;x.font="700 32px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
-  y+=62;x.fillStyle="#0C1646";x.font="700 44px 'Atkinson Hyperlegible', sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
-  y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="800 30px Urbanist, sans-serif";const lw=x.measureText(label).width+60;
+  if(d.pron){y+=48;x.font="700 32px elza, sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
+  y+=62;x.fillStyle="#0C1646";x.font="700 44px elza, sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
+  y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="700 30px elza, sans-serif";const lw=x.measureText(label).width+60;
   x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);
-  if(d.pledge){y+=78;x.font="italic 400 36px 'Atkinson Hyperlegible', sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
+  if(d.pledge){y+=78;x.font="italic 400 36px elza, sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
   const qy=H-m-150-250,qs=220;const hasQR=drawQR(x,location.origin+"/v/"+d.code,W-m-60-qs,qy,qs);
   x.textAlign=hasQR?"left":"center";const cx0=hasQR?m+60:W/2;
-  x.fillStyle="#4B537F";x.font="800 28px Urbanist, sans-serif";x.fillText("CÓDIGO DE REGISTRO",cx0,qy+70);
-  x.fillStyle="#0C1646";x.font="900 92px Urbanist, sans-serif";x.fillText(d.code,cx0,qy+165);
-  x.fillStyle="#4B537F";x.font="400 26px 'Atkinson Hyperlegible', sans-serif";x.fillText("Preséntalo en el registro el 11 de noviembre",cx0,qy+208);
+  x.fillStyle="#4B537F";x.font="700 28px elza, sans-serif";x.fillText("CÓDIGO DE REGISTRO",cx0,qy+70);
+  x.fillStyle="#0C1646";x.font="900 92px elza, sans-serif";x.fillText(d.code,cx0,qy+165);
+  x.fillStyle="#4B537F";x.font="400 26px elza, sans-serif";x.fillText("Preséntalo en el registro el 11 de noviembre",cx0,qy+208);
   x.fillStyle="#0C1646";x.fillRect(m,H-m-150,W-2*m,150);
-  x.textAlign="left";x.fillStyle="#FFC20E";x.font="800 40px Urbanist, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,H-m-86);
-  x.fillStyle="#fff";x.font="400 30px 'Atkinson Hyperlegible', sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,H-m-38);
-  x.textAlign="right";x.fillStyle="#C9CDEA";x.font="700 24px 'Atkinson Hyperlegible', sans-serif";x.fillText("By Startin.org.co",W-m-30,H-m-38);
-  x.fillStyle="#F26A21";x.font="900 36px Urbanist, sans-serif";x.fillText("ASISTENTE",W-m-30,H-m-86);
+  x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,H-m-86);
+  x.fillStyle="#fff";x.font="400 30px elza, sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,H-m-38);
+  x.textAlign="right";x.fillStyle="#C9CDEA";x.font="700 24px elza, sans-serif";x.fillText("By Startin.org.co",W-m-30,H-m-38);
+  x.fillStyle="#F26A21";x.font="900 36px elza, sans-serif";x.fillText("ASISTENTE",W-m-30,H-m-86);
   return c.toDataURL("image/png");
 }
 
