@@ -331,3 +331,13 @@ fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
   .sources li{margin-bottom:8px}
 }
 @media (max-width:360px){.meta{grid-template-columns:minmax(0,1fr)}.cd>div{min-width:32px}.cd b{font-size:1.35rem}}
+/* Móvil: nombre de cada figura siempre visible, como pie bajo el muñeco (no tooltip flotante que se recorta) */
+@media (max-width:900px){
+  .row-wrap{align-items:stretch}
+  .row{align-items:flex-end;gap:2px;padding:14px 44px 8px;width:100%;box-sizing:border-box}
+  .fig{height:auto;flex-direction:column;justify-content:flex-end;align-items:center;width:104px}
+  .fig img{height:calc(170px * var(--h,1));max-width:100%;object-fit:contain}
+  .fig::after{position:static;display:block;opacity:1;transform:none;margin-top:6px;white-space:normal;width:auto;max-width:102px;text-align:center;line-height:1.12;font-size:.76rem;padding:4px 7px;height:3.7em;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .fig:hover,.fig:focus-visible{transform:translateY(-6px)}
+  .fig:hover::after,.fig:focus-visible::after{transform:none;background:var(--sun)}
+}
