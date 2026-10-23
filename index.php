@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22h'; ?><!doctype html>
+<?php $v = '2026.10.22i'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -61,8 +61,8 @@
       <div class="ctas"><a class="btn btn-primary" href="#inscripcion" data-go="inscripcion">Inscríbete y dobla tu escarapela</a><a class="btn btn-ghost" href="#pliegue" data-go="pliegue">¿Por qué pliegues?</a></div>
     </div>
     <div class="row-wrap">
-      <p class="row-hint std-only">Toca una persona: cada una guarda una cifra del país.</p>
-      <p class="row-hint easy-only">Toca una persona para ver su dato.</p>
+      <p class="row-hint std-only"><span class="m-only">Desliza para ver a las nueve. </span>Toca una persona: cada una guarda una cifra del país.</p>
+      <p class="row-hint easy-only"><span class="m-only">Desliza para ver más. </span>Toca una persona para ver su dato.</p>
       <div class="row" id="row" role="list"></div>
       <div class="floor" aria-hidden="true"></div>
     </div>

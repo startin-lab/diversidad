@@ -242,7 +242,7 @@ $("#regForm").addEventListener("submit",async e=>{
   $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${name}, ${org}, código ${code}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${code}.png`;
   const share=`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque.${d.compromiso?" Mi compromiso: "+d.compromiso:""} #DoblarNoEsRomper ${location.origin}`;
   $("#waBtn").href="https://wa.me/?text="+encodeURIComponent(share);
-  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;
+  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;if(matchMedia("(max-width:900px)").matches)setTimeout(()=>$("#badgeImg").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}),150);
   msg.textContent=`¡Listo, ${name.split(" ")[0]}! Tu código es ${code}.${d.ajustes.length?" Registramos tus ajustes: "+d.ajustes.join(", ")+".":""}`;
   $("#mailNote").textContent="Enviando tu escarapela al correo…";
   try{const r=await fetch("api/correo.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({codigo:code,correo:mail,escarapela_png:url})});const j=await r.json();
