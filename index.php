@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22g'; ?><!doctype html>
+<?php $v = '2026.10.22h'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -56,7 +56,7 @@
       <div class="meta">
         <div><b>11 de noviembre de 2026</b><span>8:00 a.m. – 1:00 p.m.</span></div>
         <div><b>Universidad El Bosque · HUB iEX</b><span>Cra. 7b Bis No. 132-28, Bogotá</span></div>
-        <div class="countdown" role="status"><b id="cdDays">—</b><span id="cdLabel">días</span></div>
+        <div class="countdown" role="timer" aria-live="off" aria-label="Cuenta regresiva para el Encuentro"><span class="cd-title">Faltan</span><div class="cd" id="cd"><div><b id="cdD">—</b><span>días</span></div><i>:</i><div><b id="cdH">—</b><span>horas</span></div><i>:</i><div><b id="cdM">—</b><span>min</span></div><i>:</i><div><b id="cdS">—</b><span>seg</span></div></div></div>
       </div>
       <div class="ctas"><a class="btn btn-primary" href="#inscripcion" data-go="inscripcion">Inscríbete y dobla tu escarapela</a><a class="btn btn-ghost" href="#pliegue" data-go="pliegue">¿Por qué pliegues?</a></div>
     </div>

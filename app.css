@@ -81,7 +81,7 @@ h3{font-size:1.25rem;font-weight:800;margin:26px 0 10px}
 .meta{grid-column:2;grid-row:2/4;display:grid;gap:10px;align-content:start;min-width:250px}
 .meta>div{background:rgba(12,22,70,.55);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:10px 14px;display:grid}
 .meta b{font-family:var(--font-display);font-size:1.05rem;color:var(--sun)}.meta span{font-size:.92rem}
-.meta .countdown{flex-direction:row;display:flex;align-items:baseline;gap:8px}.meta .countdown b{font-size:2rem;font-variant-numeric:tabular-nums}
+.meta .countdown{display:grid;gap:4px}.cd-title{font-family:var(--font-display);font-weight:800;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sun)}.cd{display:flex;align-items:flex-start;gap:6px}.cd>div{display:grid;justify-items:center;min-width:46px}.cd b{font-family:var(--font-display);font-size:1.9rem;line-height:1;font-variant-numeric:tabular-nums;color:#fff}.cd span{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.cd i{font-style:normal;font-size:1.6rem;line-height:1;color:var(--sun);opacity:.8;animation:blink 1s steps(1) infinite}.cd.done{font-weight:700;color:#fff}@keyframes blink{50%{opacity:.25}}
 .ctas{grid-column:1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .row-wrap{position:relative;min-height:0;display:grid;grid-template-rows:minmax(0,1fr);align-items:end}
 .row-hint{margin:0;font-weight:700;font-size:.84rem;color:#fff;background:rgba(12,22,70,.6);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;position:absolute;right:8px;bottom:18px;z-index:3;max-width:46%}

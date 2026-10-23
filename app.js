@@ -141,8 +141,14 @@ $("#s-inicio").addEventListener("pointermove",e=>{if(reduced())return;const r=cv
 window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(sizeCanvas,120);});
 
 /* ================= CUENTA REGRESIVA ================= */
-(function(){const t=new Date("2026-11-11T08:00:00-05:00").getTime(),d=Math.ceil((t-Date.now())/864e5);
-  if(d>1)$("#cdDays").textContent=d;else if(d===1){$("#cdDays").textContent="1";$("#cdLabel").textContent="día";}else{$("#cdDays").textContent="¡Hoy!";$("#cdLabel").textContent="";}})();
+(function(){const T=new Date("2026-11-11T08:00:00-05:00").getTime(),box=$(".countdown");const pad=n=>String(n).padStart(2,"0");
+  function tick(){const diff=T-Date.now();
+    if(diff<=0){box.innerHTML='<span class="cd-title">¡Es hoy!</span><div class="cd done">Nos vemos en el HUB iEX de la Universidad El Bosque</div>';return;}
+    const d=Math.floor(diff/864e5),h=Math.floor(diff%864e5/36e5),m=Math.floor(diff%36e5/6e4),s=Math.floor(diff%6e4/1e3);
+    $("#cdD").textContent=d;$("#cdH").textContent=pad(h);$("#cdM").textContent=pad(m);$("#cdS").textContent=pad(s);
+    box.setAttribute("aria-label",`Faltan ${d} días, ${h} horas y ${m} minutos para el Encuentro`);
+    setTimeout(tick,reduced()?60000:1000);}
+  tick();})();
 
 /* ================= FILA DE FIGURAS ================= */
 const row=$("#row");
