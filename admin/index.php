@@ -4,12 +4,47 @@ require __DIR__ . '/../api/lib.php';
 $c = cfg();
 session_name($c['session_name']); session_start();
 $err = '';
-if (isset($_POST['salir'])) { session_destroy(); header('Location: ./'); exit; }
 if (isset($_POST['clave'])) {
   if (password_verify((string)$_POST['clave'], $c['admin_pass_hash'])) { $_SESSION['admin'] = true; session_regenerate_id(true); header('Location: ./'); exit; }
   $err = 'Contraseña incorrecta.'; usleep(600000);
 }
 $logged = !empty($_SESSION['admin']);
+if ($logged && empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(16));
+$csrf = $_SESSION['csrf'] ?? '';
+if ($logged && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['clave']) && !hash_equals($csrf, (string)($_POST['csrf'] ?? ''))) { http_response_code(400); exit('Sesión vencida. Vuelve a cargar el panel.'); }
+if (isset($_POST['salir'])) { session_destroy(); header('Location: ./'); exit; }
+$flash = $_SESSION['flash'] ?? ''; unset($_SESSION['flash']);
+$PLIEGUES = ['Personas mayores','Género y cuidado','Educación inclusiva','Discapacidad y trabajo','La ley ya cambió','Población afrodescendiente','Pueblos indígenas y Rrom','Personas LGBTIQ+','Migración y conflicto'];
+if ($logged && isset($_POST['guardar'], $_POST['id'])) {
+  $id = (int)$_POST['id'];
+  $nom = clean((string)($_POST['nombres'] ?? ''), 120); $org = clean((string)($_POST['organizacion'] ?? ''), 120);
+  $mail = mb_strtolower(clean((string)($_POST['correo'] ?? ''), 190)); $pron = clean((string)($_POST['pronombre'] ?? ''), 40);
+  $pl = clean((string)($_POST['pliegue'] ?? ''), 40); $comp = clean((string)($_POST['compromiso'] ?? ''), 200);
+  $req = !empty($_POST['requiere_ajuste']);
+  $aj = $req ? array_values(array_filter(array_map(fn($a) => clean($a, 60), explode(',', (string)($_POST['ajustes'] ?? ''))))) : [];
+  $errs = [];
+  if (mb_strlen($nom) < 3) $errs[] = 'nombre'; if (mb_strlen($org) < 2) $errs[] = 'organización'; if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) $errs[] = 'correo';
+  if (!$errs) { $q = db()->prepare('SELECT id FROM registros WHERE correo=? AND id<>?'); $q->execute([$mail, $id]); if ($q->fetch()) $errs[] = 'el correo ya lo usa otro registro'; }
+  if ($errs) { $_SESSION['flash'] = 'No se guardó: revisa ' . implode(', ', $errs) . '.'; header('Location: ./?edit=' . $id); exit; }
+  db()->prepare('UPDATE registros SET nombres=?, organizacion=?, correo=?, pronombre=?, pliegue=?, compromiso=?, requiere_ajuste=?, ajustes=? WHERE id=?')
+     ->execute([$nom, $org, $mail, $pron, $pl, $comp, $req ? 1 : 0, json_encode($aj, JSON_UNESCAPED_UNICODE), $id]);
+  $_SESSION['flash'] = 'Registro actualizado.'; header('Location: ./?edit=' . $id); exit;
+}
+if ($logged && isset($_POST['eliminar'], $_POST['id'])) {
+  $id = (int)$_POST['id'];
+  $q = db()->prepare('SELECT codigo, compromiso, organizacion FROM registros WHERE id=?'); $q->execute([$id]); $r = $q->fetch();
+  if (!$r || strtoupper(trim((string)($_POST['confirma'] ?? ''))) !== $r['codigo']) { $_SESSION['flash'] = 'No se eliminó: escribe el código exacto del registro para confirmar.'; header('Location: ./?edit=' . $id); exit; }
+  db()->prepare('DELETE FROM registros WHERE id=?')->execute([$id]);
+  if ($r['compromiso'] !== '') db()->prepare('UPDATE compromisos SET aprobado=0 WHERE texto=?')->execute([$r['compromiso']]);
+  $_SESSION['flash'] = 'Registro ' . $r['codigo'] . ' eliminado.'; header('Location: ./'); exit;
+}
+if ($logged && isset($_POST['reenviar'], $_POST['id'])) {
+  $id = (int)$_POST['id']; $q = db()->prepare('SELECT * FROM registros WHERE id=?'); $q->execute([$id]); $r = $q->fetch();
+  if ($r) { $sent = send_mail($r['correo'], 'Tu inscripción al 5° Encuentro · código ' . $r['codigo'], correo_confirmacion_html($r, false));
+    db()->prepare('UPDATE registros SET correo_enviado=? WHERE id=?')->execute([$sent ? 1 : 0, $id]);
+    $_SESSION['flash'] = $sent ? 'Correo reenviado a ' . $r['correo'] . '.' : 'El servidor no pudo enviar el correo.'; }
+  header('Location: ./?edit=' . $id); exit;
+}
 if ($logged && isset($_POST['asistio'], $_POST['id'])) {
   db()->prepare('UPDATE registros SET asistio=? WHERE id=?')->execute([(int)$_POST['asistio'], (int)$_POST['id']]);
   header('Location: ./?f=' . urlencode((string)($_POST['f'] ?? ''))); exit;
@@ -53,6 +88,8 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
 .login{max-width:380px;margin:12vh auto}
 .muted{color:#4B537F;font-size:.85rem}
 .tbl{overflow-x:auto}
+.ed-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 16px}.ed-form label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.85rem}.ed-form label.chk{flex-direction:row;align-items:center;gap:8px}.ed-form input[type=text],.ed-form select{font-weight:400}.ed-form .bar{grid-column:1/-1}
+.ed-actions{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;display:grid;gap:12px}
 </style></head><body><div class="wrap">
 <?php if (!$logged): ?>
   <div class="login card"><h1>Panel privado</h1><p class="muted">5° Encuentro Diversidades e Inclusión</p>
@@ -74,7 +111,31 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   $uso = $pdo->query('SELECT dia, SUM(n) n FROM agente_uso GROUP BY dia ORDER BY dia DESC LIMIT 7')->fetchAll();
 ?>
   <div class="bar" style="justify-content:space-between"><div><h1>Inscripciones · 5° Encuentro</h1><p class="muted" style="margin:0">Datos personales protegidos (Ley 1581 de 2012). Úsalos solo para la logística del evento.</p></div>
-  <form method="post"><button class="btn ghost" name="salir" value="1">Salir</button></form></div>
+  <form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="salir" value="1">Salir</button></form></div>
+  <?php if ($flash) echo '<p class="card" style="padding:12px 16px;border-color:#FFC20E;background:#FFF8E1">' . h($flash) . '</p>'; ?>
+  <?php if (isset($_GET['edit'])): $eq = $pdo->prepare('SELECT * FROM registros WHERE id=?'); $eq->execute([(int)$_GET['edit']]); $e = $eq->fetch(); ?>
+  <?php if (!$e): ?><p class="card">Ese registro ya no existe. <a href="./">Volver</a></p><?php else: $eaj = json_decode($e['ajustes'] ?: '[]', true) ?: []; ?>
+  <div class="card" id="editar" style="margin:16px 0;border:2px solid var(--ink)">
+    <div class="bar" style="justify-content:space-between;margin-top:0"><h2 style="margin:0">Editar registro <?= h($e['codigo']) ?></h2><a class="btn ghost" href="./">Cerrar</a></div>
+    <p class="muted" style="margin-top:0">Documento ••••<?= h(substr(decrypt_str($e['documento_enc']), -4)) ?> · inscrito el <?= h($e['creado']) ?>. El código y el documento no se pueden cambiar. La pregunta 5 (autorreconocimiento) no se edita desde aquí.</p>
+    <form method="post" class="ed-form"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="id" value="<?= (int)$e['id'] ?>">
+      <label>Nombres y apellidos<input type="text" name="nombres" value="<?= h($e['nombres']) ?>" maxlength="120" required></label>
+      <label>Organización<input type="text" name="organizacion" value="<?= h($e['organizacion']) ?>" maxlength="120" required></label>
+      <label>Correo<input type="text" name="correo" value="<?= h($e['correo']) ?>" maxlength="190" required></label>
+      <label>Pronombre<input type="text" name="pronombre" value="<?= h($e['pronombre']) ?>" maxlength="40"></label>
+      <label>Pliegue<select name="pliegue"><?php foreach ($PLIEGUES as $pl) echo '<option' . ($pl === $e['pliegue'] ? ' selected' : '') . '>' . h($pl) . '</option>'; ?></select></label>
+      <label>Compromiso<input type="text" name="compromiso" value="<?= h($e['compromiso']) ?>" maxlength="200"></label>
+      <label class="chk"><input type="checkbox" name="requiere_ajuste" value="1" <?= $e['requiere_ajuste'] ? 'checked' : '' ?>> Requiere ajustes razonables</label>
+      <label>Ajustes (separados por coma)<input type="text" name="ajustes" value="<?= h(implode(', ', $eaj)) ?>" maxlength="400"></label>
+      <div class="bar"><button class="btn" name="guardar" value="1">Guardar cambios</button></div>
+    </form>
+    <div class="ed-actions">
+      <form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="id" value="<?= (int)$e['id'] ?>"><button class="btn ghost" name="reenviar" value="1">Reenviar correo de confirmación</button><span class="muted"> Va sin escarapela adjunta: le indica que puede volver a generarla en el portal con su mismo documento y correo.</span></form>
+      <form method="post" onsubmit="return confirm('¿Eliminar definitivamente <?= h($e['codigo']) ?>? No se puede deshacer.')"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="id" value="<?= (int)$e['id'] ?>">
+        <label class="muted">Para eliminar, escribe el código <b><?= h($e['codigo']) ?></b>: <input type="text" name="confirma" autocomplete="off" style="width:140px"></label> <button class="btn warn" name="eliminar" value="1">Eliminar registro</button></form>
+    </div>
+  </div>
+  <?php endif; endif; ?>
   <div class="kpis">
     <div class="kpi"><b><?= $total ?></b><span>Personas inscritas</span></div>
     <div class="kpi"><b><?= count($orgs) ?></b><span>Organizaciones</span></div>
@@ -89,16 +150,16 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   </div>
   <h2>Listado</h2>
   <div class="bar"><form method="get" style="display:flex;gap:8px"><input type="text" name="f" value="<?= h($f) ?>" placeholder="Buscar nombre, organización, correo o código"><button class="btn">Buscar</button><?php if ($f) echo '<a class="btn ghost" href="./">Limpiar</a>'; ?></form><a class="btn warn" href="?csv=1">Exportar CSV (incluye documento)</a></div>
-  <div class="card tbl"><table><thead><tr><th>Código</th><th>Nombre</th><th>Organización</th><th>Correo</th><th>Documento</th><th>Ajustes</th><th>Pliegue</th><th>Registro</th><th>Asistió</th></tr></thead><tbody>
+  <div class="card tbl"><table><thead><tr><th>Código</th><th>Nombre</th><th>Organización</th><th>Correo</th><th>Documento</th><th>Ajustes</th><th>Pliegue</th><th>Registro</th><th>Asistió</th><th></th></tr></thead><tbody>
   <?php foreach ($rows as $r): $doc = decrypt_str($r['documento_enc']); $aj = json_decode($r['ajustes'] ?: '[]', true) ?: []; ?>
     <tr><td><b><?= h($r['codigo']) ?></b></td><td><?= h($r['nombres']) ?><?= $r['pronombre'] ? '<br><span class="muted">' . h($r['pronombre']) . '</span>' : '' ?></td><td><?= h($r['organizacion']) ?></td><td><?= h($r['correo']) ?><?= $r['correo_enviado'] ? '' : ' <span class="no" title="El correo de confirmación no se pudo enviar">✕</span>' ?></td>
     <td>••••<?= h(substr($doc, -4)) ?></td><td><?php foreach ($aj as $a) echo '<span class="tag aj">' . h($a) . '</span>'; ?></td><td><?= h($r['pliegue']) ?></td><td class="muted"><?= h($r['creado']) ?></td>
-    <td><form method="post"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><input type="hidden" name="f" value="<?= h($f) ?>"><input type="hidden" name="asistio" value="<?= $r['asistio'] ? 0 : 1 ?>"><button class="btn <?= $r['asistio'] ? '' : 'ghost' ?>" style="padding:5px 12px"><?= $r['asistio'] ? '✓ Sí' : 'Marcar' ?></button></form></td></tr>
-  <?php endforeach; if (!$rows) echo '<tr><td colspan="9" class="muted">Sin inscripciones todavía.</td></tr>'; ?>
+    <td><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><input type="hidden" name="f" value="<?= h($f) ?>"><input type="hidden" name="asistio" value="<?= $r['asistio'] ? 0 : 1 ?>"><button class="btn <?= $r['asistio'] ? '' : 'ghost' ?>" style="padding:5px 12px"><?= $r['asistio'] ? '✓ Sí' : 'Marcar' ?></button></form></td><td><a class="btn ghost" style="padding:5px 12px" href="?edit=<?= (int)$r['id'] ?>">Editar</a></td></tr>
+  <?php endforeach; if (!$rows) echo '<tr><td colspan="10" class="muted">Sin inscripciones todavía.</td></tr>'; ?>
   </tbody></table></div>
   <h2 id="muro">Muro de compromisos</h2>
   <div class="card tbl"><table><thead><tr><th>Compromiso</th><th>Organización</th><th>Pliegue</th><th>Fecha</th><th></th></tr></thead><tbody>
-  <?php foreach ($comp as $m): ?><tr><td><?= h($m['texto']) ?></td><td><?= h($m['organizacion']) ?></td><td><?= h($m['pliegue']) ?></td><td class="muted"><?= h($m['creado']) ?></td><td><form method="post"><button class="btn ghost" name="borrar_compromiso" value="<?= (int)$m['id'] ?>" style="padding:5px 12px">Ocultar</button></form></td></tr><?php endforeach; ?>
+  <?php foreach ($comp as $m): ?><tr><td><?= h($m['texto']) ?></td><td><?= h($m['organizacion']) ?></td><td><?= h($m['pliegue']) ?></td><td class="muted"><?= h($m['creado']) ?></td><td><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="borrar_compromiso" value="<?= (int)$m['id'] ?>" style="padding:5px 12px">Ocultar</button></form></td></tr><?php endforeach; ?>
   </tbody></table></div>
 <?php endif; ?>
 </div><style>.startin-credit{position:fixed;z-index:60;right:12px;bottom:calc(var(--dock,0px) + 10px + env(safe-area-inset-bottom,0px));font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85;transition:opacity .2s,color .2s}.startin-credit b{color:#16162B;font-weight:800;letter-spacing:-.01em}.startin-credit:hover,.startin-credit:focus-visible{opacity:1;color:#16162B}@media (min-width:901px){.startin-credit{bottom:16px;right:16px}}</style><a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener" aria-label="Hecho por Startin Lab">by <b>Startin*Lab</b></a></body></html>
