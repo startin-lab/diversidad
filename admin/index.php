@@ -50,6 +50,11 @@ if ($logged && isset($_POST['asistio'], $_POST['id'])) {
   db()->prepare('UPDATE registros SET asistio=? WHERE id=?')->execute([(int)$_POST['asistio'], (int)$_POST['id']]);
   header('Location: ./?f=' . urlencode((string)($_POST['f'] ?? ''))); exit;
 }
+if ($logged && isset($_POST['borrar_fotos'])) {
+  if (strtoupper(trim((string)($_POST['confirma'] ?? ''))) !== 'BORRAR FOTOS') { $_SESSION['flash'] = 'No se borraron las fotos: escribe BORRAR FOTOS para confirmar.'; header('Location: ./#datos'); exit; }
+  $n = db()->exec('UPDATE registros SET foto=NULL WHERE foto IS NOT NULL');
+  $_SESSION['flash'] = 'Fotos eliminadas: ' . (int)$n . '. Las escarapelas ya descargadas no cambian.'; header('Location: ./#datos'); exit;
+}
 if ($logged && isset($_POST['borrar_compromiso'])) {
   db()->prepare('UPDATE compromisos SET aprobado=0 WHERE id=?')->execute([(int)$_POST['borrar_compromiso']]);
   header('Location: ./#muro'); exit;
@@ -125,7 +130,7 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
       <label>Organización<input type="text" name="organizacion" value="<?= h($e['organizacion']) ?>" maxlength="120" required></label>
       <label>Correo<input type="text" name="correo" value="<?= h($e['correo']) ?>" maxlength="190" required></label>
       <label>Pronombre<input type="text" name="pronombre" value="<?= h($e['pronombre']) ?>" maxlength="40"></label>
-      <label>Pliegue<select name="pliegue"><?php foreach ($PLIEGUES as $pl) echo '<option' . ($pl === $e['pliegue'] ? ' selected' : '') . '>' . h($pl) . '</option>'; ?></select></label>
+      <label>Pliegue<select name="pliegue"><option value=""<?= $e['pliegue'] === '' ? ' selected' : '' ?>>(sin pliegue)</option><?php foreach ($PLIEGUES as $pl) echo '<option' . ($pl === $e['pliegue'] ? ' selected' : '') . '>' . h($pl) . '</option>'; ?></select></label>
       <label>Compromiso<input type="text" name="compromiso" value="<?= h($e['compromiso']) ?>" maxlength="200"></label>
       <label class="chk"><input type="checkbox" name="requiere_ajuste" value="1" <?= $e['requiere_ajuste'] ? 'checked' : '' ?>> Requiere ajustes razonables</label>
       <label>Ajustes (separados por coma)<input type="text" name="ajustes" value="<?= h(implode(', ', $eaj)) ?>" maxlength="400"></label>
@@ -164,5 +169,8 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   <div class="card tbl"><table><thead><tr><th>Compromiso</th><th>Organización</th><th>Pliegue</th><th>Fecha</th><th></th></tr></thead><tbody>
   <?php foreach ($comp as $m): ?><tr><td><?= h($m['texto']) ?></td><td><?= h($m['organizacion']) ?></td><td><?= h($m['pliegue']) ?></td><td class="muted"><?= h($m['creado']) ?></td><td><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="borrar_compromiso" value="<?= (int)$m['id'] ?>" style="padding:5px 12px">Ocultar</button></form></td></tr><?php endforeach; ?>
   </tbody></table></div>
+  <h2 id="datos">Datos después del evento</h2>
+  <div class="card"><p style="margin-top:0">Fotos guardadas (cifradas): <b><?= (int)$pdo->query('SELECT COUNT(*) FROM registros WHERE foto IS NOT NULL')->fetchColumn() ?></b>. Se usan solo para regenerar la escarapela y mostrarla en la puerta de entrada. Recomendado: borrarlas cuando termine el evento.</p>
+  <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="text" name="confirma" placeholder="Escribe BORRAR FOTOS" autocomplete="off" style="max-width:220px"><button class="btn warn" name="borrar_fotos" value="1">Borrar todas las fotos</button></form></div>
 <?php endif; ?>
 </div><style>.startin-credit{position:fixed;z-index:60;right:12px;bottom:calc(var(--dock,0px) + 10px + env(safe-area-inset-bottom,0px));font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85;transition:opacity .2s,color .2s}.startin-credit b{color:#16162B;font-weight:800;letter-spacing:-.01em}.startin-credit:hover,.startin-credit:focus-visible{opacity:1;color:#16162B}@media (min-width:901px){.startin-credit{bottom:16px;right:16px}}</style><a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener" aria-label="Hecho por Startin Lab">by <b>Startin*Lab</b></a></body></html>
