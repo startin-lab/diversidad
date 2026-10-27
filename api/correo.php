@@ -35,7 +35,7 @@ try {
       <p style="margin-top:20px"><a href="' . $site . '" style="display:inline-block;background:#F26A21;color:#fff;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:999px">Volver al portal</a></p>
       <p style="font-size:12px;color:#4B537F;margin-top:24px">Tus datos se usan solo para gestionar tu participación en el Encuentro, según la <a href="https://startin.org.co/privacidad/" style="color:#4B537F">política de tratamiento de datos</a>. Dudas: hola@startin.org.co.</p>
     </div>
-    <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">Portal construido por Fundación Startin · startin.org.co</p>
+    <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">by <a href="https://startinlab.org" style="color:#8A90B8;text-decoration:none">Startin<span style="color:#E01CC0">*</span>Lab</a> · <a href="https://startinlab.org" style="color:#8A90B8">startinlab.org</a></p>
   </div></body></html>';
   $png = null;
   if ($badge && preg_match('#^data:image/png;base64,([A-Za-z0-9+/=]+)$#', $badge, $m) && strlen($m[1]) < 2000000) $png = $m[1];
