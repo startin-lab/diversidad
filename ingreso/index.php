@@ -66,4 +66,4 @@ $("#btnScan").onclick=startScan;$("#btnStop").onclick=stopScan;
 })();
 </script>
 <?php endif; ?>
-</main></body></html>
+<p style="text-align:center;font-size:.8rem;margin:24px 0 8px"><a href="https://startinlab.org" target="_blank" rel="noopener" style="color:#C9CDEA;text-decoration:none">by Startin<span style="color:#FF2BD6">*</span>Lab</a></p></main></body></html>
