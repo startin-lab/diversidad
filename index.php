@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22zb'; ?><!doctype html>
+<?php $v = '2026.10.27a'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -180,7 +180,7 @@
           <div class="crop" id="cropBox" hidden><canvas id="cropCv" width="240" height="240" aria-label="Encuadre de tu foto: arrastra para mover"></canvas><div class="crop-tools"><label for="cropZoom">Acercar</label><input type="range" id="cropZoom" min="1" max="3" step="0.02" value="1"><button type="button" class="mini" id="cropReset">Centrar</button><span class="hint">Arrastra la foto para encuadrar tu rostro.</span></div></div></div>
       <details class="extra"><summary>Personaliza tu escarapela (opcional)</summary>
         <div class="field"><label for="fPron">¿Cómo quieres que te nombremos?</label><input id="fPron" placeholder="Ej.: ella · él · elle" maxlength="40"></div>
-        <fieldset><legend>Tu pliegue: ¿con qué dimensión te comprometes?</legend><div class="colors" id="colorPick" role="radiogroup" aria-label="Pliegue"></div></fieldset>
+        <fieldset><legend>Tu pliegue: ¿con qué dimensión te comprometes? <span class="hint">(si no eliges, tu escarapela no lo muestra)</span></legend><div class="colors" id="colorPick" role="radiogroup" aria-label="Pliegue"></div></fieldset>
         <div class="field"><label for="fPledge">Mi compromiso para 2027</label><textarea id="fPledge" maxlength="140" placeholder="Ej.: Publicaremos todas nuestras vacantes en formatos accesibles."></textarea></div>
       </details>
       <label class="consent"><input type="checkbox" id="fConsent"><span>Autorizo el tratamiento de mis datos (y de mi foto, si la subo) para gestionar mi inscripción, mi escarapela y los ajustes razonables, según la <a href="https://startin.org.co/privacidad/" target="_blank" rel="noopener">política de tratamiento de datos</a> (Ley 1581 de 2012).</span></label>

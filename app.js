@@ -196,10 +196,11 @@ $("#newChat").onclick=hello;hello();
 
 /* ================= INSCRIPCIÓN + ORIGAMI ================= */
 const picker=$("#colorPick");
-P.forEach((p,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="radio" name="pl" value="${i}" ${i===3?"checked":""}><span style="--c:${p.c}"><i></i>${esc(p.label)}</span>`;picker.appendChild(l);});
+P.forEach((p,i)=>{const l=document.createElement("label");l.innerHTML=`<input type="radio" name="pl" value="${i}"><span style="--c:${p.c}"><i></i>${esc(p.label)}</span>`;picker.appendChild(l);});
 const sheet=$("#sheet"),flaps=$$(".flap"),stepEls=$$("#steps li"),msg=$("#studioMsg");
-const pickIdx=()=>+(document.querySelector('input[name="pl"]:checked')||{value:3}).value;
-function setColor(){sheet.style.setProperty("--pc",P[pickIdx()].c);}picker.addEventListener("change",setColor);setColor();
+const pickIdx=()=>+(document.querySelector('input[name="pl"]:checked')||{value:-1}).value;
+const NOPL={c:"#FFC20E",label:""},plOf=i=>P[i]||NOPL;
+function setColor(){sheet.style.setProperty("--pc",plOf(pickIdx()).c);}picker.addEventListener("change",setColor);setColor();
 function step(n){stepEls.forEach((s,i)=>s.classList.toggle("on",i===n));}step(0);
 let photo=null,crop={zoom:1,ox:0,oy:0};
 const cropBox=$("#cropBox"),cropCv=$("#cropCv"),cropZoom=$("#cropZoom");
@@ -230,7 +231,7 @@ $("#regForm").addEventListener("submit",async e=>{
   if(miss.length){err.hidden=false;err.textContent="Para doblar tu escarapela falta: "+miss.join(", ")+".";err.scrollIntoView({block:"center"});return;}
   err.hidden=true;btn.disabled=true;btn.textContent="Guardando…";
   const d={nombres:name,documento:doc,organizacion:org,correo:mail,pronombre:$("#fPron").value.trim(),grupos:grps,grupo_otro:$("#fGrpOther").value.trim(),requiere_ajuste:ajq.value==="si",
-    ajustes:$$('input[name="aj"]:checked').map(x=>x.value),ajuste_otro:$("#fAjOther").value.trim(),pliegue:P[pickIdx()].label,compromiso:$("#fPledge").value.trim(),consentimiento:true,foto:photoData()};
+    ajustes:$$('input[name="aj"]:checked').map(x=>x.value),ajuste_otro:$("#fAjOther").value.trim(),pliegue:plOf(pickIdx()).label,compromiso:$("#fPledge").value.trim(),consentimiento:true,foto:photoData()};
   let res;try{const r=await fetch("api/registro.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});res=await r.json();}catch(x){res={ok:false,error:"No hay conexión. Intenta de nuevo."};}
   btn.disabled=false;btn.textContent="Doblar mi escarapela";
   if(!res.ok){err.hidden=false;err.textContent=res.error||"No pudimos guardar tu inscripción.";return;}
@@ -258,7 +259,7 @@ $("#regForm").addEventListener("submit",async e=>{
 function fillForm(j,doc){
   const set=(id,v)=>{const e=$(id);if(e)e.value=v||"";};
   set("#fName",j.nombres);set("#fDoc",doc);set("#fOrg",j.organizacion);set("#fMail",j.correo);set("#fPron",j.pronombre);set("#fPledge",j.compromiso);
-  const pi=P.findIndex(p=>p.label===j.pliegue);if(pi>=0){const r=document.querySelector(`input[name="pl"][value="${pi}"]`);if(r){r.checked=true;setColor();}}
+  const pi=P.findIndex(p=>p.label===j.pliegue);$$('input[name="pl"]').forEach(o=>o.checked=false);if(pi>=0){const r=document.querySelector(`input[name="pl"][value="${pi}"]`);if(r)r.checked=true;}setColor();
   $$('input[name="grp"]').forEach(o=>o.checked=false);let other="";
   (j.grupos||[]).forEach(g=>{if(/^Otras: /.test(g)){other=g.slice(7);g="Otras";}const o=document.querySelector(`input[name="grp"][value="${CSS.escape(g)}"]`);if(o)o.checked=true;});
   $("#fGrpOther").value=other;$("#grpOtherWrap").hidden=!$("#grpOther").checked;
@@ -278,7 +279,7 @@ async function recoverBadge(){
   fillForm(j,doc);
   try{await Promise.race([Promise.all(["900 80px elza","700 40px elza","500 30px elza","400 30px elza","italic 400 30px elza"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
   try{await Promise.race([LOGOSTRIP.decode(),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
-  const pl=Math.max(0,P.findIndex(p=>p.label===j.pliegue));
+  const pl=P.findIndex(p=>p.label===j.pliegue);
   const url=renderBadge({name:j.nombres,org:j.organizacion,pron:j.pronombre||"",pledge:j.compromiso||"",pl,code:j.codigo});
   $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${j.nombres}, ${j.organizacion}, código ${j.codigo}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${j.codigo}.png`;
   $("#waBtn").href="https://wa.me/?text="+encodeURIComponent(`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque. #DoblarNoEsRomper ${location.origin}`);
@@ -296,7 +297,7 @@ const LOGOSTRIP=new Image();LOGOSTRIP.src="assets/aliados-franja.webp?v=x";
 function renderBadge(d){
   const W=1080,H=2080,Hc=H-220,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   paint(x,W,H,buildMesh(W,H,120,d.name.length*31+7),{x:.8,y:.15},false);
-  const p=P[d.pl],m=70,top=520,fold=110;
+  const p=plOf(d.pl),m=70,top=520,fold=110;
   // ojal para el cordón (transparente de verdad)
   const sw=190,sh=46,sx=W/2-sw/2,sy=44;
   x.save();x.globalCompositeOperation="destination-out";x.beginPath();x.roundRect?x.roundRect(sx,sy,sw,sh,23):x.rect(sx,sy,sw,sh);x.fill();x.restore();
@@ -322,8 +323,8 @@ function renderBadge(d){
   let y=cyp+rad+110;x.fillText(d.name,W/2,y);
   if(d.pron){y+=48;x.font="700 32px elza, sans-serif";x.fillStyle="#4B537F";x.fillText(d.pron,W/2,y);}
   y+=62;x.fillStyle="#0C1646";x.font="700 44px elza, sans-serif";x.fillText(d.org,W/2,y,W-2*m-60);
-  y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="700 30px elza, sans-serif";const lw=x.measureText(label).width+60;
-  x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);
+  if(p.label){y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="700 30px elza, sans-serif";const lw=x.measureText(label).width+60;
+  x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);}
   if(d.pledge){y+=78;x.font="italic 400 36px elza, sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
   const qy=Hc-m-150-250,qs=220;const hasQR=drawQR(x,location.origin+"/v/"+d.code,W-m-60-qs,qy,qs);
   x.textAlign=hasQR?"left":"center";const cx0=hasQR?m+60:W/2;
