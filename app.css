@@ -353,3 +353,11 @@ fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
 /* Botón by Startin*Lab (igual al de semanasostenibilidadclaro2026) */
 .startin-credit{position:fixed;z-index:60;right:12px;bottom:calc(var(--dock,0px) + 10px + env(safe-area-inset-bottom,0px));font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85;transition:opacity .2s,color .2s}.startin-credit b{color:#16162B;font-weight:800;letter-spacing:-.01em}.startin-credit:hover,.startin-credit:focus-visible{opacity:1;color:#16162B}@media (min-width:901px){.startin-credit{bottom:16px;right:16px}}
 @media (max-width:900px){#s-pliego .agent{padding-bottom:36px}}
+
+/* Recuperar escarapela */
+.recover{margin:4px 0 18px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,194,14,.08)}
+.recover summary{cursor:pointer;font-weight:700;color:var(--sun);list-style:revert}
+.recover .hint{margin:8px 0}
+.rec-row{display:flex;gap:8px;flex-wrap:wrap}.rec-row input{flex:1 1 180px;min-width:0}
+.recover .err{margin:8px 0 0}
+.rec-row input{border:2px solid var(--line);background:var(--ink);color:var(--fg);border-radius:10px;padding:11px 14px;font:1rem var(--font-body)}

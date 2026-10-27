@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22y'; ?><!doctype html>
+<?php $v = '2026.10.22za'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -134,6 +134,11 @@
       <span class="eyebrow">Inscripción gratuita</span>
       <h2 id="hReg">Dobla tu <b>escarapela</b></h2>
       <p class="lede small">Seis preguntas. Al final, tu hoja se dobla y se convierte en tu escarapela con código y QR.</p>
+      <details class="recover" id="recBox"><summary>¿Ya te inscribiste? Descarga de nuevo tu escarapela</summary>
+        <p class="hint">Escribe tu documento de identidad y te mostramos tu escarapela con el mismo código. No crea un registro nuevo. Si quieres que salga con tu foto, súbela primero en «Tu foto para la escarapela», más abajo.</p>
+        <div class="rec-row"><label for="recDoc" class="sr">Documento de identidad</label><input id="recDoc" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="Número de documento"><button type="button" class="btn btn-ghost" id="recBtn">Ver mi escarapela</button></div>
+        <p class="err" id="recErr" role="alert" hidden></p>
+      </details>
       <div class="field"><label for="fName">1. Nombres y apellidos</label><input id="fName" required autocomplete="name" maxlength="120"></div>
       <div class="field"><label for="fDoc">2. Documento de identidad</label><input id="fDoc" required inputmode="numeric" maxlength="20" autocomplete="off"><span class="hint">Se guarda cifrado y solo se usa para validar tu ingreso. No aparece en la escarapela.</span></div>
       <div class="field"><label for="fOrg">3. Institución u organización</label><input id="fOrg" required autocomplete="organization" maxlength="120"></div>
@@ -170,12 +175,12 @@
           <div class="field"><label for="fAjOther">Otro apoyo</label><input id="fAjOther" maxlength="120"></div>
         </div>
       </fieldset>
+      <div class="field"><label for="fPhoto">Tu foto para la escarapela</label><input id="fPhoto" type="file" accept="image/*"><span class="hint">Sube una foto donde se vea tu rostro y encuádrala. Solo se usa para dibujar tu escarapela en tu dispositivo: no la guardamos ni la subimos.</span>
+          <div class="crop" id="cropBox" hidden><canvas id="cropCv" width="240" height="240" aria-label="Encuadre de tu foto: arrastra para mover"></canvas><div class="crop-tools"><label for="cropZoom">Acercar</label><input type="range" id="cropZoom" min="1" max="3" step="0.02" value="1"><button type="button" class="mini" id="cropReset">Centrar</button><span class="hint">Arrastra la foto para encuadrar tu rostro.</span></div></div></div>
       <details class="extra"><summary>Personaliza tu escarapela (opcional)</summary>
         <div class="field"><label for="fPron">¿Cómo quieres que te nombremos?</label><input id="fPron" placeholder="Ej.: ella · él · elle" maxlength="40"></div>
         <fieldset><legend>Tu pliegue: ¿con qué dimensión te comprometes?</legend><div class="colors" id="colorPick" role="radiogroup" aria-label="Pliegue"></div></fieldset>
         <div class="field"><label for="fPledge">Mi compromiso para 2027</label><textarea id="fPledge" maxlength="140" placeholder="Ej.: Publicaremos todas nuestras vacantes en formatos accesibles."></textarea></div>
-        <div class="field"><label for="fPhoto">Tu foto</label><input id="fPhoto" type="file" accept="image/*"><span class="hint">Solo se usa para dibujar tu escarapela en tu dispositivo; no la subimos.</span>
-          <div class="crop" id="cropBox" hidden><canvas id="cropCv" width="240" height="240" aria-label="Encuadre de tu foto: arrastra para mover"></canvas><div class="crop-tools"><label for="cropZoom">Acercar</label><input type="range" id="cropZoom" min="1" max="3" step="0.02" value="1"><button type="button" class="mini" id="cropReset">Centrar</button><span class="hint">Arrastra la foto para encuadrar tu rostro.</span></div></div></div>
       </details>
       <label class="consent"><input type="checkbox" id="fConsent"><span>Autorizo el tratamiento de mis datos para gestionar mi inscripción y los ajustes razonables, según la <a href="https://startin.org.co/privacidad/" target="_blank" rel="noopener">política de tratamiento de datos</a> (Ley 1581 de 2012).</span></label>
       <p class="err" id="regErr" role="alert" hidden></p>

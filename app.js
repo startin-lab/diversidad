@@ -252,6 +252,27 @@ $("#regForm").addEventListener("submit",async e=>{
   }catch(x){$("#mailNote").textContent="Guardamos tu inscripción. Descarga tu escarapela aquí.";}
   if(d.compromiso)loadWall();
 });
+/* ----- Recuperar escarapela solo con el documento (sin crear registro) ----- */
+async function recoverBadge(){
+  const err=$("#recErr"),btn=$("#recBtn"),doc=$("#recDoc").value.replace(/[^0-9A-Za-z]/g,"");
+  if(doc.length<5){err.hidden=false;err.textContent="Escribe tu número de documento completo.";return;}
+  err.hidden=true;btn.disabled=true;btn.textContent="Buscando…";
+  let j;try{const r=await fetch("api/recuperar.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({documento:doc})});j=await r.json();}catch(x){j={ok:false,error:"No hay conexión. Intenta de nuevo."};}
+  btn.disabled=false;btn.textContent="Ver mi escarapela";
+  if(!j.ok){err.hidden=false;err.textContent=j.error||"No encontramos tu inscripción.";return;}
+  try{await Promise.race([Promise.all(["900 80px elza","700 40px elza","500 30px elza","400 30px elza","italic 400 30px elza"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  try{await Promise.race([LOGOSTRIP.decode(),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  const pl=Math.max(0,P.findIndex(p=>p.label===j.pliegue));
+  const url=renderBadge({name:j.nombres,org:j.organizacion,pron:j.pronombre||"",pledge:j.compromiso||"",pl,code:j.codigo});
+  $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${j.nombres}, ${j.organizacion}, código ${j.codigo}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${j.codigo}.png`;
+  $("#waBtn").href="https://wa.me/?text="+encodeURIComponent(`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque. #DoblarNoEsRomper ${location.origin}`);
+  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;
+  $("#studioMsg").textContent=`Hola, ${j.nombres.split(" ")[0]}. Esta es tu escarapela; tu código es ${j.codigo}.`;
+  $("#mailNote").textContent="No se creó un registro nuevo. Si necesitas cambiar tus datos, vuelve a inscribirte con tu mismo documento y correo.";
+  setTimeout(()=>$("#badgeImg").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}),150);
+}
+$("#recBtn").addEventListener("click",recoverBadge);
+$("#recDoc").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();recoverBadge();}});
 function wrapText(ctx,text,maxW){const words=text.split(/\s+/),lines=[];let line="";words.forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);return lines;}
 function drawQR(x,text,X,Y,S){try{if(typeof qrcode!=="function")return false;const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),cell=S/(n+4);x.fillStyle="#fff";x.fillRect(X,Y,S,S);x.fillStyle="#0C1646";for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))x.fillRect(X+(c+2)*cell,Y+(r+2)*cell,Math.ceil(cell),Math.ceil(cell));return true;}catch(e){return false;}}
 const LOGOSTRIP=new Image();LOGOSTRIP.src="assets/aliados-franja.webp?v=x";
