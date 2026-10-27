@@ -234,7 +234,7 @@ $("#regForm").addEventListener("submit",async e=>{
   if(!res.ok){err.hidden=false;err.textContent=res.error||"No pudimos guardar tu inscripción.";return;}
   const code=res.codigo;resetSheet();$("#seal").textContent=initials(name);
   if(matchMedia("(max-width:900px)").matches)$(".studio").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});
-  step(1);msg.textContent=res.repetido?"Ya estabas inscrito/a. Volvemos a doblar tu escarapela.":"Marcar: reconocemos quién eres y lo que traes.";await wait(700);
+  step(1);msg.textContent=res.actualizado?"Actualizamos tus datos y volvemos a doblar tu escarapela.":res.repetido?"Ya estabas inscrito/a. Volvemos a doblar tu escarapela.":"Marcar: reconocemos quién eres y lo que traes.";await wait(700);
   flaps[0].classList.add("down");await wait(600);flaps[2].classList.add("down");await wait(700);
   step(2);msg.textContent="Doblar: ajustamos la forma para que quepas tal como eres.";flaps[1].classList.add("down");await wait(600);flaps[3].classList.add("down");await wait(900);
   step(3);msg.textContent="Sostener: cada pliegue sostiene al siguiente.";sheet.classList.add("turn");await wait(1300);
