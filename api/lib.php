@@ -115,7 +115,36 @@ function send_mail(string $to, string $subject, string $html, ?string $pngB64 = 
   }
   $body .= "--$boundary--";
   $subj = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+  if (!empty($c['smtp_host'])) {
+    $hdr = "Date: " . date('r') . "\r\nMessage-ID: <" . bin2hex(random_bytes(10)) . '@' . substr(strrchr($from, '@'), 1) . ">\r\nTo: <$to>\r\nSubject: $subj\r\n" . preg_replace('/^Bcc:[^\r]*\r\n/m', '', $headers);
+    $rcpt = [$to]; if (!empty($c['mail_bcc'])) $rcpt[] = $c['mail_bcc'];
+    return smtp_send($c, $from, $rcpt, $hdr . "\r\n" . $body);
+  }
   return @mail($to, $subj, $body, $headers, '-f' . $from);
+}
+
+/** Envío por SMTP autenticado (Microsoft 365, Hostinger, ACS…). Se activa con smtp_host en config.php.
+ *  smtp_secure: 'tls' (STARTTLS, puerto 587) o 'ssl' (puerto 465). */
+function smtp_send(array $c, string $from, array $rcpt, string $data): bool {
+  $secure = $c['smtp_secure'] ?? 'tls'; $port = (int)($c['smtp_port'] ?? ($secure === 'ssl' ? 465 : 587));
+  $fp = @stream_socket_client(($secure === 'ssl' ? 'ssl://' : 'tcp://') . $c['smtp_host'] . ':' . $port, $en, $es, 15);
+  if (!$fp) { error_log("smtp: conexión $es"); return false; }
+  stream_set_timeout($fp, 20);
+  $rd = function () use ($fp) { $out = ''; while (($l = fgets($fp, 1024)) !== false) { $out .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; } return $out; };
+  $cmd = function (string $line, array $ok) use ($fp, $rd) { if ($line !== '') fwrite($fp, $line . "\r\n"); $r = $rd(); if (!in_array((int)substr($r, 0, 3), $ok, true)) throw new RuntimeException((preg_match('/^(EHLO|STARTTLS|MAIL|RCPT|DATA|QUIT)/', $line, $mm) ? $mm[1] : 'paso') . ' → ' . trim($r)); return $r; };
+  try {
+    $cmd('', [220]); $host = $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $cmd("EHLO $host", [250]);
+    if ($secure === 'tls') { $cmd('STARTTLS', [220]);
+      if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT)) throw new RuntimeException('STARTTLS falló');
+      $cmd("EHLO $host", [250]); }
+    if (!empty($c['smtp_user'])) { $cmd('AUTH LOGIN', [334]); $cmd(base64_encode($c['smtp_user']), [334]); $cmd(base64_encode((string)$c['smtp_pass']), [235]); }
+    $cmd("MAIL FROM:<$from>", [250]);
+    foreach ($rcpt as $r) $cmd('RCPT TO:<' . $r . '>', [250, 251]);
+    $cmd('DATA', [354]);
+    $cmd(preg_replace('/^\./m', '..', $data) . "\r\n.", [250]);
+    $cmd('QUIT', [221]); fclose($fp); return true;
+  } catch (Throwable $e) { error_log('smtp: ' . $e->getMessage()); @fclose($fp); return false; }
 }
 
 /** HTML del correo de confirmación (lo usan api/correo.php y el panel para reenviar). */

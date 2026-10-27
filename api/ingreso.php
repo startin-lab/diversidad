@@ -24,5 +24,6 @@ try {
   $ya = (bool)$r['asistio'];
   if ($marcar && !$ya) { $pdo->prepare('UPDATE registros SET asistio=1 WHERE id=?')->execute([(int)$r['id']]); }
   json_out(['ok' => true, 'encontrado' => true, 'codigo' => $r['codigo'], 'nombres' => $r['nombres'], 'pronombre' => $r['pronombre'], 'organizacion' => $r['organizacion'],
-    'pliegue' => $r['pliegue'], 'ajustes' => json_decode($r['ajustes'] ?: '[]', true) ?: [], 'ya_ingreso' => $ya, 'marcado' => $marcar && !$ya]);
+    'pliegue' => $r['pliegue'], 'ajustes' => json_decode($r['ajustes'] ?: '[]', true) ?: [], 'ya_ingreso' => $ya, 'marcado' => $marcar && !$ya,
+    'foto' => !empty($r['foto']) ? (decrypt_str($r['foto']) ?: '') : '']);
 } catch (Throwable $e) { error_log('ingreso: ' . $e->getMessage()); json_out(['ok' => false, 'error' => 'Servicio no disponible.'], 500); }
