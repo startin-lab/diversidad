@@ -40,10 +40,20 @@ try {
   $pdo = db();
   // Evita duplicados: mismo documento o mismo correo → devuelve el registro existente
   $dh = hash('sha256', $documento . '|' . cfg()['enc_key_hex']);
-  $q = $pdo->prepare('SELECT codigo, nombres FROM registros WHERE documento_hash=? OR correo=? LIMIT 1');
-  $q->execute([$dh, $correo]);
+  $q = $pdo->prepare('SELECT id, codigo, nombres, correo, documento_hash, compromiso FROM registros WHERE documento_hash=? OR correo=? ORDER BY (documento_hash=?) DESC LIMIT 1');
+  $q->execute([$dh, $correo, $dh]);
   if ($r = $q->fetch()) {
-    json_out(['ok' => true, 'codigo' => $r['codigo'], 'repetido' => true, 'mensaje' => 'Ya tenías una inscripción. Te recordamos tu código.']);
+    if (hash_equals($r['documento_hash'], $dh) && $r['correo'] === $correo) {
+      // Mismo documento y mismo correo: actualiza los datos y vuelve a enviar la escarapela
+      $pdo->prepare('UPDATE registros SET nombres=?, organizacion=?, pronombre=?, grupos_enc=?, requiere_ajuste=?, ajustes=?, pliegue=?, compromiso=?, correo_enviado=0 WHERE id=?')
+          ->execute([$nombres, $organizacion, $pronombre, encrypt_str(json_encode($grupos, JSON_UNESCAPED_UNICODE)), $requiere ? 1 : 0, json_encode($ajustes, JSON_UNESCAPED_UNICODE), $pliegue, $compromiso, (int)$r['id']]);
+      if ($compromiso !== '' && $compromiso !== (string)$r['compromiso']) {
+        $pdo->prepare('INSERT INTO compromisos (texto, organizacion, pliegue) VALUES (?,?,?)')->execute([$compromiso, $organizacion, $pliegue]);
+      }
+      json_out(['ok' => true, 'codigo' => $r['codigo'], 'repetido' => true, 'actualizado' => true, 'mensaje' => 'Actualizamos tu inscripción.']);
+    }
+    // Coincide solo el documento o solo el correo: no se modifica nada
+    json_out(['ok' => true, 'codigo' => $r['codigo'], 'repetido' => true, 'mensaje' => 'Ya tenías una inscripción. Para cambiar tus datos usa el mismo documento y el mismo correo.']);
   }
   $codigo = gen_code($pdo);
   $st = $pdo->prepare('INSERT INTO registros (codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,ip_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?)');
