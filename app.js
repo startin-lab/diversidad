@@ -205,6 +205,8 @@ let photo=null,crop={zoom:1,ox:0,oy:0};
 const cropBox=$("#cropBox"),cropCv=$("#cropCv"),cropZoom=$("#cropZoom");
 function drawCrop(){if(!photo)return;const R=cropCv.width/2,x=cropCv.getContext("2d");x.clearRect(0,0,cropCv.width,cropCv.height);x.save();x.beginPath();x.arc(R,R,R-2,0,Math.PI*2);x.clip();drawPhotoIn(x,R,R,R-2);x.restore();x.strokeStyle="#FFC20E";x.lineWidth=3;x.beginPath();x.arc(R,R,R-2,0,Math.PI*2);x.stroke();}
 function drawPhotoIn(x,cx,cy,R){const s0=Math.max(2*R/photo.width,2*R/photo.height)*crop.zoom;const w=photo.width*s0,h=photo.height*s0;const maxX=Math.max(0,(w-2*R)/2)/R,maxY=Math.max(0,(h-2*R)/2)/R;crop.ox=Math.max(-maxX,Math.min(maxX,crop.ox));crop.oy=Math.max(-maxY,Math.min(maxY,crop.oy));x.drawImage(photo,cx-w/2+crop.ox*R,cy-h/2+crop.oy*R,w,h);}
+function photoData(){if(!photo)return "";try{const c=document.createElement("canvas");c.width=c.height=420;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,420,420);drawPhotoIn(x,210,210,210);return c.toDataURL("image/jpeg",.86);}catch(e){return "";}}
+function setPhotoFromData(url){return new Promise(res=>{const im=new Image();im.onload=()=>{photo=im;crop={zoom:1,ox:0,oy:0};cropZoom.value=1;cropBox.hidden=false;drawCrop();res(true);};im.onerror=()=>res(false);im.src=url;});}
 $("#fPhoto").addEventListener("change",e=>{const f=e.target.files[0];if(!f){photo=null;cropBox.hidden=true;return;}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{photo=im;crop={zoom:1,ox:0,oy:0};cropZoom.value=1;cropBox.hidden=false;drawCrop();};im.src=r.result;};r.readAsDataURL(f);});
 cropZoom.addEventListener("input",()=>{crop.zoom=+cropZoom.value;drawCrop();});
 (function(){let drag=null;const R=()=>cropCv.width/2;
@@ -228,7 +230,7 @@ $("#regForm").addEventListener("submit",async e=>{
   if(miss.length){err.hidden=false;err.textContent="Para doblar tu escarapela falta: "+miss.join(", ")+".";err.scrollIntoView({block:"center"});return;}
   err.hidden=true;btn.disabled=true;btn.textContent="Guardando…";
   const d={nombres:name,documento:doc,organizacion:org,correo:mail,pronombre:$("#fPron").value.trim(),grupos:grps,grupo_otro:$("#fGrpOther").value.trim(),requiere_ajuste:ajq.value==="si",
-    ajustes:$$('input[name="aj"]:checked').map(x=>x.value),ajuste_otro:$("#fAjOther").value.trim(),pliegue:P[pickIdx()].label,compromiso:$("#fPledge").value.trim(),consentimiento:true};
+    ajustes:$$('input[name="aj"]:checked').map(x=>x.value),ajuste_otro:$("#fAjOther").value.trim(),pliegue:P[pickIdx()].label,compromiso:$("#fPledge").value.trim(),consentimiento:true,foto:photoData()};
   let res;try{const r=await fetch("api/registro.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});res=await r.json();}catch(x){res={ok:false,error:"No hay conexión. Intenta de nuevo."};}
   btn.disabled=false;btn.textContent="Doblar mi escarapela";
   if(!res.ok){err.hidden=false;err.textContent=res.error||"No pudimos guardar tu inscripción.";return;}
@@ -252,27 +254,42 @@ $("#regForm").addEventListener("submit",async e=>{
   }catch(x){$("#mailNote").textContent="Guardamos tu inscripción. Descarga tu escarapela aquí.";}
   if(d.compromiso)loadWall();
 });
-/* ----- Recuperar escarapela solo con el documento (sin crear registro) ----- */
+/* ----- Recuperar (documento + correo) y editar la escarapela ----- */
+function fillForm(j,doc){
+  const set=(id,v)=>{const e=$(id);if(e)e.value=v||"";};
+  set("#fName",j.nombres);set("#fDoc",doc);set("#fOrg",j.organizacion);set("#fMail",j.correo);set("#fPron",j.pronombre);set("#fPledge",j.compromiso);
+  const pi=P.findIndex(p=>p.label===j.pliegue);if(pi>=0){const r=document.querySelector(`input[name="pl"][value="${pi}"]`);if(r){r.checked=true;setColor();}}
+  $$('input[name="grp"]').forEach(o=>o.checked=false);let other="";
+  (j.grupos||[]).forEach(g=>{if(/^Otras: /.test(g)){other=g.slice(7);g="Otras";}const o=document.querySelector(`input[name="grp"][value="${CSS.escape(g)}"]`);if(o)o.checked=true;});
+  $("#fGrpOther").value=other;$("#grpOtherWrap").hidden=!$("#grpOther").checked;
+  const aq=document.querySelector(`input[name="ajq"][value="${j.requiere_ajuste?"si":"no"}"]`);if(aq){aq.checked=true;$("#ajWrap").hidden=!j.requiere_ajuste;}
+  const known=$$('input[name="aj"]').map(o=>o.value),extra=[];$$('input[name="aj"]').forEach(o=>o.checked=(j.ajustes||[]).includes(o.value));
+  (j.ajustes||[]).forEach(a=>{if(!known.includes(a))extra.push(a);});$("#fAjOther").value=extra.join(", ");
+}
 async function recoverBadge(){
-  const err=$("#recErr"),btn=$("#recBtn"),doc=$("#recDoc").value.replace(/[^0-9A-Za-z]/g,"");
+  const err=$("#recErr"),btn=$("#recBtn"),doc=$("#recDoc").value.replace(/[^0-9A-Za-z]/g,""),mail=$("#recMail").value.trim().toLowerCase();
   if(doc.length<5){err.hidden=false;err.textContent="Escribe tu número de documento completo.";return;}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){err.hidden=false;err.textContent="Escribe el correo con el que te inscribiste.";return;}
   err.hidden=true;btn.disabled=true;btn.textContent="Buscando…";
-  let j;try{const r=await fetch("api/recuperar.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({documento:doc})});j=await r.json();}catch(x){j={ok:false,error:"No hay conexión. Intenta de nuevo."};}
+  let j;try{const r=await fetch("api/recuperar.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({documento:doc,correo:mail})});j=await r.json();}catch(x){j={ok:false,error:"No hay conexión. Intenta de nuevo."};}
   btn.disabled=false;btn.textContent="Ver mi escarapela";
   if(!j.ok){err.hidden=false;err.textContent=j.error||"No encontramos tu inscripción.";return;}
+  if(j.foto)await setPhotoFromData(j.foto);
+  fillForm(j,doc);
   try{await Promise.race([Promise.all(["900 80px elza","700 40px elza","500 30px elza","400 30px elza","italic 400 30px elza"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
   try{await Promise.race([LOGOSTRIP.decode(),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
   const pl=Math.max(0,P.findIndex(p=>p.label===j.pliegue));
   const url=renderBadge({name:j.nombres,org:j.organizacion,pron:j.pronombre||"",pledge:j.compromiso||"",pl,code:j.codigo});
   $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${j.nombres}, ${j.organizacion}, código ${j.codigo}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${j.codigo}.png`;
   $("#waBtn").href="https://wa.me/?text="+encodeURIComponent(`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque. #DoblarNoEsRomper ${location.origin}`);
-  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;
+  step(4);$("#foldStage").hidden=true;$("#badgeOut").hidden=false;$("#editBtn").hidden=false;
   $("#studioMsg").textContent=`Hola, ${j.nombres.split(" ")[0]}. Esta es tu escarapela; tu código es ${j.codigo}.`;
-  $("#mailNote").textContent="No se creó un registro nuevo. Si necesitas cambiar tus datos, vuelve a inscribirte con tu mismo documento y correo.";
+  $("#mailNote").textContent=j.foto?"No se creó un registro nuevo. Para cambiar algo, pulsa «Editar mis datos».":"No se creó un registro nuevo. Tu inscripción no tiene foto guardada: pulsa «Editar mis datos» para agregarla.";
   setTimeout(()=>$("#badgeImg").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}),150);
 }
 $("#recBtn").addEventListener("click",recoverBadge);
-$("#recDoc").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();recoverBadge();}});
+[$("#recDoc"),$("#recMail")].forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();recoverBadge();}}));
+$("#editBtn").addEventListener("click",()=>{$("#recBox").open=false;$("#editNote").hidden=false;$("#editNote").textContent="Cambia lo que necesites (puedes subir o reencuadrar tu foto), marca la autorización de datos y pulsa «Doblar mi escarapela». Conservas el mismo código.";$("#fName").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"});setTimeout(()=>$("#fName").focus({preventScroll:true}),400);});
 function wrapText(ctx,text,maxW){const words=text.split(/\s+/),lines=[];let line="";words.forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);return lines;}
 function drawQR(x,text,X,Y,S){try{if(typeof qrcode!=="function")return false;const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),cell=S/(n+4);x.fillStyle="#fff";x.fillRect(X,Y,S,S);x.fillStyle="#0C1646";for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))x.fillRect(X+(c+2)*cell,Y+(r+2)*cell,Math.ceil(cell),Math.ceil(cell));return true;}catch(e){return false;}}
 const LOGOSTRIP=new Image();LOGOSTRIP.src="assets/aliados-franja.webp?v=x";
