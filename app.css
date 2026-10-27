@@ -204,7 +204,7 @@ fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
 .evento{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);max-width:1280px;margin:0 auto;padding:22px 0 60px}
 .note{display:inline-block;background:rgba(255,194,14,.12);border:1px dashed var(--sun);color:var(--fg);border-radius:10px;padding:8px 12px;font-size:.88rem;margin:10px 0 0}
 .agenda{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid var(--line)}
-.agenda li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;padding:11px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.agenda li{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;padding:11px 0;border-bottom:1px solid var(--line);align-items:baseline}
 .agenda time{font-family:var(--font-display);font-weight:700;font-size:1.1rem;color:var(--sun);font-variant-numeric:tabular-nums}
 .agenda b{display:block;font-family:var(--font-display);font-size:1.05rem}.agenda span{color:var(--muted);font-size:.92rem}
 .timeline{display:grid;gap:10px;margin-top:14px}
@@ -325,7 +325,7 @@ fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
 
   /* Evento */
   .evento{padding-top:16px}
-  .agenda li{grid-template-columns:54px minmax(0,1fr);gap:10px}
+  .agenda li{grid-template-columns:104px minmax(0,1fr);gap:10px}.agenda time{font-size:.88rem}
   .wall-form{display:grid;grid-template-columns:minmax(0,1fr)}
   .wall-form .btn{width:100%}
   .sources li{margin-bottom:8px}
@@ -363,3 +363,6 @@ fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
 .rec-row input{border:2px solid var(--line);background:var(--ink);color:var(--fg);border-radius:10px;padding:11px 14px;font:1rem var(--font-body)}
 .rec-row input#recMail{flex:1 1 220px}
 .edit-note{margin:0 0 16px;padding:10px 14px;border-radius:12px;background:rgba(255,194,14,.14);border:1px solid var(--sun);font-size:.92rem}
+
+.objetivo{margin:14px 0 4px;padding:14px 16px;border-left:4px solid var(--sun);background:rgba(255,194,14,.08);border-radius:0 12px 12px 0}.objetivo span{display:block;font-family:var(--font-display);font-weight:700;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sun);margin-bottom:4px}.objetivo p{margin:0;line-height:1.5}
+.agenda time{white-space:nowrap}.ag-intro{margin:16px 0 0;color:var(--muted);font-size:.95rem}

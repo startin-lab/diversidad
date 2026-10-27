@@ -1,4 +1,4 @@
-<?php $v = '2026.10.27a'; ?><!doctype html>
+<?php $v = '2026.10.27b'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -56,7 +56,7 @@
       <p class="lede std-only">Una organización, como una hoja de papel, no necesita romperse para cambiar de forma. Necesita pliegues bien hechos: decisiones que reorganizan lo que ya existe para que todas las personas quepan.</p>
       <p class="lede easy-only">Una empresa puede cambiar sin romperse. Como un papel que se dobla. Así todas las personas tienen un lugar.</p>
       <div class="meta">
-        <div><b>11 de noviembre de 2026</b><span>8:00 a.m. – 1:00 p.m.</span></div>
+        <div><b>11 de noviembre de 2026</b><span>7:30 a.m. – 12:30 p.m.</span></div>
         <div><b>Universidad El Bosque · HUB iEX</b><span>Cra. 7b Bis No. 132-28, Bogotá</span></div>
         <div class="countdown" role="timer" aria-live="off" aria-label="Cuenta regresiva para el Encuentro"><span class="cd-title">Faltan</span><div class="cd" id="cd"><div><b id="cdD">—</b><span>días</span></div><i>:</i><div><b id="cdH">—</b><span>horas</span></div><i>:</i><div><b id="cdM">—</b><span>min</span></div><i>:</i><div><b id="cdS">—</b><span>seg</span></div></div></div>
       </div>
@@ -204,18 +204,16 @@
 <section class="scene scroll" id="s-evento" data-scene="evento" aria-labelledby="hEv" hidden>
   <div class="evento">
     <div class="ev-col">
-      <span class="eyebrow">Miércoles 11 de noviembre · 8:00 a.m. – 1:00 p.m.</span>
+      <span class="eyebrow">Miércoles 11 de noviembre · 7:30 a.m. – 12:30 p.m.</span>
       <h2 id="hEv">La <b>ruta</b> de la mañana</h2>
-      <p class="note">Agenda propuesta, por confirmar con el comité organizador.</p>
+      <div class="objetivo"><span>Objetivo del Encuentro</span><p>Fortalecer las capacidades para liderar procesos de gestión del cambio organizacional desde un enfoque interseccional, que trasciendan la implementación de la normatividad vigente y sean sostenibles e innovadores.</p></div>
+      <p class="ag-intro">Temas de profundo interés actual en el país y en la región:</p>
       <ol class="agenda">
-        <li><time>8:00</time><div><b>Registro y bienvenida</b><span>Entrega de escarapelas y activación de ajustes razonables.</span></div></li>
-        <li><time>8:30</time><div><b>Apertura · Doblar no es romper</b><span>Universidad El Bosque y DiversidadES.</span></div></li>
-        <li><time>8:50</time><div><b>Marcar</b><span>Lo que dicen los datos y lo que exige la Ley 2466 de 2025.</span></div></li>
-        <li><time>9:35</time><div><b>Doblar</b><span>Rediseñar procesos de talento sin dejar a nadie atrás.</span></div></li>
-        <li><time>10:20</time><div><b>Sostener</b><span>Cultura, liderazgo y medición para que la inclusión dure.</span></div></li>
-        <li><time>11:00</time><div><b>Taller de pliegues</b><span>Mesas de cocreación: cada reto sale con responsable, fecha e indicador.</span></div></li>
-        <li><time>12:20</time><div><b>Muro de compromisos</b><span>Cada organización deja su pliegue público.</span></div></li>
-        <li><time>12:45</time><div><b>Cierre y foto de comunidad</b><span>Aliados del 5° Encuentro.</span></div></li>
+        <li><time>7:30 – 8:30</time><div><b>Registro</b><span>Entrega de escarapelas y activación de ajustes razonables.</span></div></li>
+        <li><time>8:30 – 9:20</time><div><b>Panel · Atención con enfoque diferencial en emergencias y tiempos de crisis</b></div></li>
+        <li><time>9:30 – 10:30</time><div><b>Laboratorio de IA aplicada a procesos de inclusión en las organizaciones</b></div></li>
+        <li><time>10:30 – 11:00</time><div><b>Refrigerio</b></div></li>
+        <li><time>11:30 – 12:30</time><div><b>¿Cómo vamos con el cumplimiento de normas DEI? Desafíos y logros de cambio organizacional</b></div></li>
       </ol>
       <h3>Muro de compromisos</h3>
       <form class="wall-form" id="wallForm"><label for="wallIn" class="sr">Tu compromiso</label><input id="wallIn" maxlength="140" placeholder="Mi organización se compromete a…"><input id="wallOrg" maxlength="60" placeholder="Organización"><button class="btn btn-ghost" type="submit">Pegar</button></form>

@@ -141,7 +141,7 @@ $("#s-inicio").addEventListener("pointermove",e=>{if(reduced())return;const r=cv
 window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(sizeCanvas,120);});
 
 /* ================= CUENTA REGRESIVA ================= */
-(function(){const T=new Date("2026-11-11T08:00:00-05:00").getTime(),box=$(".countdown");const pad=n=>String(n).padStart(2,"0");
+(function(){const T=new Date("2026-11-11T07:30:00-05:00").getTime(),box=$(".countdown");const pad=n=>String(n).padStart(2,"0");
   function tick(){const diff=T-Date.now();
     if(diff<=0){box.innerHTML='<span class="cd-title">¡Es hoy!</span><div class="cd done">Nos vemos en el HUB iEX de la Universidad El Bosque</div>';return;}
     const d=Math.floor(diff/864e5),h=Math.floor(diff%864e5/36e5),m=Math.floor(diff%36e5/6e4),s=Math.floor(diff%6e4/1e3);
@@ -332,7 +332,7 @@ function renderBadge(d){
   x.fillStyle="#0C1646";x.font="900 92px elza, sans-serif";x.fillText(d.code,cx0,qy+165);
   x.fillStyle="#4B537F";x.font="400 26px elza, sans-serif";x.fillText("Preséntalo en el registro el 11 de noviembre",cx0,qy+208);
   x.fillStyle="#0C1646";x.fillRect(m,Hc-m-150,W-2*m,150);
-  x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,Hc-m-86);
+  x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 7:30 a.m.",m+40,Hc-m-86);
   x.fillStyle="#fff";x.font="400 30px elza, sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,Hc-m-38);
   x.textAlign="right";
   x.fillStyle="#F26A21";x.font="900 40px elza, sans-serif";x.fillText("ASISTENTE",W-m-30,Hc-m-62);
