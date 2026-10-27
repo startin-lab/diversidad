@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22t'; ?><!doctype html>
+<?php $v = '2026.10.22u'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -256,5 +256,6 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="app.js?v=<?= $v ?>"></script>
+<a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener" aria-label="Hecho por Startin Lab">by <b>Startin*Lab</b></a>
 </body>
 </html>
