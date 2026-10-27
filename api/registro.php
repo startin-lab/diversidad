@@ -18,6 +18,7 @@ $pliegue = clean((string)($in['pliegue'] ?? ''), 40);
 $compromiso = clean((string)($in['compromiso'] ?? ''), 200);
 $consent = !empty($in['consentimiento']);
 $badge = (string)($in['escarapela_png'] ?? '');
+$foto = foto_cifrada((string)($in['foto'] ?? ''));
 
 $errores = [];
 if (mb_strlen($nombres) < 3) $errores[] = 'nombres y apellidos';
@@ -47,6 +48,7 @@ try {
       // Mismo documento y mismo correo: actualiza los datos y vuelve a enviar la escarapela
       $pdo->prepare('UPDATE registros SET nombres=?, organizacion=?, pronombre=?, grupos_enc=?, requiere_ajuste=?, ajustes=?, pliegue=?, compromiso=?, correo_enviado=0 WHERE id=?')
           ->execute([$nombres, $organizacion, $pronombre, encrypt_str(json_encode($grupos, JSON_UNESCAPED_UNICODE)), $requiere ? 1 : 0, json_encode($ajustes, JSON_UNESCAPED_UNICODE), $pliegue, $compromiso, (int)$r['id']]);
+      if ($foto) $pdo->prepare('UPDATE registros SET foto=? WHERE id=?')->execute([$foto, (int)$r['id']]);
       if ($compromiso !== '' && $compromiso !== (string)$r['compromiso']) {
         $pdo->prepare('INSERT INTO compromisos (texto, organizacion, pliegue) VALUES (?,?,?)')->execute([$compromiso, $organizacion, $pliegue]);
       }
@@ -56,9 +58,9 @@ try {
     json_out(['ok' => true, 'codigo' => $r['codigo'], 'repetido' => true, 'mensaje' => 'Ya tenías una inscripción. Para cambiar tus datos usa el mismo documento y el mismo correo.']);
   }
   $codigo = gen_code($pdo);
-  $st = $pdo->prepare('INSERT INTO registros (codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,ip_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?)');
+  $st = $pdo->prepare('INSERT INTO registros (codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,ip_hash,foto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,?,?)');
   $st->execute([$codigo, $nombres, encrypt_str($documento), $dh, $organizacion, $correo, $pronombre,
-    encrypt_str(json_encode($grupos, JSON_UNESCAPED_UNICODE)), $requiere ? 1 : 0, json_encode($ajustes, JSON_UNESCAPED_UNICODE), $pliegue, $compromiso, ip_hash()]);
+    encrypt_str(json_encode($grupos, JSON_UNESCAPED_UNICODE)), $requiere ? 1 : 0, json_encode($ajustes, JSON_UNESCAPED_UNICODE), $pliegue, $compromiso, ip_hash(), $foto]);
   if ($compromiso !== '') {
     $pdo->prepare('INSERT INTO compromisos (texto, organizacion, pliegue) VALUES (?,?,?)')->execute([$compromiso, $organizacion, $pliegue]);
   }

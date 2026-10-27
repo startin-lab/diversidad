@@ -32,6 +32,8 @@ function db(): PDO {
     creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX (correo), INDEX (documento_hash), INDEX (creado)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+  static $fotoCol = false;
+  if (!$fotoCol) { try { $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS foto MEDIUMTEXT NULL"); } catch (Throwable $e) {} $fotoCol = true; }
   $pdo->exec("CREATE TABLE IF NOT EXISTS compromisos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     texto VARCHAR(200) NOT NULL,
@@ -145,4 +147,12 @@ function correo_confirmacion_html(array $r, bool $conEscarapela = true): string 
     <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">by <a href="https://startinlab.org" style="color:#8A90B8;text-decoration:none">Startin<span style="color:#E01CC0">*</span>Lab</a> · <a href="https://startinlab.org" style="color:#8A90B8">startinlab.org</a></p>
   </div></body></html>';
   return $html;
+}
+
+/** Valida una foto recortada (data URL JPEG/PNG) y la devuelve cifrada, o null. */
+function foto_cifrada(string $dataUrl): ?string {
+  if (!preg_match('#^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$#', $dataUrl, $m)) return null;
+  if (strlen($m[2]) > 500000) return null;
+  $bin = base64_decode($m[2], true); if ($bin === false || @getimagesizefromstring($bin) === false) return null;
+  return encrypt_str($dataUrl);
 }
