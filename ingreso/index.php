@@ -66,4 +66,4 @@ $("#btnScan").onclick=startScan;$("#btnStop").onclick=stopScan;
 })();
 </script>
 <?php endif; ?>
-<p style="text-align:center;font-size:.8rem;margin:24px 0 8px"><a href="https://startinlab.org" target="_blank" rel="noopener" style="color:#C9CDEA;text-decoration:none">by Startin<span style="color:#FF2BD6">*</span>Lab</a></p></main></body></html>
+</main><style>.startin-credit{position:fixed;z-index:60;right:12px;bottom:calc(var(--dock,0px) + 10px + env(safe-area-inset-bottom,0px));font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85;transition:opacity .2s,color .2s}.startin-credit b{color:#16162B;font-weight:800;letter-spacing:-.01em}.startin-credit:hover,.startin-credit:focus-visible{opacity:1;color:#16162B}@media (min-width:901px){.startin-credit{bottom:16px;right:16px}}</style><a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener" aria-label="Hecho por Startin Lab">by <b>Startin*Lab</b></a></body></html>
