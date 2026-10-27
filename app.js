@@ -154,19 +154,19 @@ window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setT
 const row=$("#row");
 P.forEach((p,i)=>{const b=document.createElement("button");b.className="fig in";b.setAttribute("role","listitem");b.dataset.label=p.label;b.setAttribute("aria-label","Ver la cifra: "+p.label);
   b.style.setProperty("--d",(i*.4)+"s");b.style.setProperty("--h",p.h);b.style.animationDelay=(i*.4)+"s,"+(i*.08)+"s";
-  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=r" alt="" loading="eager" decoding="async">`;
+  b.innerHTML=`<img src="assets/fig/${p.img}.webp?v=x" alt="" loading="eager" decoding="async">`;
   b.onclick=()=>{select(i,true);go("cifras");};row.appendChild(b);});
 
 /* ================= CIFRAS ================= */
 const chips=$("#chips");let cur=3;
 P.forEach((p,i)=>{const c=document.createElement("button");c.className="chip";c.setAttribute("role","tab");c.id="tab-"+p.id;c.style.setProperty("--c",p.c);
-  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=r" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
+  c.innerHTML=`<img src="assets/fig/${p.img}.webp?v=x" alt="">${esc(p.label)}`;c.onclick=()=>select(i,true);
   c.addEventListener("keydown",e=>{if(e.key==="ArrowDown"||e.key==="ArrowUp"||e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=(i+((e.key==="ArrowDown"||e.key==="ArrowRight")?1:-1)+P.length)%P.length;select(n,true);chips.children[n].focus();}});
   chips.appendChild(c);});
 function select(i,anim){cur=i;[...chips.children].forEach((c,j)=>{c.setAttribute("aria-selected",String(j===i));c.tabIndex=j===i?0:-1;});renderPanel(anim);}
 function renderPanel(anim){const p=P[cur],pn=$("#panel"),easy=root.dataset.easy==="si";pn.style.setProperty("--c",p.c);pn.setAttribute("aria-labelledby","tab-"+p.id);
   const bars=p.bars?`<div class="bars">${p.bars.map((b,k)=>`<div><div class="bar-l"><span>${esc(b[0])}</span><b>${String(b[1]).replace(".",",")}${p.unit}</b></div><div class="bar-t"><div class="bar-f${k?" alt":""}" data-w="${(b[1]/p.barMax*100).toFixed(1)}"></div></div></div>`).join("")}</div>`:"";
-  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=r" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
+  pn.innerHTML=`<img class="who" src="assets/fig/${p.img}.webp?v=x" alt=""><div><span class="eyebrow">${esc(p.label)}</span><div><span class="big${anim&&!reduced()?" unfold":""}">${esc(p.big)}</span></div><p class="statement">${esc(easy?p.easy:p.st)}</p>${bars}</div>
     <div><ul class="stats">${p.stats.map(s=>`<li>${esc(s)}</li>`).join("")}</ul><div class="action"><b>Qué puede doblar tu organización</b>${esc(p.act)}</div><p class="src">Fuente: ${esc(p.src)}</p>
     <div class="panel-tools"><button class="mini" id="pSay">Escuchar</button><button class="mini" id="pAsk">Preguntarle a Pliego</button><button class="mini" id="pNext">Siguiente pliegue →</button></div></div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>$$(".bar-f").forEach(f=>f.style.width=f.dataset.w+"%")));
@@ -239,6 +239,7 @@ $("#regForm").addEventListener("submit",async e=>{
   step(2);msg.textContent="Doblar: ajustamos la forma para que quepas tal como eres.";flaps[1].classList.add("down");await wait(600);flaps[3].classList.add("down");await wait(900);
   step(3);msg.textContent="Sostener: cada pliegue sostiene al siguiente.";sheet.classList.add("turn");await wait(1300);
   try{await Promise.race([Promise.all(["900 80px elza","700 40px elza","500 30px elza","400 30px elza","italic 400 30px elza"].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+  try{await Promise.race([LOGOSTRIP.decode(),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
   const url=renderBadge({name,org,pron:d.pronombre,pledge:d.compromiso,pl:pickIdx(),code});
   $("#badgeImg").src=url;$("#badgeImg").alt=`Escarapela del 5° Encuentro de ${name}, ${org}, código ${code}`;$("#dlBtn").href=url;$("#dlBtn").download=`escarapela-${code}.png`;
   const share=`Me inscribí al 5° Encuentro Diversidades e Inclusión: Gestión del cambio organizacional para la Inclusión y Equidad. 11 nov 2026, Universidad El Bosque.${d.compromiso?" Mi compromiso: "+d.compromiso:""} #DoblarNoEsRomper ${location.origin}`;
@@ -253,8 +254,9 @@ $("#regForm").addEventListener("submit",async e=>{
 });
 function wrapText(ctx,text,maxW){const words=text.split(/\s+/),lines=[];let line="";words.forEach(w=>{const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);return lines;}
 function drawQR(x,text,X,Y,S){try{if(typeof qrcode!=="function")return false;const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),cell=S/(n+4);x.fillStyle="#fff";x.fillRect(X,Y,S,S);x.fillStyle="#0C1646";for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))x.fillRect(X+(c+2)*cell,Y+(r+2)*cell,Math.ceil(cell),Math.ceil(cell));return true;}catch(e){return false;}}
+const LOGOSTRIP=new Image();LOGOSTRIP.src="assets/aliados-franja.webp?v=x";
 function renderBadge(d){
-  const W=1080,H=1860,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const W=1080,H=2080,Hc=H-220,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   paint(x,W,H,buildMesh(W,H,120,d.name.length*31+7),{x:.8,y:.15},false);
   const p=P[d.pl],m=70,top=520,fold=110;
   // ojal para el cordón (transparente de verdad)
@@ -267,7 +269,7 @@ function renderBadge(d){
   x.fillStyle="#0C1646";x.font="700 46px elza, sans-serif";x.fillText("ENCUENTRO",m+240,230);x.font="700 56px elza, sans-serif";x.fillText("Diversidades",m+240,288);x.fillText("e Inclusión",m+240,346);
   x.fillStyle="#fff";x.font="700 34px elza, sans-serif";x.fillText("Gestión del cambio organizacional para la Inclusión y Equidad",m,430,W-2*m);
   // tarjeta de papel con esquina doblada
-  x.fillStyle="#F7F4EE";x.beginPath();x.moveTo(m,top);x.lineTo(W-m-fold,top);x.lineTo(W-m,top+fold);x.lineTo(W-m,H-m);x.lineTo(m,H-m);x.closePath();x.fill();
+  x.fillStyle="#F7F4EE";x.beginPath();x.moveTo(m,top);x.lineTo(W-m-fold,top);x.lineTo(W-m,top+fold);x.lineTo(W-m,Hc-m);x.lineTo(m,Hc-m);x.closePath();x.fill();
   x.fillStyle="rgba(12,22,70,.18)";x.beginPath();x.moveTo(W-m-fold,top);x.lineTo(W-m-fold,top+fold);x.lineTo(W-m,top+fold);x.closePath();x.fill();
   x.fillStyle=p.c;x.fillRect(m,top,W-2*m-fold,18);
   // foto circular con anillo
@@ -285,16 +287,21 @@ function renderBadge(d){
   y+=76;const label="MI PLIEGUE · "+p.label.toUpperCase();x.font="700 30px elza, sans-serif";const lw=x.measureText(label).width+60;
   x.fillStyle=p.c;x.beginPath();x.roundRect?x.roundRect(W/2-lw/2,y-42,lw,62,31):x.rect(W/2-lw/2,y-42,lw,62);x.fill();x.fillStyle="#0C1646";x.fillText(label,W/2,y);
   if(d.pledge){y+=78;x.font="italic 400 36px elza, sans-serif";x.fillStyle="#0C1646";wrapText(x,"«"+d.pledge+"»",W-2*m-120).slice(0,3).forEach(l=>{x.fillText(l,W/2,y);y+=48;});}
-  const qy=H-m-150-250,qs=220;const hasQR=drawQR(x,location.origin+"/v/"+d.code,W-m-60-qs,qy,qs);
+  const qy=Hc-m-150-250,qs=220;const hasQR=drawQR(x,location.origin+"/v/"+d.code,W-m-60-qs,qy,qs);
   x.textAlign=hasQR?"left":"center";const cx0=hasQR?m+60:W/2;
   x.fillStyle="#4B537F";x.font="700 28px elza, sans-serif";x.fillText("CÓDIGO DE REGISTRO",cx0,qy+70);
   x.fillStyle="#0C1646";x.font="900 92px elza, sans-serif";x.fillText(d.code,cx0,qy+165);
   x.fillStyle="#4B537F";x.font="400 26px elza, sans-serif";x.fillText("Preséntalo en el registro el 11 de noviembre",cx0,qy+208);
-  x.fillStyle="#0C1646";x.fillRect(m,H-m-150,W-2*m,150);
-  x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,H-m-86);
-  x.fillStyle="#fff";x.font="400 30px elza, sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,H-m-38);
-  {x.textAlign="left";x.font="700 26px elza, sans-serif";const s1="by Startin",s2="*",s3="Lab",w1=x.measureText(s1).width,w2=x.measureText(s2).width,w3=x.measureText(s3).width;let bx=W-m-30-(w1+w2+w3);x.fillStyle="#C9CDEA";x.fillText(s1,bx,H-m-38);x.fillStyle="#FF2BD6";x.fillText(s2,bx+w1,H-m-38);x.fillStyle="#C9CDEA";x.fillText(s3,bx+w1+w2,H-m-38);x.textAlign="right";}
-  x.fillStyle="#F26A21";x.font="900 36px elza, sans-serif";x.fillText("ASISTENTE",W-m-30,H-m-86);
+  x.fillStyle="#0C1646";x.fillRect(m,Hc-m-150,W-2*m,150);
+  x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,Hc-m-86);
+  x.fillStyle="#fff";x.font="400 30px elza, sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,Hc-m-38);
+  x.textAlign="right";
+  x.fillStyle="#F26A21";x.font="900 40px elza, sans-serif";x.fillText("ASISTENTE",W-m-30,Hc-m-62);
+  // franja de aliados
+  {const sy=Hc-m+24,sh=H-m-sy;x.fillStyle="#fff";x.beginPath();x.roundRect?x.roundRect(m,sy,W-2*m,sh,22):x.rect(m,sy,W-2*m,sh);x.fill();
+   if(LOGOSTRIP.complete&&LOGOSTRIP.naturalWidth){const iw=W-2*m-28,ih=iw*LOGOSTRIP.naturalHeight/LOGOSTRIP.naturalWidth;x.drawImage(LOGOSTRIP,m+14,sy+(sh-ih)/2,iw,ih);}
+   else{x.fillStyle="#4B537F";x.font="700 26px elza, sans-serif";x.textAlign="center";x.fillText("Aliados del 5° Encuentro Diversidades e Inclusión",W/2,sy+sh/2+9);}}
+  
   return c.toDataURL("image/png");
 }
 
