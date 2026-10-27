@@ -22,6 +22,7 @@ input[type=text],input[type=password]{width:100%;padding:16px;border:2px solid r
 .scan{position:relative;border-radius:18px;overflow:hidden;background:#000;aspect-ratio:1;max-height:46dvh}.scan video{width:100%;height:100%;object-fit:cover}.scan .frame{position:absolute;inset:14%;border:3px solid var(--sun);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}.scan[hidden]{display:none}
 .result{border-radius:18px;padding:22px;display:grid;gap:6px;text-align:center}.result.ok{background:var(--ok)}.result.no{background:var(--no)}.result.warn{background:var(--warn);color:#000}
 .result .big{font-size:2rem;font-weight:900;line-height:1.1}.result .code{font-weight:800;letter-spacing:.06em;opacity:.9}.result .aj{background:rgba(255,255,255,.2);border-radius:12px;padding:10px;font-size:.95rem;margin-top:6px}
+.result .ph{width:150px;height:150px;border-radius:50%;object-fit:cover;justify-self:center;border:5px solid rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .result[hidden]{display:none}.muted{opacity:.75;font-size:.9rem}.login{margin-top:12vh;display:grid;gap:12px;text-align:center}
 .hist{display:grid;gap:6px;font-size:.9rem}.hist div{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;background:rgba(255,255,255,.08);border-radius:10px}
 </style></head><body>
@@ -47,9 +48,10 @@ async function validar(v){v=v.trim();if(!v)return;if(v===last&&Date.now()-lastT<
   try{const r=await fetch("../api/ingreso.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:v,marcar:true})});const j=await r.json();
     if(!j.ok){res.className="result no";res.innerHTML=`<div class='big'>Error</div><div>${esc(j.error||"")}</div>`;beep(false);return;}
     if(!j.encontrado){res.className="result no";res.innerHTML=`<div class='big'>No está inscrito/a</div><div class='code'>${esc(v)}</div><div class='muted'>Invítale a inscribirse en el portal o verifica el documento.</div>`;beep(false);return;}
+    const ph=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(j.foto||"")?`<img class='ph' src='${j.foto}' alt='Foto de ${esc(j.nombres)}'>`:"";
     const aj=j.ajustes&&j.ajustes.length?`<div class='aj'><b>Ajustes razonables:</b> ${esc(j.ajustes.join(", "))}</div>`:"";
-    if(j.ya_ingreso){res.className="result warn";res.innerHTML=`<div class='big'>Ya había ingresado</div><div style='font-size:1.3rem;font-weight:800'>${esc(j.nombres)}</div><div>${esc(j.organizacion)}</div><div class='code'>${esc(j.codigo)}</div>${aj}`;beep(false);}
-    else{res.className="result ok";res.innerHTML=`<div class='big'>¡Bienvenido/a!</div><div style='font-size:1.4rem;font-weight:800'>${esc(j.nombres)}${j.pronombre?" · "+esc(j.pronombre):""}</div><div>${esc(j.organizacion)}</div><div class='code'>${esc(j.codigo)}</div>${aj}`;beep(true);}
+    if(j.ya_ingreso){res.className="result warn";res.innerHTML=`${ph}<div class='big'>Ya había ingresado</div><div style='font-size:1.3rem;font-weight:800'>${esc(j.nombres)}</div><div>${esc(j.organizacion)}</div><div class='code'>${esc(j.codigo)}</div>${aj}`;beep(false);}
+    else{res.className="result ok";res.innerHTML=`${ph}<div class='big'>¡Bienvenido/a!</div><div style='font-size:1.4rem;font-weight:800'>${esc(j.nombres)}${j.pronombre?" · "+esc(j.pronombre):""}</div><div>${esc(j.organizacion)}</div><div class='code'>${esc(j.codigo)}</div>${aj}`;beep(true);}
     const d=document.createElement("div");d.innerHTML=`<span>${esc(j.nombres)}</span><span>${esc(j.codigo)} · ${new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"})}</span>`;hist.prepend(d);while(hist.children.length>8)hist.lastChild.remove();
   }catch(e){res.className="result no";res.innerHTML="<div class='big'>Sin conexión</div>";}
 }
