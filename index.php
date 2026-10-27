@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22r'; ?><!doctype html>
+<?php $v = '2026.10.22s'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -224,7 +224,7 @@
         <article class="ed now"><span class="num">5ª</span><span class="st">11 nov 2026 · HUB iEX, UEB</span><h4>Gestión del cambio organizacional para la Inclusión y Equidad</h4><p>Del diagnóstico a la transformación: marcar, doblar y sostener.</p></article>
       </div>
       <h3>Hacen posible el Encuentro</h3>
-      <div class="allies"><span>Universidad El Bosque</span><span>DiversidadES</span><span>Claro</span><span>Umanos Lab</span><span>Bancamía</span><span>Fundación BBVA Microfinanzas</span><span>Equilatera</span><span>Fundación CIREC</span><span>Cámara de la Diversidad</span><span>Pride Connection Colombia</span><span>Escuela Colombiana de Rehabilitación</span><span>101ideas.co</span><span>Nuestro Flow</span><span>Evas &amp; Adanes</span></div>
+      <ul class="allies-logos" role="list"><li class="al-text">Universidad El Bosque</li><li><img src="assets/aliado-diversidades.webp?v=s" alt="DiversidadES" loading="lazy" decoding="async"></li><li><img src="assets/aliado-centro-diversidad.webp?v=s" alt="Centro de Diversidad, Equidad e Inclusión" loading="lazy" decoding="async"></li><li><img src="assets/aliado-claro.webp?v=s" alt="Claro" loading="lazy" decoding="async"></li><li><img src="assets/aliado-umanos.webp?v=s" alt="Umanos Lab" loading="lazy" decoding="async"></li><li class="wide"><img src="assets/aliado-bancamia.webp?v=s" alt="Bancamía y Fundación BBVA Microfinanzas" loading="lazy" decoding="async"></li><li><img src="assets/aliado-equilatera.webp?v=s" alt="Equilatera, Inclusión y Sostenibilidad" loading="lazy" decoding="async"></li><li><img src="assets/aliado-startin.webp?v=s" alt="Startin" loading="lazy" decoding="async"></li><li><img src="assets/aliado-externado.webp?v=s" alt="Universidad Externado de Colombia, Facultad de Administración de Empresas" loading="lazy" decoding="async"></li><li><img src="assets/aliado-cirec.webp?v=s" alt="Fundación CIREC" loading="lazy" decoding="async"></li><li><img src="assets/aliado-camara.webp?v=s" alt="Cámara de la Diversidad" loading="lazy" decoding="async"></li><li><img src="assets/aliado-pride.webp?v=s" alt="Pride Connection Colombia" loading="lazy" decoding="async"></li><li><img src="assets/aliado-ecr.webp?v=s" alt="Escuela Colombiana de Rehabilitación" loading="lazy" decoding="async"></li><li><img src="assets/aliado-101ideas.webp?v=s" alt="101ideas.co, El orgullo de la edad" loading="lazy" decoding="async"></li><li><img src="assets/aliado-nuestroflow.webp?v=s" alt="Nuestro Flow, Transformación social" loading="lazy" decoding="async"></li><li><img src="assets/aliado-evasadanes.webp?v=s" alt="Asociación Evas &amp; Adanes" loading="lazy" decoding="async"></li></ul>
       <h3>Fuentes de las cifras</h3>
       <ol class="sources">
         <li>DANE, GEIH, población LGBT, jul 2025–jun 2026. <a href="https://www.dane.gov.co/files/operaciones/GEIH/bol-GEIHMLLGBT-jul2025-jun2026.pdf" target="_blank" rel="noopener">Boletín</a></li>
@@ -239,7 +239,7 @@
         <li>McKinsey, Diversity Matters Even More (2023), vía <a href="https://internationalwim.org/iwim-reports/diversity-matters-even-more-the-case-for-holistic-impact/" target="_blank" rel="noopener">IWIM</a>.</li>
         <li>4° Encuentro: <a href="https://www.lasillavacia.com/red-de-expertos/de-los-desafios-a-las-soluciones-encuentro-de-diversidades/" target="_blank" rel="noopener">La Silla Vacía</a> y <a href="https://confidencialnoticias.com/opinion/liderazgos-que-construyen-futuro-en-el-4-o-encuentro-de-diversidades/" target="_blank" rel="noopener">Confidencial Noticias</a>.</li>
       </ol>
-      <p class="credit">5° Encuentro Diversidades e Inclusión · Bogotá, 2026 · Portal by <a href="https://startin.org.co" target="_blank" rel="noopener">Startin.org.co</a></p>
+      <p class="credit">5° Encuentro Diversidades e Inclusión · Bogotá, 2026 · Portal by <a href="https://startinlab.org" target="_blank" rel="noopener">Startin<span class="ast">*</span>Lab</a></p>
     </div>
   </div>
 </section>

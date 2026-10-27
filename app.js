@@ -293,7 +293,7 @@ function renderBadge(d){
   x.fillStyle="#0C1646";x.fillRect(m,H-m-150,W-2*m,150);
   x.textAlign="left";x.fillStyle="#FFC20E";x.font="700 40px elza, sans-serif";x.fillText("11 nov 2026 · 8:00 a.m.",m+40,H-m-86);
   x.fillStyle="#fff";x.font="400 30px elza, sans-serif";x.fillText("Universidad El Bosque · HUB iEX, Bogotá",m+40,H-m-38);
-  x.textAlign="right";x.fillStyle="#C9CDEA";x.font="700 24px elza, sans-serif";x.fillText("By Startin.org.co",W-m-30,H-m-38);
+  {x.textAlign="left";x.font="700 26px elza, sans-serif";const s1="by Startin",s2="*",s3="Lab",w1=x.measureText(s1).width,w2=x.measureText(s2).width,w3=x.measureText(s3).width;let bx=W-m-30-(w1+w2+w3);x.fillStyle="#C9CDEA";x.fillText(s1,bx,H-m-38);x.fillStyle="#FF2BD6";x.fillText(s2,bx+w1,H-m-38);x.fillStyle="#C9CDEA";x.fillText(s3,bx+w1+w2,H-m-38);x.textAlign="right";}
   x.fillStyle="#F26A21";x.font="900 36px elza, sans-serif";x.fillText("ASISTENTE",W-m-30,H-m-86);
   return c.toDataURL("image/png");
 }

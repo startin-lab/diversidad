@@ -14,4 +14,4 @@ function h(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES,
 <?php else: ?><div class="code"><?= h($r['codigo']) ?></div><p class="ok">Inscripción válida</p><p style="font-size:1.3rem;font-weight:800;margin:4px 0"><?= h($r['nombres']) ?></p><p style="margin:0"><?= h($r['organizacion']) ?></p>
   <?php if ($r['asistio']) echo '<p class="ok">✓ Asistencia registrada</p>'; ?>
   <?php if ($logged): if ($r['requiere_ajuste']) echo '<div class="aj"><b>Ajustes razonables:</b> ' . h(implode(', ', json_decode($r['ajustes'] ?: '[]', true) ?: [])) . '</div>'; if (!$r['asistio']) echo '<form method="post" style="margin-top:14px"><button class="btn" name="marcar" value="1">Marcar asistencia</button></form>'; else echo ''; else: ?><p style="font-size:.85rem;color:#4B537F">El equipo de la mesa de entrada valida el ingreso en <a href="ingreso/">/ingreso</a>.</p><?php endif; ?>
-<?php endif; ?></div></body></html>
+<?php endif; ?><p style="margin:18px 0 0;font-size:.8rem"><a href="https://startinlab.org" target="_blank" rel="noopener" style="color:#4B537F;text-decoration:none">by Startin<span style="color:#E01CC0">*</span>Lab</a></p></div></body></html>
