@@ -1,4 +1,4 @@
-<?php $v = '2026.10.22u'; ?><!doctype html>
+<?php $v = '2026.10.22v'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -239,7 +239,6 @@
         <li>McKinsey, Diversity Matters Even More (2023), vía <a href="https://internationalwim.org/iwim-reports/diversity-matters-even-more-the-case-for-holistic-impact/" target="_blank" rel="noopener">IWIM</a>.</li>
         <li>4° Encuentro: <a href="https://www.lasillavacia.com/red-de-expertos/de-los-desafios-a-las-soluciones-encuentro-de-diversidades/" target="_blank" rel="noopener">La Silla Vacía</a> y <a href="https://confidencialnoticias.com/opinion/liderazgos-que-construyen-futuro-en-el-4-o-encuentro-de-diversidades/" target="_blank" rel="noopener">Confidencial Noticias</a>.</li>
       </ol>
-      <p class="credit">5° Encuentro Diversidades e Inclusión · Bogotá, 2026 · Portal by <a href="https://startinlab.org" target="_blank" rel="noopener">Startin<span class="ast">*</span>Lab</a></p>
     </div>
   </div>
 </section>
