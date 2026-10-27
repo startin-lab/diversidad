@@ -101,4 +101,4 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   <?php foreach ($comp as $m): ?><tr><td><?= h($m['texto']) ?></td><td><?= h($m['organizacion']) ?></td><td><?= h($m['pliegue']) ?></td><td class="muted"><?= h($m['creado']) ?></td><td><form method="post"><button class="btn ghost" name="borrar_compromiso" value="<?= (int)$m['id'] ?>" style="padding:5px 12px">Ocultar</button></form></td></tr><?php endforeach; ?>
   </tbody></table></div>
 <?php endif; ?>
-</div></body></html>
+<p class="muted" style="text-align:center;margin-top:28px"><a href="https://startinlab.org" target="_blank" rel="noopener" style="color:#4B537F;text-decoration:none">by Startin<span style="color:#E01CC0">*</span>Lab</a></p></div></body></html>
