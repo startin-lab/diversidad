@@ -167,7 +167,7 @@ function correo_confirmacion_html(array $r, bool $conEscarapela = true): string 
       <p style="font-size:34px;font-weight:900;letter-spacing:.04em;margin:0 0 14px">' . htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8') . '</p>
       <p>' . ($conEscarapela ? 'Preséntalo, o el código QR de tu escarapela adjunta, en la mesa de registro.' : 'Preséntalo en la mesa de registro. Si necesitas tu escarapela, vuelve a inscribirte en el portal con tu mismo documento y correo: se genera de nuevo con el mismo código.') . '</p>
       <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px">
-        <tr><td style="padding:8px 0;color:#4B537F;width:110px">Cuándo</td><td style="padding:8px 0;font-weight:700">Miércoles 11 de noviembre de 2026 · 8:00 a.m. – 1:00 p.m.</td></tr>
+        <tr><td style="padding:8px 0;color:#4B537F;width:110px">Cuándo</td><td style="padding:8px 0;font-weight:700">Miércoles 11 de noviembre de 2026 · 7:30 a.m. – 12:30 p.m. (registro desde las 7:30)</td></tr>
         <tr><td style="padding:8px 0;color:#4B537F">Dónde</td><td style="padding:8px 0;font-weight:700">Universidad El Bosque – HUB iEX<br><span style="font-weight:400">Cra. 7b Bis No. 132-28, Bogotá</span></td></tr>
       </table>' . $ajTxt . '
       <p style="margin-top:20px"><a href="' . $site . '" style="display:inline-block;background:#F26A21;color:#fff;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:999px">Volver al portal</a></p>

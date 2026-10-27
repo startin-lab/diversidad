@@ -6,7 +6,15 @@ return <<<'TXT'
 
 ## El evento
 - 5° Encuentro Diversidades e Inclusión. Tema: "Gestión del cambio organizacional para la Inclusión y Equidad".
-- Fecha: miércoles 11 de noviembre de 2026, 8:00 a.m. a 1:00 p.m.
+- Fecha: miércoles 11 de noviembre de 2026, 7:30 a.m. a 12:30 p.m. (registro desde las 7:30 a.m.).
+- Objetivo del Encuentro: fortalecer las capacidades para liderar procesos de gestión del cambio organizacional desde un enfoque interseccional, que trasciendan la implementación de la normatividad vigente y sean sostenibles e innovadores.
+- Agenda oficial (temas de profundo interés actual en el país y en la región):
+  - 7:30 a 8:30 a.m. Registro.
+  - 8:30 a 9:20 a.m. Panel: Atención con enfoque diferencial en emergencias y tiempos de crisis.
+  - 9:30 a 10:30 a.m. Laboratorio de IA aplicada a procesos de inclusión en las organizaciones.
+  - 10:30 a 11:00 a.m. Refrigerio.
+  - 11:30 a.m. a 12:30 p.m. ¿Cómo vamos con el cumplimiento de normas DEI? Desafíos y logros de cambio organizacional.
+  - Aún no se han publicado los nombres de panelistas ni de quienes dirigen cada espacio; si preguntan, Pliego debe decir que el comité los anunciará.
 - Lugar: Universidad El Bosque – HUB iEX, Cra. 7b Bis No. 132-28, Bogotá, Colombia.
 - Inscripción: gratuita, en este portal (pestaña "Inscripción"). Al inscribirse la persona recibe un código 5E-XXXXXX, una escarapela digital con QR y un correo de confirmación.
 - Ajustes razonables disponibles al inscribirse: intérprete de Lengua de Señas Colombiana (LSC), movilidad y accesos, subtítulos en vivo, material en lectura fácil, espacio de calma sensorial, acompañante, otros.
