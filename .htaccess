@@ -6,9 +6,9 @@ Options -Indexes
 <FilesMatch "\.(zip|sql|gz|tar|bak|old|log|md|env|ini)$|^default\.php$">
   Require all denied
 </FilesMatch>
-<Files "config.php">
+<FilesMatch "^config(\.graph)?\.php$">
   Require all denied
-</Files>
+</FilesMatch>
 <FilesMatch "^(lib|conocimiento)\.php$">
   Require all denied
 </FilesMatch>
