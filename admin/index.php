@@ -26,6 +26,7 @@ if ($logged && isset($_POST['guardar'], $_POST['id'])) {
   if (mb_strlen($nom) < 3) $errs[] = 'nombre'; if (mb_strlen($org) < 2) $errs[] = 'organización'; if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) $errs[] = 'correo';
   if (!$errs) { $q = db()->prepare('SELECT id FROM registros WHERE correo=? AND id<>?'); $q->execute([$mail, $id]); if ($q->fetch()) $errs[] = 'el correo ya lo usa otro registro'; }
   if ($errs) { $_SESSION['flash'] = 'No se guardó: revisa ' . implode(', ', $errs) . '.'; header('Location: ./?edit=' . $id); exit; }
+  if (!empty($_POST['quitar_foto'])) db()->prepare('UPDATE registros SET foto=NULL WHERE id=?')->execute([$id]);
   db()->prepare('UPDATE registros SET nombres=?, organizacion=?, correo=?, pronombre=?, pliegue=?, compromiso=?, requiere_ajuste=?, ajustes=? WHERE id=?')
      ->execute([$nom, $org, $mail, $pron, $pl, $comp, $req ? 1 : 0, json_encode($aj, JSON_UNESCAPED_UNICODE), $id]);
   $_SESSION['flash'] = 'Registro actualizado.'; header('Location: ./?edit=' . $id); exit;
@@ -54,7 +55,7 @@ if ($logged && isset($_POST['borrar_compromiso'])) {
   header('Location: ./#muro'); exit;
 }
 if ($logged && isset($_GET['csv'])) {
-  $rows = db()->query('SELECT * FROM registros ORDER BY id')->fetchAll();
+  $rows = db()->query('SELECT id,codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,asistio,correo_enviado,creado FROM registros ORDER BY id')->fetchAll();
   header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="inscripciones-5-encuentro-' . date('Ymd-Hi') . '.csv"');
   $o = fopen('php://output', 'w'); fprintf($o, "\xEF\xBB\xBF");
   fputcsv($o, ['Código','Nombres y apellidos','Documento','Organización','Correo','Pronombre','Grupos (pregunta 5)','Requiere ajuste','Ajustes','Pliegue','Compromiso','Asistió','Correo enviado','Fecha registro'], ';');
@@ -89,6 +90,7 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
 .muted{color:#4B537F;font-size:.85rem}
 .tbl{overflow-x:auto}
 .ed-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 16px}.ed-form label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.85rem}.ed-form label.chk{flex-direction:row;align-items:center;gap:8px}.ed-form input[type=text],.ed-form select{font-weight:400}.ed-form .bar{grid-column:1/-1}
+.foto-adm{grid-column:1/-1;display:flex;align-items:center;gap:12px}.foto-adm img{border-radius:50%;object-fit:cover}
 .ed-actions{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;display:grid;gap:12px}
 </style></head><body><div class="wrap">
 <?php if (!$logged): ?>
@@ -97,8 +99,8 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
 <?php else:
   $pdo = db();
   $f = clean((string)($_GET['f'] ?? ''), 80);
-  $rows = $f ? (function() use ($pdo, $f) { $q = $pdo->prepare('SELECT * FROM registros WHERE nombres LIKE ? OR organizacion LIKE ? OR correo LIKE ? OR codigo LIKE ? ORDER BY id DESC'); $like = "%$f%"; $q->execute([$like,$like,$like,$like]); return $q->fetchAll(); })()
-             : $pdo->query('SELECT * FROM registros ORDER BY id DESC')->fetchAll();
+  $rows = $f ? (function() use ($pdo, $f) { $q = $pdo->prepare('SELECT id,codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,asistio,correo_enviado,creado FROM registros WHERE nombres LIKE ? OR organizacion LIKE ? OR correo LIKE ? OR codigo LIKE ? ORDER BY id DESC'); $like = "%$f%"; $q->execute([$like,$like,$like,$like]); return $q->fetchAll(); })()
+             : $pdo->query('SELECT id,codigo,nombres,documento_enc,documento_hash,organizacion,correo,pronombre,grupos_enc,requiere_ajuste,ajustes,pliegue,compromiso,consentimiento,asistio,correo_enviado,creado FROM registros ORDER BY id DESC')->fetchAll();
   $all = $pdo->query('SELECT requiere_ajuste, ajustes, grupos_enc, asistio, organizacion FROM registros')->fetchAll();
   $total = count($all); $asis = 0; $ajN = 0; $ajCount = []; $grCount = []; $orgs = [];
   foreach ($all as $r) {
@@ -127,6 +129,7 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
       <label>Compromiso<input type="text" name="compromiso" value="<?= h($e['compromiso']) ?>" maxlength="200"></label>
       <label class="chk"><input type="checkbox" name="requiere_ajuste" value="1" <?= $e['requiere_ajuste'] ? 'checked' : '' ?>> Requiere ajustes razonables</label>
       <label>Ajustes (separados por coma)<input type="text" name="ajustes" value="<?= h(implode(', ', $eaj)) ?>" maxlength="400"></label>
+      <div class="foto-adm"><?php if (!empty($e['foto'])): ?><img src="<?= h(decrypt_str($e['foto'])) ?>" alt="Foto de <?= h($e['nombres']) ?>" width="72" height="72"><label class="chk"><input type="checkbox" name="quitar_foto" value="1"> Quitar foto</label><?php else: ?><span class="muted">Sin foto guardada.</span><?php endif; ?></div>
       <div class="bar"><button class="btn" name="guardar" value="1">Guardar cambios</button></div>
     </form>
     <div class="ed-actions">
