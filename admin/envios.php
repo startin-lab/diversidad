@@ -63,7 +63,8 @@ $falta = (float)@file_get_contents($marca) + ENVIO_PAUSA - microtime(true);
 if ($falta > 0) json_out(['ok' => true, 'espera' => (int)ceil($falta * 1000)]);
 $hoy = (int)$pdo->query('SELECT COUNT(*) FROM envios WHERE creado >= CURDATE()')->fetchColumn();
 if ($hoy >= (int)(cfg()['envio_max_dia'] ?? 1500)) json_out(['ok' => false, 'error' => 'Se alcanzó el tope de envíos de hoy. Continúa mañana.'], 429);
-$r = $pdo->query('SELECT r.* ' . pendientes_sql($camp) . ' ORDER BY r.id LIMIT 1')->fetch();
+// Hotmail, Outlook y Live al final: el dominio es nuevo y Microsoft le da más confianza si antes salieron los demás.
+$r = $pdo->query('SELECT r.* ' . pendientes_sql($camp) . " ORDER BY r.correo REGEXP '@(hotmail|outlook|live|msn)\\\\.', r.id LIMIT 1")->fetch();
 if (!$r) json_out(['ok' => true, 'terminado' => true] + estado($pdo, $camp));
 file_put_contents($marca, (string)microtime(true), LOCK_EX);
 [$asunto, $html] = mensaje($camp, $r);

@@ -167,7 +167,8 @@ function correo_marco(string $cuerpo): string {
       <div style="font-size:14px;opacity:.85;margin-top:4px">Gestión del cambio organizacional para la Inclusión y Equidad</div>
     </div>
     <div style="background:#fff;padding:26px 28px;border-radius:0 0 16px 16px">
-' . $cuerpo . '      <p style="font-size:12px;color:#4B537F;margin-top:24px">Tus datos se usan solo para gestionar tu participación en el Encuentro, según la <a href="https://startin.org.co/privacidad/" style="color:#4B537F">política de tratamiento de datos</a>. Dudas: hola@startin.org.co.</p>
+' . $cuerpo . '      <p style="font-size:13px;color:#4B537F;margin-top:20px">Para que nuestros correos te lleguen a la bandeja de entrada, agrega <b>eventos@startinlab.org</b> a tus contactos.</p>
+      <p style="font-size:12px;color:#4B537F;margin-top:16px">Tus datos se usan solo para gestionar tu participación en el Encuentro, según la <a href="https://startin.org.co/privacidad/" style="color:#4B537F">política de tratamiento de datos</a>. Dudas: hola@startin.org.co.</p>
     </div>
     <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">by <a href="https://startinlab.org" style="color:#8A90B8;text-decoration:none">Startin<span style="color:#E01CC0">*</span>Lab</a> · <a href="https://startinlab.org" style="color:#8A90B8">startinlab.org</a></p>
   </div></body></html>';
