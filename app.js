@@ -16,7 +16,7 @@ const P=[
   bars:[["1985",6],["2024",15],["2070 (proyección)",36]],barMax:40,unit:" %",
   act:"Rutas de talento intergeneracional: mentoría en dos vías, reentrenamiento y retiro flexible. Y lenguaje: «personas mayores», no «abuelitos».",
   src:"Fundación Saldarriaga Concha con datos DANE (feb 2025); DANE vía RTVC (jul 2025)."},
- {id:"genero",img:"gestante",h:.91,label:"Género y cuidado",c:"#E6DDBF",
+ {id:"genero",img:"mujer",h:.91,label:"Género y cuidado",c:"#E6DDBF",
   big:"11,4 %",st:"fue la tasa de desempleo de las mujeres en 2025. La de los hombres fue 7,0 %.",
   easy:"Más mujeres que hombres buscan trabajo y no lo encuentran.",
   stats:["La participación laboral de las mujeres está 24 puntos por debajo de la de los hombres.","Con título universitario, una mujer gana 82 centavos por cada peso de un hombre.","El 35 % de las mujeres que quieren trabajar y no buscan empleo lo atribuye a responsabilidades familiares."],
