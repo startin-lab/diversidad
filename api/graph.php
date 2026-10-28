@@ -19,7 +19,7 @@ function graph_token(): ?string {
 }
 
 /** Envía por Microsoft 365 (Graph sendMail) desde un buzón de startinlab.org: sale firmado con DKIM del dominio. */
-function send_graph(string $to, string $subject, string $html, ?string $pngB64, string $pngName): bool {
+function send_graph(string $to, string $subject, string $html, ?string $pngB64, string $pngName, bool $copia = true): bool {
   $c = cfg(); $g = $c['graph'];
   for ($try = 0; $try < 3; $try++) {
     $tok = graph_token();
@@ -27,7 +27,7 @@ function send_graph(string $to, string $subject, string $html, ?string $pngB64, 
     $msg = ['subject' => $subject, 'body' => ['contentType' => 'HTML', 'content' => $html],
       'toRecipients' => [['emailAddress' => ['address' => $to]]]];
     if (!empty($c['mail_reply_to'])) $msg['replyTo'] = [['emailAddress' => ['address' => $c['mail_reply_to']]]];
-    if (!empty($c['mail_bcc'])) $msg['bccRecipients'] = [['emailAddress' => ['address' => $c['mail_bcc']]]];
+    if ($copia && !empty($c['mail_bcc'])) $msg['bccRecipients'] = [['emailAddress' => ['address' => $c['mail_bcc']]]];
     if ($pngB64) $msg['attachments'] = [['@odata.type' => '#microsoft.graph.fileAttachment', 'name' => $pngName, 'contentType' => 'image/png', 'contentBytes' => $pngB64]];
     $ch = curl_init('https://graph.microsoft.com/v1.0/users/' . rawurlencode($c['mail_from']) . '/sendMail');
     curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 25,
