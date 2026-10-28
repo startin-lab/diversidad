@@ -109,15 +109,15 @@ function puerta_logged(): bool {
   return !empty($_SESSION['admin']) || !empty($_SESSION['puerta']);
 }
 
-/** Envía un correo HTML con adjunto opcional (PNG en base64). */
-function send_mail(string $to, string $subject, string $html, ?string $pngB64 = null, string $pngName = 'escarapela.png'): bool {
+/** Envía un correo HTML con adjunto opcional (PNG en base64). $copia=false omite la copia oculta (envíos en lote). */
+function send_mail(string $to, string $subject, string $html, ?string $pngB64 = null, string $pngName = 'escarapela.png', bool $copia = true): bool {
   $c = cfg();
   // Con Graph configurado no hay respaldo a mail(): el correo del hosting no está alineado y cae en spam.
-  if (!empty($c['graph']['client_secret'])) return send_graph($to, $subject, $html, $pngB64, $pngName);
+  if (!empty($c['graph']['client_secret'])) return send_graph($to, $subject, $html, $pngB64, $pngName, $copia);
   $boundary = 'b' . bin2hex(random_bytes(12));
   $from = $c['mail_from']; $fromName = '=?UTF-8?B?' . base64_encode($c['mail_from_name']) . '?=';
   $headers = "From: $fromName <$from>\r\nReply-To: {$c['mail_reply_to']}\r\n";
-  if (!empty($c['mail_bcc'])) $headers .= "Bcc: {$c['mail_bcc']}\r\n";
+  if ($copia && !empty($c['mail_bcc'])) $headers .= "Bcc: {$c['mail_bcc']}\r\n";
   $headers .= "MIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
   $body = "--$boundary\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) . "\r\n";
   if ($pngB64) {
@@ -127,7 +127,7 @@ function send_mail(string $to, string $subject, string $html, ?string $pngB64 = 
   $subj = '=?UTF-8?B?' . base64_encode($subject) . '?=';
   if (!empty($c['smtp_host'])) {
     $hdr = "Date: " . date('r') . "\r\nMessage-ID: <" . bin2hex(random_bytes(10)) . '@' . substr(strrchr($from, '@'), 1) . ">\r\nTo: <$to>\r\nSubject: $subj\r\n" . preg_replace('/^Bcc:[^\r]*\r\n/m', '', $headers);
-    $rcpt = [$to]; if (!empty($c['mail_bcc'])) $rcpt[] = $c['mail_bcc'];
+    $rcpt = [$to]; if ($copia && !empty($c['mail_bcc'])) $rcpt[] = $c['mail_bcc'];
     return smtp_send($c, $from, $rcpt, $hdr . "\r\n" . $body);
   }
   return @mail($to, $subj, $body, $headers, '-f' . $from);
@@ -157,14 +157,9 @@ function smtp_send(array $c, string $from, array $rcpt, string $data): bool {
   } catch (Throwable $e) { error_log('smtp: ' . $e->getMessage()); @fclose($fp); return false; }
 }
 
-/** HTML del correo de confirmación (lo usan api/correo.php y el panel para reenviar). */
-function correo_confirmacion_html(array $r, bool $conEscarapela = true): string {
-  $codigo = $r['codigo'];
-  $ajustes = json_decode($r['ajustes'] ?: '[]', true) ?: [];
-  $site = cfg()['site_url'];
-  $primer = htmlspecialchars(explode(' ', $r['nombres'])[0], ENT_QUOTES, 'UTF-8');
-  $ajTxt = $ajustes ? '<p style="margin:12px 0;padding:12px 14px;background:#FFF4D6;border-radius:10px;color:#4A3A00"><b>Ajustes razonables registrados:</b> ' . htmlspecialchars(implode(', ', $ajustes), ENT_QUOTES, 'UTF-8') . '. El equipo organizador los tendrá listos para ti.</p>' : '';
-  $html = '<!doctype html><html lang="es"><body style="margin:0;background:#F4F3FA;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#0C1646">
+/** Marco común de los correos a inscritos: encabezado del Encuentro, cuerpo y pie con la política de datos. */
+function correo_marco(string $cuerpo): string {
+  return '<!doctype html><html lang="es"><body style="margin:0;background:#F4F3FA;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#0C1646">
   <div style="max-width:560px;margin:0 auto;padding:28px 16px">
     <div style="background:#0C1646;color:#fff;border-radius:16px 16px 0 0;padding:26px 28px">
       <div style="font-size:44px;font-weight:900;color:#FFC20E;line-height:1">5°</div>
@@ -172,20 +167,52 @@ function correo_confirmacion_html(array $r, bool $conEscarapela = true): string 
       <div style="font-size:14px;opacity:.85;margin-top:4px">Gestión del cambio organizacional para la Inclusión y Equidad</div>
     </div>
     <div style="background:#fff;padding:26px 28px;border-radius:0 0 16px 16px">
-      <p style="font-size:17px">Hola, ' . $primer . '. Tu inscripción quedó registrada.</p>
+' . $cuerpo . '      <p style="font-size:13px;color:#4B537F;margin-top:20px">Para que nuestros correos te lleguen a la bandeja de entrada, agrega <b>eventos@startinlab.org</b> a tus contactos.</p>
+      <p style="font-size:12px;color:#4B537F;margin-top:16px">Tus datos se usan solo para gestionar tu participación en el Encuentro, según la <a href="https://startin.org.co/privacidad/" style="color:#4B537F">política de tratamiento de datos</a>. Dudas: hola@startin.org.co.</p>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">by <a href="https://startinlab.org" style="color:#8A90B8;text-decoration:none">Startin<span style="color:#E01CC0">*</span>Lab</a> · <a href="https://startinlab.org" style="color:#8A90B8">startinlab.org</a></p>
+  </div></body></html>';
+}
+
+/** HTML del correo de confirmación (lo usan api/correo.php y el panel para reenviar). */
+function correo_confirmacion_html(array $r, bool $conEscarapela = true): string {
+  $codigo = $r['codigo'];
+  $ajustes = json_decode($r['ajustes'] ?: '[]', true) ?: [];
+  $site = cfg()['site_url'];
+  $primer = htmlspecialchars(explode(' ', $r['nombres'])[0], ENT_QUOTES, 'UTF-8');
+  $ajTxt = $ajustes ? '<p style="margin:12px 0;padding:12px 14px;background:#FFF4D6;border-radius:10px;color:#4A3A00"><b>Ajustes razonables registrados:</b> ' . htmlspecialchars(implode(', ', $ajustes), ENT_QUOTES, 'UTF-8') . '. El equipo organizador los tendrá listos para ti.</p>' : '';
+  return correo_marco('      <p style="font-size:17px">Hola, ' . $primer . '. Tu inscripción quedó registrada.</p>
       <p style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#4B537F;font-weight:700">Tu código de registro</p>
       <p style="font-size:34px;font-weight:900;letter-spacing:.04em;margin:0 0 14px">' . htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8') . '</p>
-      <p>' . ($conEscarapela ? 'Preséntalo, o el código QR de tu escarapela adjunta, en la mesa de registro.' : 'Preséntalo en la mesa de registro. Si necesitas tu escarapela, vuelve a inscribirte en el portal con tu mismo documento y correo: se genera de nuevo con el mismo código.') . '</p>
+      <p>' . ($conEscarapela ? 'Preséntalo, o el código QR de tu escarapela adjunta, en la mesa de registro.' : 'Preséntalo en la mesa de registro. Si necesitas tu escarapela, entra al portal, en Inscripción abre «¿Ya te inscribiste? Descarga de nuevo tu escarapela» y escribe tu documento y correo: sale de nuevo con el mismo código.') . '</p>
       <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px">
         <tr><td style="padding:8px 0;color:#4B537F;width:110px">Cuándo</td><td style="padding:8px 0;font-weight:700">Miércoles 11 de noviembre de 2026 · 7:30 a.m. – 12:30 p.m. (registro desde las 7:30)</td></tr>
         <tr><td style="padding:8px 0;color:#4B537F">Dónde</td><td style="padding:8px 0;font-weight:700">Universidad El Bosque – HUB iEX<br><span style="font-weight:400">Cra. 7b Bis No. 132-28, Bogotá</span></td></tr>
       </table>' . $ajTxt . '
       <p style="margin-top:20px"><a href="' . $site . '" style="display:inline-block;background:#F26A21;color:#fff;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:999px">Volver al portal</a></p>
-      <p style="font-size:12px;color:#4B537F;margin-top:24px">Tus datos se usan solo para gestionar tu participación en el Encuentro, según la <a href="https://startin.org.co/privacidad/" style="color:#4B537F">política de tratamiento de datos</a>. Dudas: hola@startin.org.co.</p>
-    </div>
-    <p style="text-align:center;font-size:12px;color:#8A90B8;margin-top:14px">by <a href="https://startinlab.org" style="color:#8A90B8;text-decoration:none">Startin<span style="color:#E01CC0">*</span>Lab</a> · <a href="https://startinlab.org" style="color:#8A90B8">startinlab.org</a></p>
-  </div></body></html>';
-  return $html;
+');
+}
+
+const ASUNTO_RECORDATORIO = 'Te esperamos el 11 de noviembre · 5° Encuentro Diversidades e Inclusión';
+/** HTML del recordatorio previo al evento (envío en lotes desde el panel). */
+function correo_recordatorio_html(array $r): string {
+  $e = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+  $ajustes = json_decode($r['ajustes'] ?: '[]', true) ?: [];
+  $site = cfg()['site_url'];
+  $caja = 'margin:14px 0;padding:12px 14px;border-radius:10px';
+  $ajTxt = $ajustes
+    ? '<p style="' . $caja . ';background:#FFF4D6;color:#4A3A00"><b>Tus ajustes razonables:</b> ' . $e(implode(', ', $ajustes)) . '. Los tendremos listos. Si necesitas otro, aún puedes pedirlo en «Editar mis datos» o respondiendo este correo.</p>'
+    : '<p style="' . $caja . ';background:#FFF4D6;color:#4A3A00"><b>¿Necesitas un ajuste razonable?</b> Por ejemplo, intérprete de Lengua de Señas Colombiana, subtítulos en vivo, apoyo de movilidad, material en lectura fácil o un espacio de calma sensorial. Aún puedes pedirlo en «Editar mis datos» o respondiendo este correo.</p>';
+  return correo_marco('      <p style="font-size:17px">Hola, ' . $e(explode(' ', $r['nombres'])[0]) . '. Te esperamos en el 5° Encuentro.</p>
+      <p style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#4B537F;font-weight:700">Tu código de registro</p>
+      <p style="font-size:34px;font-weight:900;letter-spacing:.04em;margin:0 0 14px">' . $e($r['codigo']) . '</p>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px">
+        <tr><td style="padding:8px 0;color:#4B537F;width:110px">Cuándo</td><td style="padding:8px 0;font-weight:700">Miércoles 11 de noviembre de 2026<br><span style="font-weight:400">El registro abre a las 7:30 a.m. Llega con tiempo para recibir tu escarapela.</span></td></tr>
+        <tr><td style="padding:8px 0;color:#4B537F">Dónde</td><td style="padding:8px 0;font-weight:700">Universidad El Bosque – HUB iEX<br><span style="font-weight:400">Cra. 7b Bis No. 132-28, Bogotá</span></td></tr>
+      </table>' . $ajTxt . '
+      <p><b>Completa tu escarapela.</b> Puedes agregar tu foto o elegir tu pliegue: en el portal, ve a Inscripción, abre «¿Ya te inscribiste? Descarga de nuevo tu escarapela», escribe tu documento y correo y pulsa «Editar mis datos». Conservas el mismo código.</p>
+      <p style="margin-top:20px"><a href="' . $site . '#inscripcion" style="display:inline-block;background:#F26A21;color:#fff;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:999px">Editar mis datos</a></p>
+');
 }
 
 /** Valida una foto recortada (data URL JPEG/PNG) y la devuelve cifrada, o null. */

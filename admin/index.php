@@ -77,7 +77,7 @@ function h(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES,
 <link rel="stylesheet" href="https://use.typekit.net/rcv2qny.css"><title>Panel · 5° Encuentro</title>
 <style>
 :root{--ink:#0C1646;--bg:#F4F3FA;--line:#DDE0F0;--sun:#FFC20E;--flame:#F26A21}
-*{box-sizing:border-box}body{margin:0;font:15px/1.5 "elza","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;font:15px/1.5 "elza","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
 .wrap{max-width:1240px;margin:0 auto;padding:24px 16px}
 h1{font-size:1.6rem;margin:0 0 4px}h2{font-size:1.15rem;margin:28px 0 10px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
@@ -156,6 +156,60 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
     <div class="card"><h2 style="margin-top:0">Autorreconocimiento (agregado)</h2><p class="muted" style="margin-top:0">Solo cifras agregadas: no se muestra por persona.</p><?php foreach ($grCount as $k => $v) echo '<div>' . h($k) . ' <b>' . $v . '</b></div>'; ?></div>
     <div class="card"><h2 style="margin-top:0">Pliego · mensajes por día</h2><?php if (!$uso) echo '<p class="muted">Sin uso todavía.</p>'; foreach ($uso as $u) echo '<div>' . h($u['dia']) . ' <b>' . (int)$u['n'] . '</b></div>'; ?></div>
   </div>
+  <h2 id="correos">Correos a inscritos</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+  <?php foreach (['confirmacion' => ['Reenviar confirmación', 'A quienes no les llegó el correo de confirmación. Va sin escarapela adjunta y explica cómo descargarla de nuevo.'],
+                  'recordatorio' => ['Recordatorio del evento', 'A todas las personas inscritas: registro desde las 7:30 a.m., ajustes razonables y cómo agregar foto o pliegue en «Editar mis datos».']] as $k => [$tit, $desc]): ?>
+    <div class="card lote" data-campana="<?= $k ?>"><h2 style="margin-top:0"><?= h($tit) ?></h2><p class="muted" style="margin-top:0"><?= h($desc) ?></p>
+      <p class="estado" aria-live="polite">Cargando…</p>
+      <div class="bar"><input type="text" class="prueba-correo" placeholder="Correo para la prueba" autocomplete="off"><label class="muted"><input type="checkbox" class="prueba-aj"> con ajustes</label><button class="btn ghost" data-accion="prueba">Enviarme una prueba</button></div>
+      <div class="bar"><input type="text" class="confirma" placeholder="Escribe ENVIAR" autocomplete="off" style="max-width:150px"><button class="btn warn" data-accion="enviar">Iniciar envío</button><button class="btn ghost" data-accion="pausar" hidden>Pausar</button><button class="btn ghost" data-accion="reintentar" hidden>Reintentar fallidos</button></div>
+    </div>
+  <?php endforeach; ?>
+  </div>
+  <script>
+  (() => {
+    const csrf = <?= json_encode($csrf) ?>;
+    const api = (body) => fetch('envios.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({csrf, ...body})}).then(r => r.json());
+    const espera = (ms) => new Promise(r => setTimeout(r, ms));
+    document.querySelectorAll('.lote').forEach(card => {
+      const campana = card.dataset.campana, $ = (s) => card.querySelector(s), est = $('.estado');
+      let corriendo = false;
+      const pinta = (j, extra = '') => {
+        if (!j.ok) { est.innerHTML = '<span class="no">' + (j.error || 'Error') + '</span>'; return; }
+        if ('pendientes' in j) est.innerHTML = '<b>' + j.pendientes + '</b> pendientes · <b>' + j.enviados + '</b> enviados · <b>' + j.fallidos + '</b> fallidos' + extra;
+        $('[data-accion=reintentar]').hidden = corriendo || !j.fallidos;
+      };
+      const carga = () => api({campana, accion: 'estado'}).then(j => pinta(j));
+      carga();
+      $('[data-accion=prueba]').onclick = async () => {
+        const correo = $('.prueba-correo').value.trim();
+        const j = await api({campana, accion: 'prueba', correo, con_ajustes: $('.prueba-aj').checked});
+        est.innerHTML = j.ok ? (j.enviado ? '<span class="ok">Prueba enviada a ' + correo.replace(/</g, '') + '.</span>' : '<span class="no">El servidor no pudo enviar la prueba.</span>') : '<span class="no">' + j.error + '</span>';
+        setTimeout(carga, 4000);
+      };
+      $('[data-accion=reintentar]').onclick = () => api({campana, accion: 'reintentar'}).then(j => pinta(j));
+      $('[data-accion=pausar]').onclick = () => { corriendo = false; };
+      $('[data-accion=enviar]').onclick = async () => {
+        const confirma = $('.confirma').value.trim();
+        if (confirma !== 'ENVIAR') { est.innerHTML = '<span class="no">Escribe ENVIAR para confirmar.</span>'; return; }
+        const e0 = await api({campana, accion: 'estado'});
+        if (!e0.ok || !e0.pendientes) { pinta(e0, ' · nada por enviar.'); return; }
+        if (!confirm('Se enviarán ' + e0.pendientes + ' correos, uno cada 2,5 segundos (unos ' + Math.ceil(e0.pendientes * 2.5 / 60) + ' minutos). Deja esta pestaña abierta. ¿Continuar?')) return;
+        corriendo = true; $('[data-accion=enviar]').hidden = true; $('[data-accion=pausar]').hidden = false;
+        while (corriendo) {
+          let j; try { j = await api({campana, accion: 'enviar', confirma}); } catch (_) { await espera(5000); continue; }
+          if (j.espera) { await espera(j.espera); continue; }
+          if (!j.ok || j.terminado) { corriendo = false; pinta(j, j.terminado ? ' · <span class="ok">terminado.</span>' : ''); break; }
+          pinta(j, ' · último: ' + j.codigo + (j.enviado ? '' : ' <span class="no">(falló)</span>'));
+          await espera(2500);
+        }
+        $('[data-accion=enviar]').hidden = false; $('[data-accion=pausar]').hidden = true; $('.confirma').value = '';
+        carga();
+      };
+    });
+  })();
+  </script>
   <h2>Listado</h2>
   <div class="bar"><form method="get" style="display:flex;gap:8px"><input type="text" name="f" value="<?= h($f) ?>" placeholder="Buscar nombre, organización, correo o código"><button class="btn">Buscar</button><?php if ($f) echo '<a class="btn ghost" href="./">Limpiar</a>'; ?></form><a class="btn warn" href="?csv=1">Exportar CSV (incluye documento)</a></div>
   <div class="card tbl"><table><thead><tr><th>Código</th><th>Nombre</th><th>Organización</th><th>Correo</th><th>Documento</th><th>Ajustes</th><th>Pliegue</th><th>Registro</th><th>Asistió</th><th></th></tr></thead><tbody>
