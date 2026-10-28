@@ -1,4 +1,4 @@
-<?php $v = '2026.10.27b'; ?><!doctype html>
+<?php $v = '2026.10.28a'; ?><!doctype html>
 <html lang="es-CO">
 <head>
 <meta charset="utf-8">
@@ -7,7 +7,7 @@
 <meta name="description" content="Gestión del cambio organizacional para la Inclusión y Equidad. 11 de noviembre de 2026, Universidad El Bosque – HUB iEX, Bogotá. Inscríbete y dobla tu escarapela.">
 <meta property="og:title" content="5° Encuentro Diversidades e Inclusión">
 <meta property="og:description" content="Gestión del cambio organizacional para la Inclusión y Equidad · 11 nov 2026 · Universidad El Bosque, Bogotá">
-<meta property="og:image" content="https://diversidad.startinlab.org/assets/og.jpg">
+<meta property="og:image" content="https://diversidad.startinlab.org/assets/og.jpg?v=2">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0C1646">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
