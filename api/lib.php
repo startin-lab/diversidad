@@ -1,7 +1,15 @@
 <?php
 declare(strict_types=1);
 
-function cfg(): array { static $c; if (!$c) { $c = require __DIR__ . '/../config.php'; } return $c; }
+function cfg(): array {
+  static $c;
+  if (!$c) {
+    $c = require __DIR__ . '/../config.php';
+    if (is_file(__DIR__ . '/../config.graph.php')) $c = array_replace($c, require __DIR__ . '/../config.graph.php');
+  }
+  return $c;
+}
+require_once __DIR__ . '/graph.php';
 
 function db(): PDO {
   static $pdo;
@@ -104,6 +112,8 @@ function puerta_logged(): bool {
 /** Envía un correo HTML con adjunto opcional (PNG en base64). */
 function send_mail(string $to, string $subject, string $html, ?string $pngB64 = null, string $pngName = 'escarapela.png'): bool {
   $c = cfg();
+  // Con Graph configurado no hay respaldo a mail(): el correo del hosting no está alineado y cae en spam.
+  if (!empty($c['graph']['client_secret'])) return send_graph($to, $subject, $html, $pngB64, $pngName);
   $boundary = 'b' . bin2hex(random_bytes(12));
   $from = $c['mail_from']; $fromName = '=?UTF-8?B?' . base64_encode($c['mail_from_name']) . '?=';
   $headers = "From: $fromName <$from>\r\nReply-To: {$c['mail_reply_to']}\r\n";

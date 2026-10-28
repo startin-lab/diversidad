@@ -1,0 +1,14 @@
+# Secretos y respaldos: nunca al repo (es público)
+config.php
+config.*.php
+!config.example.php
+*.zip
+*.sql
+*.sql.gz
+*.csv
+*.bak
+*.bak-*
+*.old
+*.log
+.env
+.DS_Store
