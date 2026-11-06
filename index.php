@@ -211,7 +211,7 @@
       <ol class="agenda">
         <li><time>7:30 – 8:30</time><div><b>Registro</b><span>Entrega de escarapelas y activación de ajustes razonables.</span></div></li>
         <li><time>8:30 – 9:20</time><div><b>Panel · Atención con enfoque diferencial en emergencias y tiempos de crisis</b></div></li>
-        <li><time>9:30 – 10:30</time><div><b>Laboratorio de IA aplicada a procesos de inclusión en las organizaciones</b><span>Al registrar tu ingreso recibes tu grupo. <a href="taller/">Entra a Mi taller</a> con el código de tu escarapela.</span></div></li>
+        <li><time>9:30 – 10:30</time><div><b>Laboratorio de IA aplicada a procesos de inclusión en las organizaciones</b><span>Al registrar tu ingreso recibes tu grupo. Entra con el código de tu escarapela.</span><div style="margin-top:10px"><a class="btn btn-primary" href="taller/" style="padding:12px 20px">Ingresar al taller</a></div></div></li>
         <li><time>10:30 – 11:00</time><div><b>Refrigerio</b></div></li>
         <li><time>11:30 – 12:30</time><div><b>¿Cómo vamos con el cumplimiento de normas DEI? Desafíos y logros de cambio organizacional</b></div></li>
       </ol>
