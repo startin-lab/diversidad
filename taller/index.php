@@ -33,7 +33,7 @@ body.on .top{color:var(--ink)}body.on .top .n{color:var(--ink)}body.on .icon{bac
 .hero .linea{display:flex;align-items:flex-end;gap:12px;margin-top:2px}
 .hero .cel{font:900 clamp(3.4rem,19vw,5.2rem)/.85 var(--f);letter-spacing:-.04em}
 .hero .cel small{display:block;font-size:.95rem;letter-spacing:.02em;font-weight:800;margin-bottom:4px}
-.hero .mesa{margin-left:auto;text-align:right;font-weight:800;font-size:.9rem;line-height:1.15}.hero .mesa b{display:block;font-size:1.9rem;line-height:1}
+.hero .grp{margin-left:auto;text-align:right;font-weight:800;font-size:.9rem;line-height:1.15}.hero .grp b{display:block;font-size:1.9rem;line-height:1}
 .hero .reto{margin-top:10px;font-weight:800;font-size:1.04rem;line-height:1.28;max-width:30ch}
 
 /* ---------- Fase con cronómetro en anillo ---------- */
@@ -83,13 +83,12 @@ nav button svg{width:24px;height:24px}nav button[aria-selected=true]{color:var(-
 .entrada h1{font:900 clamp(2.6rem,13vw,3.6rem)/.92 var(--f);margin:0;letter-spacing:-.03em}.entrada h1 span{color:var(--sun)}
 .entrada p{margin:0;color:var(--muted)}.entrada input{font-size:1.25rem;text-align:center;text-transform:uppercase;letter-spacing:.05em;min-height:56px}
 .entrada .err{color:#FFB4A8;font-weight:800;min-height:1.3em}
-.gente{position:fixed;left:0;right:0;bottom:0;height:24dvh;display:flex;align-items:flex-end;justify-content:center;gap:0;pointer-events:none;z-index:1;overflow:hidden}
-.gente img{height:100%;width:auto;margin:0 -2.2vw;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));transform-origin:bottom center;animation:sube .8s cubic-bezier(.2,.9,.3,1.2) both}
-.gente img:nth-child(odd){height:86%}
+.gente{position:fixed;left:12px;right:12px;bottom:0;height:20dvh;display:flex;align-items:flex-end;justify-content:space-evenly;gap:6px;pointer-events:none;z-index:1}
+.gente img{height:100%;width:auto;max-width:18%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));transform-origin:bottom center;animation:sube .8s cubic-bezier(.2,.9,.3,1.2) both}
 @keyframes sube{from{transform:translateY(60%) scale(.9);opacity:0}}
 .espera{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;padding:4px 16px 0;color:var(--ink)}
 .espera .grande{font:900 clamp(9rem,58vw,15rem)/.8 var(--f);letter-spacing:-.06em;margin:4px 0 0}
-.espera .eje{font-weight:900;font-size:1.25rem;line-height:1.1}.espera .mesa{display:inline-block;margin-top:10px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px;font-weight:900}
+.espera .eje{font-weight:900;font-size:1.25rem;line-height:1.1}.espera .chip{display:inline-block;margin-top:10px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px;font-weight:900}
 .espera .nota{margin-top:auto;margin-bottom:26dvh;background:var(--ink);color:#fff;border-radius:20px;padding:14px 16px;font-size:.95rem}
 .espera .nota b{color:var(--sun)}
 .pulso{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--sun);margin-right:8px;animation:pulso 1.4s ease-in-out infinite}@keyframes pulso{50%{opacity:.25}}
@@ -157,8 +156,8 @@ function vista(v){// login | espera | activo
   ["#hero","#fase","#main","#tabs"].forEach(s=>$(s).hidden=v!=="activo");$("#salir").hidden=v==="login";
   document.body.classList.toggle("on",v!=="login");document.body.classList.toggle("sin-nav",v!=="activo");
   const alto=v==="login"?"0px":v==="espera"?"100dvh":($(".top").offsetHeight+$("#hero").offsetHeight+34)+"px";$("#papel").style.setProperty("--alto",alto);}
-function gente(n){const g=$("#gente");if(g.dataset.n==n)return;g.dataset.n=n;let h="";for(let i=0;i<n;i++){const f=FIG[(i*4+(data&&data.ubicacion?data.ubicacion.grupo:0))%FIG.length];h+=`<img src="../assets/fig/${f}.webp?v=x" alt="" style="animation-delay:${i*90}ms">`;}g.innerHTML=h;}
-function mostrarLogin(msg){vista("login");gente(9);$("#loginErr").textContent=msg||"";$("#cIn").value=/^5E-/.test(code||"")?code:"";}
+function gente(n){const g=$("#gente");if(g.dataset.n==n)return;g.dataset.n=n;let h="";for(let i=0;i<n;i++){const f=FIG[(i*2+(data&&data.ubicacion?data.ubicacion.grupo*3:0))%FIG.length];h+=`<img src="../assets/fig/${f}.webp?v=x" alt="" style="animation-delay:${i*90}ms">`;}g.innerHTML=h;}
+function mostrarLogin(msg){vista("login");gente(5);$("#loginErr").textContent=msg||"";$("#cIn").value=/^5E-/.test(code||"")?code:"";}
 $("#login").addEventListener("submit",async e=>{e.preventDefault();const v=$("#cIn").value.trim().toUpperCase();const m=v.match(/^5E-?([A-Z0-9]{6})$/);
   if(m){guardarCodigo("5E-"+m[1]);cargar(true);return;}
   const doc=v.replace(/[^0-9A-Z]/g,"");if(doc.length<5){$("#loginErr").textContent="Escribe el código 5E-XXXXXX o tu número de cédula.";return;}
@@ -172,13 +171,13 @@ async function cargar(){if(!code){mostrarLogin();return;}
     data=j;off=j.estado.ahora-Date.now()/1000;pintar();}catch(e){}}
 
 function pintar(){const j=data,u=j.ubicacion,e=j.estado;document.body.dataset.g=u?u.grupo:"";
-  if(!u||!u.celula){vista("espera");gente(u?5:3);
+  if(!u||!u.celula){vista("espera");gente(3);
     $("#espera").innerHTML=u
-      ?`<div class="eje">Hola, ${esc(j.nombre)}. Tu grupo es</div><div class="grande" aria-label="Grupo ${+u.grupo}">${+u.grupo}</div><div class="eje">${esc(u.eje)}</div><div><span class="mesa">Siéntate en la Mesa ${+u.mesa}</span></div><div class="nota"><span class="pulso" aria-hidden="true"></span>A las <b>9:30</b> se forma tu célula y aquí aparece con su reto. No tienes que recargar.</div>`
+      ?`<div class="eje">Hola, ${esc(j.nombre)}. Tu grupo es</div><div class="grande" aria-label="Grupo ${+u.grupo}">${+u.grupo}</div><div class="eje">${esc(u.eje)}</div><div><span class="chip">1 de los 3 grandes grupos</span></div><div class="nota"><span class="pulso" aria-hidden="true"></span>A las <b>9:30</b> se forma tu célula y aquí aparece con su reto. No tienes que recargar.</div>`
       :`<div class="eje">Hola, ${esc(j.nombre)}.</div><div class="grande" style="font-size:clamp(5rem,30vw,8rem)">¿Ya llegaste?</div><div class="nota">Tu grupo aparece cuando registras tu ingreso en la mesa de entrada con tu escarapela.</div>`;
     celVista=u?0:celVista;return;}
   const f=e.fase;
-  $("#hero").innerHTML=`<div class="eje">Hola, ${esc(j.nombre)} · Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="linea"><div class="cel"><small>Tu célula</small>${+u.celula}</div><div class="mesa">Mesa<b>${+u.mesa}</b></div></div><div class="reto">${esc(u.reto)}</div>`;
+  $("#hero").innerHTML=`<div class="eje">Hola, ${esc(j.nombre)} · Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="linea"><div class="cel"><small>Tu célula</small>${+u.celula}</div><div class="grp">Grupo<b>${+u.grupo}</b></div></div><div class="reto">${esc(u.reto)}</div>`;
   vista("activo");
   const etq=!f?"Laboratorio de IA":(f.n>=1&&f.n<=3?`Fase ${f.n} de 3`:(f.n===0?"Arranca":"Cierre del taller"));
   $("#faseNom").innerHTML=`<small>${etq}</small>${f?esc(f.nombre):"Aún no empieza"}`;
@@ -191,13 +190,13 @@ function pintar(){const j=data,u=j.ubicacion,e=j.estado;document.body.dataset.g=
   faseVista=f?f.id:null;}
 
 function confeti(c){if(reducido)return"";let h="";const cs=["#FFC20E","#F26A21","#13A79A","#EE7DB9","#6A47B8","#fff"];for(let i=0;i<34;i++)h+=`<i style="left:${Math.random()*100}%;background:${cs[i%cs.length]};animation-duration:${2.2+Math.random()*1.8}s;animation-delay:${Math.random()*.6}s"></i>`;return`<div class="confeti">${h}</div>`;}
-function revelar(u){const c=$("#capa");c.innerHTML=`<div class="capa" role="dialog" aria-modal="true" aria-labelledby="revT">${confeti()}<div class="hoja"><div class="k">Grupo ${+u.grupo} · Mesa ${+u.mesa}</div><div class="big" id="revT">Célula ${+u.celula}</div><div class="txt">Tu reto: ${esc(u.reto)}</div></div><button class="btn" type="button" id="revOk">¡Vamos!</button></div>`;
+function revelar(u){const c=$("#capa");c.innerHTML=`<div class="capa" role="dialog" aria-modal="true" aria-labelledby="revT">${confeti()}<div class="hoja"><div class="k">Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="big" id="revT">Célula ${+u.celula}</div><div class="txt">Tu reto: ${esc(u.reto)}</div></div><button class="btn" type="button" id="revOk">¡Vamos!</button></div>`;
   $("#revOk").onclick=()=>{c.innerHTML="";};$("#revOk").focus();}
 function avisoFase(f){const c=$("#capa");c.innerHTML=`<div class="capa fase-aviso" role="alert"><div class="hoja"><div class="k">${f.n&&f.n<4?"Fase "+f.n+" de 3":"Ahora"}</div><div class="big">${esc(f.nombre)}</div><div class="txt">${esc(f.pregunta||f.texto||"")}</div></div><button class="btn" type="button" id="avOk" style="background:var(--flame)">Empezar · ${f.min} min</button></div>`;
   const cerrar=()=>{c.innerHTML="";};$("#avOk").onclick=cerrar;setTimeout(()=>{if($("#avOk"))cerrar();},6000);}
 
 function pintarFase(){const f=data.estado.fase;let h="";
-  if(!f){h=`<h2>Prepárense</h2><p>La persona facilitadora dará inicio en un momento.</p><ol class="pasos"><li>Busquen a su célula en la Mesa ${+data.ubicacion.mesa}.</li><li>Lean juntos el reto de arriba.</li><li>Escojan quién lleva el primer post-it al backing.</li></ol>`;}
+  if(!f){h=`<h2>Prepárense</h2><p>La persona facilitadora dará inicio en un momento.</p><ol class="pasos"><li>Reúnanse con su célula: la persona facilitadora del grupo les indica dónde.</li><li>Lean juntos el reto de arriba.</li><li>Escojan quién lleva el primer post-it al backing.</li></ol>`;}
   else{h=`<h2>${esc(f.nombre)}</h2>`;if(f.pregunta)h+=`<p class="preg">${esc(f.pregunta)}</p>`;if(f.texto)h+=`<p class="preg">${esc(f.texto)}</p>`;
     if(f.pasos&&f.pasos.length)h+=`<ol class="pasos">${f.pasos.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`;
     const p=data.prompts&&data.prompts[f.id];

@@ -39,9 +39,9 @@ main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-
 .g .num{margin-left:auto;margin-right:3.4vh;text-align:right;font:900 7.4vh/.9 var(--f);letter-spacing:-.04em;transition:transform .3s}.g .num small{display:block;font-size:1.4vh;letter-spacing:.06em;font-weight:800;text-transform:uppercase}
 .g .num.salta{transform:scale(1.18)}
 .g .cels{display:flex;gap:.5vw;flex-wrap:wrap;margin-top:1vh;position:relative;z-index:1}.g .cels span{background:var(--ink);color:#fff;border-radius:999px;padding:.4vh .9vw;font-weight:800;font-size:1.4vh}
-.g .gente{margin-top:auto;height:var(--hg,15vh);position:relative;z-index:1;margin-left:-.4vw;margin-right:-.4vw}
-.g .gente img{position:absolute;bottom:0;left:calc(var(--x) * (100% - 6vh));height:100%;width:auto;filter:drop-shadow(0 .6vh .8vh rgba(0,0,0,.25));transform-origin:bottom center}
-.g .gente img.atras{height:84%;bottom:1.2vh;z-index:0;filter:brightness(.92) drop-shadow(0 .6vh .8vh rgba(0,0,0,.2))}.g .gente img.frente{z-index:1}
+.g .gente{margin-top:auto;height:19vh;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-evenly;gap:1vw}
+.g .gente img{height:100%;width:auto;max-width:17%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 .6vh .8vh rgba(0,0,0,.25));transform-origin:bottom center}
+.g .gente img.salta{animation:brinca .7s ease-out}@keyframes brinca{40%{transform:translateY(-14%)}}
 .g .gente img.nueva{animation:sube .9s cubic-bezier(.2,.9,.3,1.25) both}
 @keyframes sube{from{transform:translateY(70%) scale(.85);opacity:0}}
 .g .vacio{margin-top:auto;margin-bottom:2.4vh;font-weight:800;font-size:1.9vh;opacity:.75;position:relative;z-index:1}
@@ -78,7 +78,7 @@ function pintar(){const e=d.estado,f=e.fase;
   let m=!f?"inicio":(f.id==="plenaria"?"plenaria":(f.id==="cierre"?"cierre":"fase"));
   const firma=m+(f?f.id:"")+(e.formado?1:0);
   if(firma!==modo){modo=firma;
-    if(m==="inicio"){$("#izq").innerHTML=`<div class="k">${e.formado?"Las células están listas":"Bienvenida"}</div><div class="preg xl">De identificar barreras a experimentar soluciones.</div><div class="sub">${e.formado?"Busca tu célula en la mesa de tu grupo. <b>Tu reto ya está en tu celular.</b>":"Escanea el código, entra con tu escarapela o tu cédula y descubre <b>tu grupo, tu célula y tu reto</b>."}</div>`;
+    if(m==="inicio"){$("#izq").innerHTML=`<div class="k">${e.formado?"Las células están listas":"Bienvenida"}</div><div class="preg xl">De identificar barreras a experimentar soluciones.</div><div class="sub">${e.formado?"Reúnete con tu célula. <b>Tu reto ya está en tu celular.</b>":"Escanea el código, entra con tu escarapela o tu cédula y descubre <b>tu grupo, tu célula y tu reto</b>."}</div>`;
       $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_T}</div><b>Entra a Mi taller</b><span>diversidad.startinlab.org/taller</span></div>`;}
     else if(m==="cierre"){$("#izq").innerHTML=`<div class="k">Cierre</div><div class="preg xl">Ahora, dobla tu compromiso.</div><div class="sub">Escribe una acción que impulsarás en tu organización en el <b>Muro de compromisos</b>.</div>`;
       $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_C}</div><b>Muro de compromisos</b><span>diversidad.startinlab.org</span></div>`;}
@@ -90,15 +90,15 @@ function pintar(){const e=d.estado,f=e.fase;
   const g=$("#grupos");if(!g.children.length)g.innerHTML=d.grupos.map(x=>`<article class="g" id="g${x.grupo}"></article>`).join("");
   d.grupos.forEach(x=>{const el=$("#g"+x.grupo),plen=m==="plenaria"||m==="cierre";const cs=Object.entries(x.celulas);
     const prev=vistos[x.grupo]||0;
-    let h=`<div class="cab"><div><div class="lab">Grupo ${x.grupo} · Mesa ${x.grupo}</div><h2>${esc(x.eje)}</h2></div><div class="num${x.personas>prev&&prev?" salta":""}">${x.personas}<small>personas</small></div></div>`;
+    let h=`<div class="cab"><div><div class="lab">Grupo ${x.grupo}</div><h2>${esc(x.eje)}</h2></div><div class="num${x.personas>prev&&prev?" salta":""}">${x.personas}<small>personas</small></div></div>`;
     if(cs.length&&!plen)h+=`<div class="cels">${cs.map(([c,n])=>`<span>Célula ${c} · ${n}</span>`).join("")}</div>`;
     if(plen&&x.destacada){const t=x.destacada;h+=`<div class="dest"><span class="r">★ Célula ${t.celula} · ${esc(t.reto)}</span>${esc(t.solucion||t.barrera||"")}${t.primer_paso?`<span class="pp">Primer paso: ${esc(t.primer_paso)}</span>`:""}</div>`;}
     else if(plen){h+=`<div class="vacio">Eligiendo su idea destacada…</div>`;}
     else if(!x.personas){h+=`<div class="vacio">Esperando a las primeras personas…</div>`;}
-    else{const n=Math.min(x.personas,45),hg=n>20?14:16;
-      // Reparto parejo a lo ancho; una fila adelante y otra atrás para dar profundidad.
-      h+=`<div class="gente" style="--hg:${hg}vh">${Array.from({length:n},(_,i)=>{const pos=n>1?i/(n-1):.5;return`<img src="../assets/fig/${FIG[(i*4+x.grupo)%9]}.webp?v=x" alt="" class="${i%2?"atras":"frente"}${i>=prev?" nueva":""}" style="--x:${pos.toFixed(3)}${i>=prev?`;animation-delay:${Math.min(i-prev,20)*110}ms`:""}">`;}).join("")}</div>`;}
-    const sig=h.replace(/ nueva|animation-delay:\d+ms|num salta/g,"");if(el.dataset.sig===sig&&x.personas===prev){return;}
+    else{// Pocas figuras, separadas: representan al grupo; el número grande dice cuántas personas hay.
+      const n=Math.min(x.personas,5),nuevo=x.personas>prev&&prev>=5;
+      h+=`<div class="gente">${Array.from({length:n},(_,i)=>`<img src="../assets/fig/${FIG[(i*2+x.grupo*3)%9]}.webp?v=x" alt="" class="${i>=prev?"nueva":""}${nuevo&&i===(x.personas%n)?" salta":""}"${i>=prev?` style="animation-delay:${(i-prev)*140}ms"`:""}>`).join("")}</div>`;}
+    const sig=h.replace(/nueva| salta|animation-delay:\d+ms/g,"");if(el.dataset.sig===sig&&x.personas===prev){return;}
     el.dataset.sig=sig;el.innerHTML=h;vistos[x.grupo]=x.personas;
     const nm=el.querySelector(".num.salta");if(nm)setTimeout(()=>nm.classList.remove("salta"),400);});
   tick();}
