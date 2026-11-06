@@ -96,7 +96,7 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
 </style></head><body><div class="wrap">
 <?php if ($imprimir): ?>
   <p class="noprint bar"><button class="btn" onclick="print()">Imprimir</button><a class="btn ghost" href="taller.php">Volver</a></p>
-  <?php foreach (TALLER_GRUPOS as $g => $d): ?><div class="pg"><h1>Grupo <?= $g ?> · <?= h($d['eje']) ?> · Mesa <?= $g ?></h1><p><?= h($d['pregunta']) ?></p>
+  <?php foreach (TALLER_GRUPOS as $g => $d): ?><div class="pg"><h1>Grupo <?= $g ?> · <?= h($d['eje']) ?></h1><p><?= h($d['pregunta']) ?></p>
     <?php foreach ($porG[$g] ?? [] as $cel => $ps): ?><h2><?= $cel ? 'Célula ' . $cel . ' · ' . h($d['retos'][($cel - 1) % 5]) : 'Sin célula todavía' ?></h2>
       <table class="print"><tr><th>Nombre</th><th>Organización</th><th>Código</th></tr><?php foreach ($ps as $p): ?><tr><td><?= h($p['nombres']) ?><?= taller_es_lsc($p['ajustes']) ? ' (LSC)' : '' ?></td><td><?= h($p['organizacion']) ?></td><td><?= h($p['codigo']) ?></td></tr><?php endforeach; ?></table>
     <?php endforeach; ?></div><?php endforeach; ?>
@@ -131,7 +131,7 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
   <h2>Grupos y células</h2>
   <div class="grid">
   <?php foreach (TALLER_GRUPOS as $g => $d): $dest = (int)taller_kv($pdo, "destacada_$g", '0'); ?>
-    <div class="card g<?= $g ?>"><h3 style="margin:0">Grupo <?= $g ?> · <?= h($d['eje']) ?></h3><p class="muted" style="margin:2px 0 8px">Mesa <?= $g ?> · <?= taller_celulas($pdo, $g) ?> células</p>
+    <div class="card g<?= $g ?>"><h3 style="margin:0">Grupo <?= $g ?> · <?= h($d['eje']) ?></h3><p class="muted" style="margin:2px 0 8px"><?= taller_celulas($pdo, $g) ?> células</p>
     <?php foreach ($porG[$g] ?? [] as $cel => $ps): $f = $cel ? taller_ficha($pdo, $g, $cel) : []; ?>
       <details class="cel"><summary><?= $cel ? "Célula $cel" : 'Sin célula' ?> · <?= count($ps) ?> personas<?= $cel && $dest === $cel ? ' · ★ destacada' : '' ?></summary>
         <?php if ($cel): ?><p style="margin:4px 0"><b>Reto:</b> <?= h($d['retos'][($cel - 1) % 5]) ?></p><?php endif; ?>

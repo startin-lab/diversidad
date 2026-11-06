@@ -1,43 +1,109 @@
 <?php declare(strict_types=1); header('Cache-Control: no-store'); ?><!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
 <title>Laboratorio de IA · Pantalla · 5° Encuentro</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="https://use.typekit.net/rcv2qny.css">
 <style>
-:root{--ink:#0C1646;--ink2:#14215E;--sun:#FFC20E;--flame:#F26A21;--teal:#13A79A;--pink:#EE7DB9;--muted:#C9CDEA}
+:root{--ink:#0C1646;--ink2:#14215E;--ink3:#1D2C74;--sun:#FFC20E;--flame:#F26A21;--teal:#13A79A;--pink:#EE7DB9;--violet:#6A47B8;--paper:#F7F4EE;--muted:#C9CDEA;--f:"elza","Avenir Next","Segoe UI",system-ui,sans-serif}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
-body{font:clamp(14px,1.4vw,26px)/1.35 "elza","Segoe UI",system-ui,sans-serif;background:var(--ink);color:#fff;display:grid;grid-template-rows:auto 1fr auto;height:100vh;overflow:hidden;padding:2.2vh 3vw}
-header{display:flex;align-items:center;gap:1.2vw}header .n{color:var(--sun);font-size:3.2em;font-weight:900;line-height:1}header b{font-size:1.1em;line-height:1.15}
-.reloj{margin-left:auto;text-align:right}.reloj .f{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.9em}.reloj .t{font-size:4.4em;font-weight:900;line-height:1;color:var(--sun);font-variant-numeric:tabular-nums}.reloj .t.fin{color:var(--flame)}
-main{display:grid;grid-template-rows:auto 1fr;gap:2.4vh;padding-top:2.4vh;min-height:0}
-.preg{font-size:2.2em;font-weight:900;line-height:1.15;max-width:30ch}.sub{color:var(--muted);margin-top:.6vh}
-.grupos{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vw;min-height:0}
-.g{background:var(--ink2);border-radius:1.4vw;padding:2vh 1.4vw;border-top:.8vh solid var(--c);display:flex;flex-direction:column;gap:.8vh;min-height:0;overflow:hidden}
-.g:nth-child(1){--c:var(--sun)}.g:nth-child(2){--c:var(--teal)}.g:nth-child(3){--c:var(--pink)}
-.g h2{margin:0;font-size:1.35em}.g .k{color:var(--c);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:.8em}.g .num{font-size:2.6em;font-weight:900;line-height:1}
-.cels{display:flex;gap:.5vw;flex-wrap:wrap}.cels span{background:rgba(255,255,255,.1);border-radius:999px;padding:.3vh .8vw;font-weight:700;font-size:.85em}
-.dest{background:#fff;color:var(--ink);border-radius:1vw;padding:1.4vh 1vw;font-size:.92em;overflow:hidden}.dest b{display:block;font-size:.8em;color:#5A5F7D;text-transform:uppercase;letter-spacing:.05em;margin-top:.6vh}
-footer{display:flex;align-items:center;gap:1.4vw;color:var(--muted)}footer .qr{background:#fff;border-radius:.8vw;padding:.6vw;width:9vh;height:9vh}footer .qr svg,footer .qr img{width:100%;height:100%;display:block}footer .u{font-weight:900;color:#fff;font-size:1.3em}
-.dots{display:flex;gap:.4vw;margin-left:auto}.dots i{width:4vw;height:.8vh;border-radius:9px;background:rgba(255,255,255,.18)}.dots i.on{background:var(--teal)}.dots i.now{background:var(--sun)}
-.startin-credit{position:fixed;right:1vw;bottom:1vh;font:600 .6em/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);border-radius:999px;padding:4px 10px}.startin-credit b{color:#16162B;font-weight:800}
+body{font:1.6vh/1.3 var(--f);background:var(--ink);color:#fff;height:100vh;overflow:hidden;display:grid;grid-template-rows:auto 1fr 34vh;gap:2.2vh;padding:2.4vh 2.6vw 2.8vh;position:relative}
+/* Facetas de papel de fondo: luz y sombra de un pliegue, sin cuadrícula. */
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.045) 0 34%,transparent 34%),linear-gradient(242deg,rgba(255,255,255,.03) 0 22%,transparent 22%),linear-gradient(20deg,rgba(0,0,0,.18) 0 18%,transparent 18%);pointer-events:none}
+header{display:flex;align-items:center;gap:1.4vw;position:relative}
+header .n{font:900 6.4vh/1 var(--f);color:var(--sun)}header .t{font-weight:900;font-size:2.1vh;line-height:1.1}header .t small{display:block;font-weight:700;color:var(--muted);font-size:1.6vh}
+.ruta{margin-left:auto;display:flex;gap:.5vw}
+.ruta div{width:8.6vw;padding:.9vh .7vw 1vh;background:rgba(255,255,255,.07);clip-path:polygon(0 0,100% 0,92% 100%,0 100%);font-weight:800;font-size:1.35vh;color:var(--muted);transition:background .4s,color .4s}
+.ruta div b{display:block;font-size:1.1vh;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.ruta div.ok{background:rgba(19,167,154,.35);color:#fff}.ruta div.ya{background:var(--sun);color:var(--ink)}
+
+main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-height:0;position:relative}
+.k{font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:1.9vh;color:var(--sun)}
+.preg{font:900 clamp(3vh,5.6vh,7vh)/1.08 var(--f);letter-spacing:-.02em;margin:1.2vh 0 1.6vh;max-width:24ch;text-wrap:balance}
+.preg.xl{font-size:8.4vh;max-width:16ch}
+.sub{font-size:2.3vh;color:var(--muted);max-width:52ch;font-weight:600}
+.sub b{color:#fff}
+.reloj{position:relative;width:38vh;height:38vh}
+.reloj svg{width:100%;height:100%;transform:rotate(-90deg)}.reloj circle{fill:none;stroke-width:9}.reloj .bg{stroke:rgba(255,255,255,.1)}.reloj .fg{stroke:var(--sun);stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .4s}
+.reloj .c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.reloj .c b{font:900 9.6vh/1 var(--f);font-variant-numeric:tabular-nums;letter-spacing:-.03em}.reloj .c span{font-weight:800;color:var(--muted);font-size:1.8vh;letter-spacing:.1em;text-transform:uppercase}
+.reloj.fin .fg{stroke:var(--flame)}.reloj.fin{animation:late 1s ease-in-out infinite}.reloj.cero .c b{color:var(--flame)}
+@keyframes late{50%{transform:scale(1.035)}}
+.qr{width:38vh;background:var(--paper);color:var(--ink);border-radius:2.4vh;padding:2.6vh;text-align:center;position:relative;box-shadow:0 2vh 5vh rgba(0,0,0,.35)}
+.qr::after{content:"";position:absolute;right:0;top:0;width:6vh;height:6vh;background:linear-gradient(225deg,var(--ink) 0 50%,#DCD6CB 50%);border-top-right-radius:2.4vh}
+.qr #qr{width:100%;aspect-ratio:1}.qr #qr svg{width:100%;height:100%;display:block}
+.qr b{display:block;font-size:2.2vh;margin-top:1.2vh}.qr span{font-size:1.6vh;font-weight:700;color:#4B537F}
+
+.grupos{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vw;min-height:0;position:relative}
+.g{--c:var(--sun);--c2:#D9A200;background:var(--c);color:var(--ink);border-radius:2.4vh;padding:2vh 1.4vw 0;position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.g:nth-child(2){--c:var(--teal);--c2:#0E8479}.g:nth-child(3){--c:var(--pink);--c2:#D2589C}
+.g::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.26) 0 42%,transparent 42%);pointer-events:none}
+.g::after{content:"";position:absolute;right:0;top:0;width:5.5vh;height:5.5vh;background:linear-gradient(225deg,var(--ink) 0 50%,var(--c2) 50%)}
+.g .cab{display:flex;align-items:flex-start;gap:1vw;position:relative;z-index:1}
+.g .lab{font-weight:900;font-size:1.5vh;letter-spacing:.12em;text-transform:uppercase}.g h2{margin:.3vh 0 0;font:900 3vh/1.05 var(--f)}
+.g .num{margin-left:auto;margin-right:3.4vh;text-align:right;font:900 7.4vh/.9 var(--f);letter-spacing:-.04em;transition:transform .3s}.g .num small{display:block;font-size:1.4vh;letter-spacing:.06em;font-weight:800;text-transform:uppercase}
+.g .num.salta{transform:scale(1.18)}
+.g .cels{display:flex;gap:.5vw;flex-wrap:wrap;margin-top:1vh;position:relative;z-index:1}.g .cels span{background:var(--ink);color:#fff;border-radius:999px;padding:.4vh .9vw;font-weight:800;font-size:1.4vh}
+.g .gente{margin-top:auto;height:19vh;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-evenly;gap:1vw}
+.g .gente img{height:100%;width:auto;max-width:17%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 .6vh .8vh rgba(0,0,0,.25));transform-origin:bottom center}
+.g .gente img.salta{animation:brinca .7s ease-out}@keyframes brinca{40%{transform:translateY(-14%)}}
+.g .gente img.nueva{animation:sube .9s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes sube{from{transform:translateY(70%) scale(.85);opacity:0}}
+.g .vacio{margin-top:auto;margin-bottom:2.4vh;font-weight:800;font-size:1.9vh;opacity:.75;position:relative;z-index:1}
+.g .dest{margin:1.4vh 0 2vh;background:var(--paper);border-radius:1.6vh;padding:1.6vh 1.2vw;font-size:1.9vh;line-height:1.3;position:relative;z-index:1;overflow:hidden;flex:1;min-height:0}
+.g .dest .r{font-size:1.4vh;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#4B537F;display:block;margin-bottom:.6vh}.g .dest .pp{display:block;margin-top:.8vh;font-weight:800}
+
+.capa{position:fixed;inset:0;z-index:20;background:var(--sun);color:var(--ink);display:grid;place-content:center;text-align:center;perspective:120vh}
+.capa .h{transform-origin:top center;animation:despliega 1s cubic-bezier(.2,.8,.2,1) both}
+.capa .h b{display:block;font-weight:900;letter-spacing:.16em;text-transform:uppercase;font-size:3vh}.capa .h div{font:900 22vh/.9 var(--f);letter-spacing:-.05em}
+.capa::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3) 0 40%,transparent 40%),linear-gradient(225deg,rgba(0,0,0,.08) 0 30%,transparent 30%)}
+@keyframes despliega{from{transform:rotateX(-88deg);opacity:0}}
+.capa.sale{animation:sale .6s ease-in forwards}@keyframes sale{to{opacity:0}}
+.startin-credit{position:fixed;right:1vw;bottom:.8vh;font:600 1.2vh/1.2 var(--f);color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.9);border-radius:999px;padding:.4vh .8vw;z-index:30}.startin-credit b{color:#16162B;font-weight:800}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style></head><body>
-<header><span class="n">5°</span><b>Laboratorio de IA aplicada<br>a procesos de inclusión</b><div class="reloj"><div class="f" id="fase">Preparando</div><div class="t" id="t"></div></div></header>
-<main><div><div class="preg" id="preg">De identificar barreras a experimentar soluciones.</div><div class="sub" id="sub">Tres grupos, una ruta: Diagnóstico, Análisis y Experimentación.</div></div><div class="grupos" id="grupos"></div></main>
-<footer><div class="qr" id="qr" aria-hidden="true"></div><div>Tu grupo, tu célula, tu reto y Pliego en el celular:<div class="u">diversidad.startinlab.org/taller</div></div><div class="dots" id="dots" aria-hidden="true"></div></footer>
+<header><span class="n">5°</span><div class="t">Laboratorio de IA aplicada a procesos de inclusión<small>Encuentro Diversidades e Inclusión · 11 de noviembre</small></div><div class="ruta" id="ruta" aria-hidden="true"></div></header>
+<main><div id="izq"></div><div id="der"></div></main>
+<section class="grupos" id="grupos"></section>
+<div id="capa"></div>
 <a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener">by <b>Startin*Lab</b></a>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 (function(){const $=s=>document.querySelector(s);const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-try{const q=qrcode(0,"M");q.addData("https://diversidad.startinlab.org/taller/");q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:4,margin:0,scalable:true});}catch(e){}
-let d=null,off=0;
+const FIG=["afro","ciego","indigena","lgbt","mayor","migrante","mujer","nina","silla"];
+const reducido=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function qrSvg(url){try{const q=qrcode(0,"M");q.addData(url);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true});}catch(e){return"";}}
+const QR_T=qrSvg("https://diversidad.startinlab.org/taller/"),QR_C=qrSvg("https://diversidad.startinlab.org/#evento");
+let d=null,off=0,faseVista,vistos={},modo="";
 async function cargar(){try{const r=await fetch("../api/taller.php?solo=pantalla",{cache:"no-store"});const j=await r.json();if(j.ok){d=j;off=j.estado.ahora-Date.now()/1000;pintar();}}catch(e){}}
+function aviso(f){if(reducido)return;const c=$("#capa");c.innerHTML=`<div class="capa"><div class="h"><b>${f.n>=1&&f.n<=3?"Fase "+f.n+" de 3":"Ahora"}</b><div>${esc(f.nombre)}</div></div></div>`;setTimeout(()=>{const x=c.firstChild;if(x){x.classList.add("sale");setTimeout(()=>c.innerHTML="",600);}},3200);}
+function reloj(){return`<div class="reloj" id="reloj"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" id="arco" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg><div class="c"><b id="t">–</b><span id="tl">minutos</span></div></div>`;}
 function pintar(){const e=d.estado,f=e.fase;
-  $("#fase").textContent=f?f.nombre:(e.formado?"Células listas":"Preparando");
-  $("#preg").textContent=f?(f.pregunta||f.texto||""):"De identificar barreras a experimentar soluciones.";
-  $("#sub").textContent=f&&f.pregunta?"Escriban la respuesta en su ficha y lleven el post-it al backing de "+f.nombre+".":(f?"":"Tres grupos, una ruta: Diagnóstico, Análisis y Experimentación.");
-  $("#dots").innerHTML=e.fases.map((x,i)=>`<i class="${f&&i<f.n?"on":""}${f&&i===f.n?" now":""}"></i>`).join("");
-  const plen=f&&(f.id==="plenaria"||f.id==="cierre");
-  $("#grupos").innerHTML=d.grupos.map(g=>{let h=`<div class="g"><span class="k">Grupo ${g.grupo} · Mesa ${g.grupo}</span><h2>${esc(g.eje)}</h2>`;
-    if(plen&&g.destacada){const x=g.destacada;h+=`<div class="dest"><b>Célula ${x.celula} · ${esc(x.reto)}</b>${esc(x.solucion||x.barrera||"")}${x.primer_paso?`<b>Primer paso</b>${esc(x.primer_paso)}`:""}</div>`;}
-    else{h+=`<div class="num">${g.personas}</div><div>personas</div>`;const cs=Object.entries(g.celulas);if(cs.length)h+=`<div class="cels">${cs.map(([c,n])=>`<span>Célula ${c} · ${n}</span>`).join("")}</div>`;}
-    return h+`</div>`;}).join("");tick();}
-function tick(){const el=$("#t");if(!d||!d.estado.fase){el.textContent="";return;}const s=Math.max(0,Math.round(d.estado.fase.fin-(Date.now()/1000+off)));el.textContent=s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:"Tiempo";el.classList.toggle("fin",s<60);}
-setInterval(tick,1000);setInterval(cargar,5000);cargar();})();
+  $("#ruta").innerHTML=e.fases.map((x,i)=>`<div class="${f&&i<f.n?"ok":""}${f&&i===f.n?" ya":""}"><b>${i>=1&&i<=3?"Fase "+i:(i===0?"Inicio":"Cierre")}</b>${esc(x.nombre)}</div>`).join("");
+  let m=!f?"inicio":(f.id==="plenaria"?"plenaria":(f.id==="cierre"?"cierre":"fase"));
+  const firma=m+(f?f.id:"")+(e.formado?1:0);
+  if(firma!==modo){modo=firma;
+    if(m==="inicio"){$("#izq").innerHTML=`<div class="k">${e.formado?"Las células están listas":"Bienvenida"}</div><div class="preg xl">De identificar barreras a experimentar soluciones.</div><div class="sub">${e.formado?"Reúnete con tu célula. <b>Tu reto ya está en tu celular.</b>":"Escanea el código, entra con tu escarapela o tu cédula y descubre <b>tu grupo, tu célula y tu reto</b>."}</div>`;
+      $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_T}</div><b>Entra a Mi taller</b><span>diversidad.startinlab.org/taller</span></div>`;}
+    else if(m==="cierre"){$("#izq").innerHTML=`<div class="k">Cierre</div><div class="preg xl">Ahora, dobla tu compromiso.</div><div class="sub">Escribe una acción que impulsarás en tu organización en el <b>Muro de compromisos</b>.</div>`;
+      $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_C}</div><b>Muro de compromisos</b><span>diversidad.startinlab.org</span></div>`;}
+    else{$("#izq").innerHTML=`<div class="k">${f.n>=1&&f.n<=3?"Fase "+f.n+" de 3 · ":""}${esc(f.nombre)}</div><div class="preg">${esc(f.pregunta||f.texto||"")}</div><div class="sub">${f.pregunta?`Escríbanla en la ficha de su célula y lleven el post-it al <b>backing de ${esc(f.nombre)}</b>. Pliego los acompaña desde el celular.`:"Cada grupo comparte su idea destacada en un minuto."}</div>`;
+      $("#der").innerHTML=reloj();}
+  }
+  if(f&&faseVista!==undefined&&faseVista!==f.id)aviso(f);faseVista=f?f.id:null;
+  // Grupos: una figura de papel por persona; en la puesta en común, la idea destacada.
+  const g=$("#grupos");if(!g.children.length)g.innerHTML=d.grupos.map(x=>`<article class="g" id="g${x.grupo}"></article>`).join("");
+  d.grupos.forEach(x=>{const el=$("#g"+x.grupo),plen=m==="plenaria"||m==="cierre";const cs=Object.entries(x.celulas);
+    const prev=vistos[x.grupo]||0;
+    let h=`<div class="cab"><div><div class="lab">Grupo ${x.grupo}</div><h2>${esc(x.eje)}</h2></div><div class="num${x.personas>prev&&prev?" salta":""}">${x.personas}<small>personas</small></div></div>`;
+    if(cs.length&&!plen)h+=`<div class="cels">${cs.map(([c,n])=>`<span>Célula ${c} · ${n}</span>`).join("")}</div>`;
+    if(plen&&x.destacada){const t=x.destacada;h+=`<div class="dest"><span class="r">★ Célula ${t.celula} · ${esc(t.reto)}</span>${esc(t.solucion||t.barrera||"")}${t.primer_paso?`<span class="pp">Primer paso: ${esc(t.primer_paso)}</span>`:""}</div>`;}
+    else if(plen){h+=`<div class="vacio">Eligiendo su idea destacada…</div>`;}
+    else if(!x.personas){h+=`<div class="vacio">Esperando a las primeras personas…</div>`;}
+    else{// Pocas figuras, separadas: representan al grupo; el número grande dice cuántas personas hay.
+      const n=Math.min(x.personas,5),nuevo=x.personas>prev&&prev>=5;
+      h+=`<div class="gente">${Array.from({length:n},(_,i)=>`<img src="../assets/fig/${FIG[(i*2+x.grupo*3)%9]}.webp?v=x" alt="" class="${i>=prev?"nueva":""}${nuevo&&i===(x.personas%n)?" salta":""}"${i>=prev?` style="animation-delay:${(i-prev)*140}ms"`:""}>`).join("")}</div>`;}
+    const sig=h.replace(/nueva| salta|animation-delay:\d+ms/g,"");if(el.dataset.sig===sig&&x.personas===prev){return;}
+    el.dataset.sig=sig;el.innerHTML=h;vistos[x.grupo]=x.personas;
+    const nm=el.querySelector(".num.salta");if(nm)setTimeout(()=>nm.classList.remove("salta"),400);});
+  tick();}
+function tick(){const el=$("#t");if(!d||!el)return;const f=d.estado.fase;if(!f)return;const tot=f.min*60,s=Math.max(0,Math.round(f.fin-(Date.now()/1000+off)));
+  el.textContent=s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:"¡Tiempo!";$("#tl").textContent=s?(s<60?"último minuto":"minutos"):"";
+  $("#arco").style.strokeDashoffset=276.5*(1-s/tot);$("#reloj").classList.toggle("fin",s>0&&s<60);$("#reloj").classList.toggle("cero",!s);}
+setInterval(tick,1000);setInterval(cargar,4000);cargar();})();
 </script></body></html>

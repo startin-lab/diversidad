@@ -34,7 +34,7 @@ const TALLER_GRUPOS = [
 // Fases del documento metodológico (60 minutos).
 const TALLER_FASES = [
   'bienvenida' => ['n' => 0, 'nombre' => 'Bienvenida', 'min' => 5,
-    'texto' => 'Ubica tu célula en la mesa de tu grupo. Cada célula trabaja un reto durante las tres fases, con apoyo de Pliego, el agente de IA.'],
+    'texto' => 'Reúnete con tu célula: la persona facilitadora de tu grupo les indica dónde. Cada célula trabaja un reto durante las tres fases, con apoyo de Pliego, el agente de IA.'],
   'diagnostico' => ['n' => 1, 'nombre' => 'Diagnóstico', 'min' => 12, 'campo' => 'barrera',
     'pregunta' => '¿Qué está impidiendo que todas las personas puedan participar, acceder o desarrollarse en igualdad de condiciones?',
     'pasos' => ['Lean el reto que les correspondió.', 'Conversen: ¿qué barrera concreta puede existir?, ¿a quién podría afectar?, ¿en qué momento del proceso aparece?', 'Escriban una barrera en la ficha y en un post-it. Una idea por nota.', 'La persona delegada pega el post-it en el backing Diagnóstico, en el espacio de su grupo y célula.'],
@@ -161,7 +161,7 @@ function taller_conteo(PDO $pdo, int $g, ?int $c, string $org): array {
 
 function taller_ubicacion(int $g, int $c): array {
   if (!$g || !isset(TALLER_GRUPOS[$g])) return [];
-  $u = ['grupo' => $g, 'mesa' => $g, 'eje' => TALLER_GRUPOS[$g]['eje'], 'pregunta_eje' => TALLER_GRUPOS[$g]['pregunta'], 'celula' => $c ?: null, 'reto' => null];
+  $u = ['grupo' => $g, 'eje' => TALLER_GRUPOS[$g]['eje'], 'pregunta_eje' => TALLER_GRUPOS[$g]['pregunta'], 'celula' => $c ?: null, 'reto' => null];
   if ($c) $u['reto'] = TALLER_GRUPOS[$g]['retos'][($c - 1) % 5];
   return $u;
 }

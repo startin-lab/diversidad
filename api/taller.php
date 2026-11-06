@@ -20,16 +20,27 @@ try {
     }
     json_out(['ok' => true, 'estado' => $estado, 'grupos' => $grupos]);
   }
-  $code = strtoupper(preg_replace('/[^A-Z0-9\-]/i', '', (string)($in['c'] ?? '')));
-  if (!preg_match('/^5E-?([A-Z0-9]{6})$/', $code, $m)) json_out(['ok' => false, 'error' => 'Escribe el código de tu escarapela (5E-XXXXXX).'], 422);
-  $code = '5E-' . $m[1];
-  $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
-  $r = $q->fetch();
-  if (!$r) { usleep(300000); json_out(['ok' => false, 'error' => 'No encontramos ese código. Revísalo en tu escarapela.'], 404); }
+  // Entrada con el código de la escarapela o con la cédula. La cédula solo llega por POST (nunca en la URL)
+  // y la respuesta devuelve el código, que es lo único que el celular guarda.
+  $doc = $_SERVER['REQUEST_METHOD'] === 'POST' ? preg_replace('/[^0-9A-Za-z]/', '', (string)($in['doc'] ?? '')) : '';
+  if ($doc !== '') {
+    if (strlen($doc) < 5) json_out(['ok' => false, 'error' => 'Revisa el número de documento.'], 422);
+    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula FROM registros WHERE documento_hash=?');
+    $q->execute([hash('sha256', $doc . '|' . cfg()['enc_key_hex'])]);
+    $r = $q->fetch();
+    if (!$r) { usleep(600000); json_out(['ok' => false, 'error' => 'No encontramos ese documento. Prueba con el código de tu escarapela.'], 404); }
+  } else {
+    $code = strtoupper(preg_replace('/[^A-Z0-9\-]/i', '', (string)($in['c'] ?? '')));
+    if (!preg_match('/^5E-?([A-Z0-9]{6})$/', $code, $m)) json_out(['ok' => false, 'error' => 'Escribe el código de tu escarapela (5E-XXXXXX) o tu cédula.'], 422);
+    $code = '5E-' . $m[1];
+    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
+    $r = $q->fetch();
+    if (!$r) { usleep(300000); json_out(['ok' => false, 'error' => 'No encontramos ese código. Revísalo en tu escarapela.'], 404); }
+  }
   $u = taller_ubicacion((int)$r['taller_grupo'], (int)$r['taller_celula']);
   $g = (int)$r['taller_grupo']; $c = (int)$r['taller_celula'];
 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '') {
     if (!$c) json_out(['ok' => false, 'error' => 'La ficha se abre cuando se formen las células.'], 409);
     $campo = (string)($in['campo'] ?? '');
     if (!isset(TALLER_CAMPOS[$campo])) json_out(['ok' => false, 'error' => 'Campo desconocido.'], 422);
