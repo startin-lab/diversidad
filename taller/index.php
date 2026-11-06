@@ -38,13 +38,13 @@ nav[hidden]{display:none}
 .startin-credit{position:fixed;z-index:60;right:12px;bottom:calc(58px + env(safe-area-inset-bottom,0px));font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85}.startin-credit b{color:#16162B;font-weight:800}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
-<header><span class="n">5°</span><b>Laboratorio de IA aplicada<br>a procesos de inclusión</b><button class="btn ghost sm" id="salir" type="button" hidden>Cambiar código</button></header>
+<header><span class="n">5°</span><b>Laboratorio de IA aplicada<br>a procesos de inclusión</b><button class="btn ghost sm" id="salir" type="button" hidden>Salir</button></header>
 <section class="ubic wrap" id="ubic" hidden aria-live="polite"></section>
 <main><div class="wrap">
   <form class="login" id="login" hidden>
     <h1 style="margin:0;font-size:1.5rem">Mi taller</h1>
-    <p class="muted">Escribe el código de tu escarapela. Está debajo del QR y empieza por 5E.</p>
-    <label for="cIn" class="sr">Código de tu escarapela</label><input type="text" id="cIn" placeholder="5E-XXXXXX" autocomplete="off" maxlength="9" required>
+    <p class="muted">Escribe el código de tu escarapela (está debajo del QR y empieza por 5E) o tu número de cédula.</p>
+    <label for="cIn" class="sr">Código de tu escarapela o número de cédula</label><input type="text" id="cIn" placeholder="5E-XXXXXX o cédula" autocomplete="off" maxlength="20" required>
     <button class="btn">Ver mi grupo</button><p id="loginErr" role="alert" style="color:#FFB4A8;font-weight:700"></p>
   </form>
   <div id="espera" class="panel" hidden></div>
@@ -69,7 +69,13 @@ try{hist=JSON.parse(sessionStorage.getItem("dvs_taller_chat")||"[]")}catch(e){}
 const api=(body)=>fetch("../api/taller.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json());
 function guardarCodigo(c){code=c;try{localStorage.setItem(KEY,c)}catch(e){}}
 function mostrarLogin(msg){$("#login").hidden=false;$("#ubic").hidden=true;$("#tabs").hidden=true;$("#espera").hidden=true;["fase","ficha","pliego"].forEach(t=>$("#p-"+t).hidden=true);$("#salir").hidden=true;$("#loginErr").textContent=msg||"";$("#cIn").value=code||"";}
-$("#login").addEventListener("submit",e=>{e.preventDefault();const v=$("#cIn").value.trim().toUpperCase();const m=v.match(/5E-?([A-Z0-9]{6})/);if(!m){$("#loginErr").textContent="El código tiene la forma 5E-XXXXXX.";return;}guardarCodigo("5E-"+m[1]);cargar();});
+$("#login").addEventListener("submit",async e=>{e.preventDefault();const v=$("#cIn").value.trim().toUpperCase();const m=v.match(/^5E-?([A-Z0-9]{6})$/);
+  if(m){guardarCodigo("5E-"+m[1]);cargar();return;}
+  const doc=v.replace(/[^0-9A-Z]/g,"");if(doc.length<5){$("#loginErr").textContent="Escribe el código 5E-XXXXXX o tu número de cédula.";return;}
+  $("#loginErr").textContent="Buscando…";
+  try{const r=await fetch("../api/taller.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({doc})});const j=await r.json();
+    if(!j.ok){$("#loginErr").textContent=j.error||"No encontramos ese documento.";return;}
+    $("#cIn").value="";guardarCodigo(j.codigo);data=j;off=j.estado.ahora-Date.now()/1000;pintar();}catch(err){$("#loginErr").textContent="Sin conexión. Intenta de nuevo.";}});
 $("#salir").onclick=()=>{try{localStorage.removeItem(KEY);sessionStorage.removeItem("dvs_taller_chat")}catch(e){}code="";hist=[];mostrarLogin();};
 async function cargar(){if(!code){mostrarLogin();return;}
   try{const r=await fetch("../api/taller.php?c="+encodeURIComponent(code),{cache:"no-store"});const j=await r.json();
