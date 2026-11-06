@@ -126,6 +126,7 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   <div class="bar" style="justify-content:space-between"><div><h1>Inscripciones · 5° Encuentro</h1><p class="muted" style="margin:0">Datos personales protegidos (Ley 1581 de 2012). Úsalos solo para la logística del evento.</p></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="taller.php">Taller · Laboratorio de IA</a><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="salir" value="1">Salir</button></form></div></div>
   <?php if ($flash) echo '<p class="card" style="padding:12px 16px;border-color:#FFC20E;background:#FFF8E1">' . h($flash) . '</p>'; ?>
+  <?php $nPrueba = (int)$pdo->query("SELECT COUNT(*) FROM registros WHERE codigo LIKE '5E-PRB%'")->fetchColumn(); if ($nPrueba) echo '<p class="card" style="padding:12px 16px;border-color:#F26A21;background:#FFF3EA"><b>Modo prueba activo:</b> hay ' . $nPrueba . ' personas ficticias (códigos 5E-PRB…) en las cifras y el listado. <a href="taller.php#prueba">Bórralas en Taller</a> cuando termines. No reciben correos.</p>'; ?>
   <?php if (isset($_GET['edit'])): $eq = $pdo->prepare('SELECT * FROM registros WHERE id=?'); $eq->execute([(int)$_GET['edit']]); $e = $eq->fetch(); ?>
   <?php if (!$e): ?><p class="card">Ese registro ya no existe. <a href="./">Volver</a></p><?php else: $eaj = json_decode($e['ajustes'] ?: '[]', true) ?: []; ?>
   <div class="card" id="editar" style="margin:16px 0;border:2px solid var(--ink)">

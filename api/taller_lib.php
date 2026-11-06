@@ -248,3 +248,41 @@ function taller_prompt(string $fase, array $u, array $ficha): string {
   $barrera = trim($ficha['barrera'] ?? '') ?: '[escriban aquí la barrera que identificaron]';
   return strtr($p, ['{reto}' => (string)($u['reto'] ?? ''), '{barrera}' => $barrera]);
 }
+
+// ---- Modo prueba: 50 personas ficticias para ensayar el taller sin tocar a los inscritos reales. ----
+const TALLER_PRUEBA = '5E-PRB';
+
+function taller_prueba_n(PDO $pdo): int {
+  return (int)$pdo->query("SELECT COUNT(*) FROM registros WHERE codigo LIKE '" . TALLER_PRUEBA . "%'")->fetchColumn();
+}
+
+/** Vuelve a empezar: sin células, fases ni fichas; quienes ya ingresaron reciben grupo de nuevo. */
+function taller_reiniciar(PDO $pdo): void {
+  taller_db();
+  $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
+  $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas');
+  foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
+}
+
+/** Crea 30 personas de prueba (sin correo real) y registra el ingreso de las primeras 24. */
+function taller_prueba_crear(PDO $pdo): void {
+  taller_db();
+  if (taller_prueba_n($pdo)) return;
+  $orgs = ['Organización Prueba A', 'Organización Prueba A', 'Organización Prueba A', 'Organización Prueba B', 'Organización Prueba B', 'Organización Prueba C', 'Organización Prueba D', 'Organización Prueba E'];
+  $ins = $pdo->prepare('INSERT INTO registros (codigo, nombres, documento_enc, documento_hash, organizacion, correo, grupos_enc, requiere_ajuste, ajustes, consentimiento, correo_enviado) VALUES (?,?,?,?,?,?,?,?,?,1,1)');
+  for ($i = 1; $i <= 50; $i++) {
+    $aj = in_array($i, [5, 17, 33], true) ? ['Intérprete de LSC'] : [];
+    $ins->execute([sprintf('%s%03d', TALLER_PRUEBA, $i), sprintf('Persona de prueba %02d', $i), encrypt_str('0'), hash('sha256', random_bytes(16)),
+      $orgs[$i % count($orgs)], sprintf('prueba%02d@prueba.invalid', $i), encrypt_str('[]'), $aj ? 1 : 0, json_encode($aj, JSON_UNESCAPED_UNICODE)]);
+  }
+  $q = $pdo->prepare("SELECT id FROM registros WHERE codigo LIKE ? ORDER BY codigo LIMIT 44"); $q->execute([TALLER_PRUEBA . '%']);
+  foreach ($q->fetchAll(PDO::FETCH_COLUMN) as $id) { $pdo->prepare('UPDATE registros SET asistio=1 WHERE id=?')->execute([(int)$id]); taller_asignar($pdo, (int)$id); }
+}
+
+/** Borra las personas de prueba y deja el taller en cero. */
+function taller_prueba_borrar(PDO $pdo): int {
+  $n = $pdo->exec("DELETE FROM registros WHERE codigo LIKE '" . TALLER_PRUEBA . "%'");
+  try { $pdo->exec('DELETE e FROM envios e LEFT JOIN registros r ON r.id=e.registro_id WHERE r.id IS NULL'); } catch (Throwable $e) {}
+  taller_reiniciar($pdo);
+  return (int)$n;
+}
