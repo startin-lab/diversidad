@@ -28,7 +28,7 @@ function mensaje(string $camp, array $r): array {
     : [ASUNTO_RECORDATORIO, correo_recordatorio_html($r)];
 }
 function pendientes_sql(string $camp): string {
-  $base = "FROM registros r WHERE NOT EXISTS (SELECT 1 FROM envios e WHERE e.registro_id=r.id AND e.campana='$camp')";
+  $base = "FROM registros r WHERE r.codigo NOT LIKE '5E-PRB%' AND NOT EXISTS (SELECT 1 FROM envios e WHERE e.registro_id=r.id AND e.campana='$camp')";
   return $camp === 'confirmacion' ? "$base AND r.correo_enviado=0" : $base;
 }
 function estado(PDO $pdo, string $camp): array {

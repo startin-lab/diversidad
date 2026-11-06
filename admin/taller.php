@@ -43,11 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
   if ($a === 'reiniciar') {
     if (trim((string)($_POST['confirma'] ?? '')) !== 'REINICIAR') volver('No se reinició: escribe REINICIAR para confirmar.');
-    $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
-    $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas');
-    // Quienes ya ingresaron vuelven a recibir grupo en el mismo orden de llegada.
-    foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
+    taller_reiniciar($pdo);
     volver('Taller reiniciado: grupos repartidos de nuevo, sin células, fases ni fichas.');
+  }
+  if ($a === 'prueba_crear') {
+    if (taller_prueba_n($pdo)) volver('Ya hay personas de prueba.');
+    taller_prueba_crear($pdo);
+    volver('Listo: 50 personas de prueba. 44 ya ingresaron y quedaron repartidas en los 3 grupos; 6 esperan en la mesa de entrada.');
+  }
+  if ($a === 'prueba_borrar') {
+    $n = taller_prueba_borrar($pdo);
+    volver("Se borraron $n personas de prueba y el taller quedó en cero.");
   }
   volver('Acción desconocida.');
 }
@@ -137,6 +143,20 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
     <?php endforeach; if (empty($porG[$g])) echo '<p class="muted">Todavía nadie.</p>'; ?>
     </div>
   <?php endforeach; ?>
+  </div>
+
+  <h2 id="prueba">Ensayar el taller</h2>
+  <?php $np = taller_prueba_n($pdo); ?>
+  <div class="card" style="<?= $np ? 'border-color:#F26A21;background:#FFF3EA' : '' ?>">
+  <?php if (!$np): ?>
+    <p style="margin-top:0">Crea 50 personas ficticias para ensayar todo el flujo sin tocar a los inscritos reales. No reciben correos. Las 44 primeras quedan con ingreso y repartidas en grupos; las otras 6 las puedes validar en la mesa de entrada para ver cómo llega alguien tarde.</p>
+    <form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="prueba_crear"><button class="btn">Crear 50 personas de prueba</button></form>
+  <?php else: $pq = $pdo->query("SELECT codigo, asistio, taller_grupo g, taller_celula c FROM registros WHERE codigo LIKE '" . TALLER_PRUEBA . "%' ORDER BY codigo")->fetchAll(); ?>
+    <p style="margin-top:0"><b>Modo prueba activo: <?= $np ?> personas ficticias.</b> Bórralas al terminar: también cuentan en las cifras del panel.</p>
+    <p><b>Sin ingreso (valídalas en <a href="../ingreso/" target="_blank" rel="noopener">la mesa de entrada</a>):</b> <?php foreach ($pq as $p) if (!$p['asistio']) echo '<code>' . h($p['codigo']) . '</code> '; ?></p>
+    <p><b>Abre «Mi taller» como si fueras una de ellas:</b> <?php $vis = []; foreach ($pq as $p) if ($p['asistio'] && $p['g'] && !isset($vis[$p['g']])) { $vis[$p['g']] = 1; echo '<a class="btn ghost" target="_blank" rel="noopener" href="../taller/?c=' . h($p['codigo']) . '">Grupo ' . (int)$p['g'] . ' · ' . h($p['codigo']) . '</a> '; } ?></p>
+    <form method="post" onsubmit="return confirm('¿Borrar las personas de prueba y dejar el taller en cero (sin células, fases ni fichas)? Los inscritos reales no se tocan.')"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="prueba_borrar"><button class="btn">Borrar personas de prueba y reiniciar</button></form>
+  <?php endif; ?>
   </div>
 
   <h2>Reiniciar el taller</h2>
