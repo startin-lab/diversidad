@@ -48,6 +48,12 @@ if ($logged && isset($_POST['reenviar'], $_POST['id'])) {
 }
 if ($logged && isset($_POST['asistio'], $_POST['id'])) {
   db()->prepare('UPDATE registros SET asistio=? WHERE id=?')->execute([(int)$_POST['asistio'], (int)$_POST['id']]);
+  // El taller solo cuenta a quienes ingresaron: al marcar recibe grupo; al desmarcar sale del reparto.
+  try {
+    require_once __DIR__ . '/../api/taller_lib.php'; taller_db();
+    if ((int)$_POST['asistio']) taller_asignar(db(), (int)$_POST['id']);
+    else db()->prepare('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL WHERE id=?')->execute([(int)$_POST['id']]);
+  } catch (Throwable $e) { error_log('taller: ' . $e->getMessage()); }
   header('Location: ./?f=' . urlencode((string)($_POST['f'] ?? ''))); exit;
 }
 if ($logged && isset($_POST['borrar_fotos'])) {
@@ -118,7 +124,7 @@ input[type=text],input[type=password],select{padding:9px 12px;border:1px solid v
   $uso = $pdo->query('SELECT dia, SUM(n) n FROM agente_uso GROUP BY dia ORDER BY dia DESC LIMIT 7')->fetchAll();
 ?>
   <div class="bar" style="justify-content:space-between"><div><h1>Inscripciones · 5° Encuentro</h1><p class="muted" style="margin:0">Datos personales protegidos (Ley 1581 de 2012). Úsalos solo para la logística del evento.</p></div>
-  <form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="salir" value="1">Salir</button></form></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="taller.php">Taller · Laboratorio de IA</a><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><button class="btn ghost" name="salir" value="1">Salir</button></form></div></div>
   <?php if ($flash) echo '<p class="card" style="padding:12px 16px;border-color:#FFC20E;background:#FFF8E1">' . h($flash) . '</p>'; ?>
   <?php if (isset($_GET['edit'])): $eq = $pdo->prepare('SELECT * FROM registros WHERE id=?'); $eq->execute([(int)$_GET['edit']]); $e = $eq->fetch(); ?>
   <?php if (!$e): ?><p class="card">Ese registro ya no existe. <a href="./">Volver</a></p><?php else: $eaj = json_decode($e['ajustes'] ?: '[]', true) ?: []; ?>

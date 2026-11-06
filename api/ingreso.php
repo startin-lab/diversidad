@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/lib.php';
+require __DIR__ . '/taller_lib.php';
 if (!puerta_logged()) json_out(['ok' => false, 'error' => 'Sesión de entrada no iniciada.'], 401);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') json_out(['ok' => false, 'error' => 'Método no permitido'], 405);
 $in = body_json();
@@ -23,7 +23,10 @@ try {
   if (!$r) json_out(['ok' => true, 'encontrado' => false]);
   $ya = (bool)$r['asistio'];
   if ($marcar && !$ya) { $pdo->prepare('UPDATE registros SET asistio=1 WHERE id=?')->execute([(int)$r['id']]); }
+  // Laboratorio de IA: al ingresar, la persona recibe su grupo (y su célula, si ya se formaron).
+  $taller = [];
+  if ($ya || $marcar) { try { $taller = taller_asignar($pdo, (int)$r['id']); } catch (Throwable $e) { error_log('taller: ' . $e->getMessage()); } }
   json_out(['ok' => true, 'encontrado' => true, 'codigo' => $r['codigo'], 'nombres' => $r['nombres'], 'pronombre' => $r['pronombre'], 'organizacion' => $r['organizacion'],
-    'pliegue' => $r['pliegue'], 'ajustes' => json_decode($r['ajustes'] ?: '[]', true) ?: [], 'ya_ingreso' => $ya, 'marcado' => $marcar && !$ya,
+    'pliegue' => $r['pliegue'], 'ajustes' => json_decode($r['ajustes'] ?: '[]', true) ?: [], 'ya_ingreso' => $ya, 'marcado' => $marcar && !$ya, 'taller' => $taller ?: null,
     'foto' => !empty($r['foto']) ? (decrypt_str($r['foto']) ?: '') : '']);
 } catch (Throwable $e) { error_log('ingreso: ' . $e->getMessage()); json_out(['ok' => false, 'error' => 'Servicio no disponible.'], 500); }
