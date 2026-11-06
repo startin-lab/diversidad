@@ -1,0 +1,151 @@
+<?php
+declare(strict_types=1);
+// Panel del Laboratorio de IA: reparto por grupos, formación de células, fases, fichas y lista imprimible.
+require __DIR__ . '/../api/taller_lib.php';
+$c = cfg();
+session_name($c['session_name']); session_start();
+if (empty($_SESSION['admin'])) { header('Location: ./'); exit; }
+if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(16));
+$csrf = $_SESSION['csrf'];
+$pdo = taller_db();
+function h(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function volver(string $msg): void { $_SESSION['flash_t'] = $msg; header('Location: taller.php'); exit; }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (!hash_equals($csrf, (string)($_POST['csrf'] ?? ''))) { http_response_code(400); exit('Sesión vencida. Vuelve a cargar el panel.'); }
+  $a = (string)($_POST['accion'] ?? '');
+  if ($a === 'formar') {
+    $res = taller_formar($pdo);
+    $txt = []; foreach ($res as $g => $cel) $txt[] = "Grupo $g: " . ($cel ? count($cel) . ' células (' . implode(', ', $cel) . ')' : 'sin personas');
+    volver('Células formadas. ' . implode(' · ', $txt) . '.');
+  }
+  if ($a === 'fase') {
+    $f = (string)($_POST['fase'] ?? '');
+    if ($f === 'detener') { taller_kv_set($pdo, 'fase', null); volver('Taller en pausa: no hay fase en curso.'); }
+    if (!isset(TALLER_FASES[$f])) volver('Fase desconocida.');
+    taller_kv_set($pdo, 'fase', $f); taller_kv_set($pdo, 'fase_inicio', (string)time());
+    volver('Fase en curso: ' . TALLER_FASES[$f]['nombre'] . ' (' . TALLER_FASES[$f]['min'] . ' min).');
+  }
+  if ($a === 'mover') {
+    $code = strtoupper(clean((string)($_POST['codigo'] ?? ''), 12)); $g = (int)($_POST['grupo'] ?? 0); $cel = (int)($_POST['celula'] ?? 0);
+    if (!isset(TALLER_GRUPOS[$g]) || $cel < 0 || $cel > TALLER_MAX_CELULAS) volver('Grupo o célula no válidos.');
+    $q = $pdo->prepare('UPDATE registros SET taller_grupo=?, taller_celula=? WHERE codigo=? AND asistio=1'); $q->execute([$g, $cel ?: null, $code]);
+    if (!$q->rowCount()) volver("No se movió: $code no existe o no ha registrado ingreso.");
+    if ($cel > taller_celulas($pdo, $g)) taller_kv_set($pdo, "celulas_$g", (string)$cel);
+    volver("$code quedó en el grupo $g" . ($cel ? ", célula $cel" : '') . '.');
+  }
+  if ($a === 'destacada') {
+    $g = (int)($_POST['grupo'] ?? 0); $cel = (int)($_POST['celula'] ?? 0);
+    if (!isset(TALLER_GRUPOS[$g])) volver('Grupo no válido.');
+    $actual = (int)taller_kv($pdo, "destacada_$g", '0');
+    taller_kv_set($pdo, "destacada_$g", $actual === $cel ? null : (string)$cel);
+    volver($actual === $cel ? "Se quitó la destacada del grupo $g." : "Célula $cel es la destacada del grupo $g.");
+  }
+  if ($a === 'reiniciar') {
+    if (trim((string)($_POST['confirma'] ?? '')) !== 'REINICIAR') volver('No se reinició: escribe REINICIAR para confirmar.');
+    $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
+    $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas');
+    // Quienes ya ingresaron vuelven a recibir grupo en el mismo orden de llegada.
+    foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
+    volver('Taller reiniciado: grupos repartidos de nuevo, sin células, fases ni fichas.');
+  }
+  volver('Acción desconocida.');
+}
+
+if (isset($_GET['csv'])) {
+  header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="fichas-laboratorio-ia.csv"');
+  $o = fopen('php://output', 'w'); fwrite($o, "\xEF\xBB\xBF");
+  fputcsv($o, array_merge(['Grupo', 'Eje', 'Célula', 'Reto'], array_column(TALLER_CAMPOS, 0), ['Destacada']), ';');
+  foreach (TALLER_GRUPOS as $g => $d) for ($i = 1; $i <= taller_celulas($pdo, $g); $i++) {
+    $f = taller_ficha($pdo, $g, $i);
+    fputcsv($o, array_merge([$g, $d['eje'], $i, $d['retos'][($i - 1) % 5]], array_values($f), [(int)taller_kv($pdo, "destacada_$g", '0') === $i ? 'Sí' : '']), ';');
+  }
+  exit;
+}
+
+$flash = $_SESSION['flash_t'] ?? ''; unset($_SESSION['flash_t']);
+$gente = $pdo->query('SELECT codigo, nombres, organizacion, ajustes, taller_grupo g, taller_celula c FROM registros WHERE asistio=1 ORDER BY taller_grupo, taller_celula, nombres')->fetchAll();
+$porG = []; foreach ($gente as $p) $porG[(int)$p['g']][(int)$p['c']][] = $p;
+$est = taller_estado($pdo); $formado = $est['formado']; $imprimir = isset($_GET['imprimir']);
+?><!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Taller · Panel · 5° Encuentro</title>
+<link rel="stylesheet" href="https://use.typekit.net/rcv2qny.css">
+<style>
+body{margin:0;font:15px/1.45 "elza","Segoe UI",system-ui,sans-serif;background:#F7F4EE;color:#16162B}.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+h1{margin:0;font-size:1.5rem}h2{margin:26px 0 10px;font-size:1.15rem}.muted{color:#5A5F7D}
+.card{background:#fff;border:1px solid #ECE7E4;border-radius:14px;padding:14px 16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.btn{border:0;border-radius:999px;padding:9px 16px;font:700 .92rem "elza","Segoe UI",system-ui,sans-serif;cursor:pointer;background:#F26A21;color:#fff;text-decoration:none;display:inline-block}.btn.ghost{background:#fff;color:#0C1646;box-shadow:inset 0 0 0 2px #0C1646}.btn.on{background:#0C1646;color:#FFC20E}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.flash{border-color:#FFC20E;background:#FFF8E1;margin-top:12px}
+.g1{border-top:6px solid #FFC20E}.g2{border-top:6px solid #13A79A}.g3{border-top:6px solid #EE7DB9}
+.cel{border-top:1px solid #ECE7E4;padding:8px 0}.cel summary{cursor:pointer;font-weight:700}.cel ul{margin:6px 0;padding-left:18px}
+.lsc{background:#E6F6F4;color:#0B6B62;border-radius:6px;padding:0 6px;font-size:.8rem;font-weight:700}
+.ficha{font-size:.88rem;background:#FAF8F4;border-radius:10px;padding:8px 10px;margin-top:6px}.ficha b{display:block;font-size:.8rem;color:#5A5F7D}
+.reloj{font-size:1.6rem;font-weight:900;font-variant-numeric:tabular-nums;color:#F26A21}
+input,select{font:inherit;padding:8px;border:1px solid #CFCBD6;border-radius:10px}
+.btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #FFC20E;outline-offset:2px}
+table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,table.print th{border:1px solid #999;padding:4px 8px;text-align:left}
+@media print{.noprint{display:none!important}body{background:#fff}.pg{page-break-after:always}.card{border:0;padding:0}}
+.startin-credit{position:fixed;z-index:60;right:16px;bottom:16px;font:600 .68rem/1.2 "elza","Segoe UI",system-ui,sans-serif;color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.88);border:1px solid #ECE7E4;border-radius:999px;padding:4px 10px;opacity:.85}.startin-credit b{color:#16162B;font-weight:800}
+</style></head><body><div class="wrap">
+<?php if ($imprimir): ?>
+  <p class="noprint bar"><button class="btn" onclick="print()">Imprimir</button><a class="btn ghost" href="taller.php">Volver</a></p>
+  <?php foreach (TALLER_GRUPOS as $g => $d): ?><div class="pg"><h1>Grupo <?= $g ?> · <?= h($d['eje']) ?> · Mesa <?= $g ?></h1><p><?= h($d['pregunta']) ?></p>
+    <?php foreach ($porG[$g] ?? [] as $cel => $ps): ?><h2><?= $cel ? 'Célula ' . $cel . ' · ' . h($d['retos'][($cel - 1) % 5]) : 'Sin célula todavía' ?></h2>
+      <table class="print"><tr><th>Nombre</th><th>Organización</th><th>Código</th></tr><?php foreach ($ps as $p): ?><tr><td><?= h($p['nombres']) ?><?= taller_es_lsc($p['ajustes']) ? ' (LSC)' : '' ?></td><td><?= h($p['organizacion']) ?></td><td><?= h($p['codigo']) ?></td></tr><?php endforeach; ?></table>
+    <?php endforeach; ?></div><?php endforeach; ?>
+<?php else: ?>
+  <div class="bar" style="justify-content:space-between"><div><h1>Laboratorio de IA · Taller</h1><p class="muted" style="margin:0">9:30 – 10:30 · Las personas reciben grupo al registrar su ingreso. Datos personales protegidos (Ley 1581 de 2012).</p></div>
+  <div class="bar"><a class="btn ghost" href="./">Volver al panel</a><a class="btn ghost" href="../taller/pantalla.php" target="_blank" rel="noopener">Pantalla del auditorio</a><a class="btn ghost" href="?imprimir=1">Lista imprimible</a><a class="btn ghost" href="?csv=1">Fichas en CSV</a></div></div>
+  <?php if ($flash) echo '<p class="card flash">' . h($flash) . '</p>'; ?>
+
+  <div class="grid" style="margin-top:14px">
+    <div class="card"><h2 style="margin-top:0">1. Reparto</h2>
+      <p><b><?= count($gente) ?></b> personas con ingreso registrado. <?php foreach (TALLER_GRUPOS as $g => $d) { $n = 0; foreach ($porG[$g] ?? [] as $ps) $n += count($ps); echo "Grupo $g: <b>$n</b>. "; } ?></p>
+      <p class="muted">Quienes pidieron intérprete de LSC van al grupo <?= taller_grupo_lsc() ?> y, al formar, juntas a la célula 1. Las células tienen máximo <?= TALLER_MAX_CELULA ?> personas y hay hasta <?= TALLER_MAX_CELULAS ?> por grupo.</p>
+      <form method="post" onsubmit="return confirm(<?= h(json_encode($formado ? '¿Formar las células de nuevo? Se rehace el reparto de células y las fichas ya escritas pueden quedar con otra gente.' : '¿Formar las células ahora con las personas que ya ingresaron? Quien llegue después entra a la célula más pequeña de su grupo.')) ?>)">
+        <input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="formar"><button class="btn"><?= $formado ? 'Formar células de nuevo' : 'Formar células' ?></button></form>
+    </div>
+    <div class="card"><h2 style="margin-top:0">2. Fases</h2>
+      <p>En curso: <b><?= $est['fase'] ? h($est['fase']['nombre']) : 'ninguna' ?></b> <span class="reloj" id="reloj"></span></p>
+      <form method="post" class="bar"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="fase">
+        <?php foreach (TALLER_FASES as $k => $f): ?><button class="btn <?= ($est['fase']['id'] ?? '') === $k ? 'on' : 'ghost' ?>" name="fase" value="<?= $k ?>"><?= h($f['nombre']) ?> · <?= $f['min'] ?>′</button><?php endforeach; ?>
+        <button class="btn ghost" name="fase" value="detener">Pausar</button></form>
+      <p class="muted">Al pulsar una fase arranca su cronómetro en todos los celulares y en la pantalla.</p>
+    </div>
+    <div class="card"><h2 style="margin-top:0">Mover a una persona</h2>
+      <form method="post" class="bar"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="mover">
+        <label>Código <input name="codigo" placeholder="5E-XXXXXX" size="10" required></label>
+        <label>Grupo <select name="grupo"><?php foreach (TALLER_GRUPOS as $g => $d) echo "<option>$g</option>"; ?></select></label>
+        <label>Célula <select name="celula"><option value="0">Sin célula</option><?php for ($i = 1; $i <= TALLER_MAX_CELULAS; $i++) echo "<option>$i</option>"; ?></select></label>
+        <button class="btn">Mover</button></form>
+    </div>
+  </div>
+
+  <h2>Grupos y células</h2>
+  <div class="grid">
+  <?php foreach (TALLER_GRUPOS as $g => $d): $dest = (int)taller_kv($pdo, "destacada_$g", '0'); ?>
+    <div class="card g<?= $g ?>"><h3 style="margin:0">Grupo <?= $g ?> · <?= h($d['eje']) ?></h3><p class="muted" style="margin:2px 0 8px">Mesa <?= $g ?> · <?= taller_celulas($pdo, $g) ?> células</p>
+    <?php foreach ($porG[$g] ?? [] as $cel => $ps): $f = $cel ? taller_ficha($pdo, $g, $cel) : []; ?>
+      <details class="cel"><summary><?= $cel ? "Célula $cel" : 'Sin célula' ?> · <?= count($ps) ?> personas<?= $cel && $dest === $cel ? ' · ★ destacada' : '' ?></summary>
+        <?php if ($cel): ?><p style="margin:4px 0"><b>Reto:</b> <?= h($d['retos'][($cel - 1) % 5]) ?></p><?php endif; ?>
+        <ul><?php foreach ($ps as $p): ?><li><?= h($p['nombres']) ?> · <span class="muted"><?= h($p['organizacion']) ?> · <?= h($p['codigo']) ?></span> <?= taller_es_lsc($p['ajustes']) ? '<span class="lsc">LSC</span>' : '' ?></li><?php endforeach; ?></ul>
+        <?php if ($cel): foreach (TALLER_CAMPOS as $k => [$tit]) if ($f[$k] !== '') echo '<div class="ficha"><b>' . h($tit) . '</b>' . nl2br(h($f[$k])) . '</div>'; ?>
+          <form method="post" style="margin-top:6px"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="destacada"><input type="hidden" name="grupo" value="<?= $g ?>"><input type="hidden" name="celula" value="<?= $cel ?>"><button class="btn ghost"><?= $dest === $cel ? 'Quitar destacada' : '★ Elegir como destacada del grupo' ?></button></form>
+        <?php endif; ?>
+      </details>
+    <?php endforeach; if (empty($porG[$g])) echo '<p class="muted">Todavía nadie.</p>'; ?>
+    </div>
+  <?php endforeach; ?>
+  </div>
+
+  <h2>Reiniciar el taller</h2>
+  <div class="card"><p class="muted" style="margin-top:0">Úsalo solo si hiciste pruebas: borra células, fases y fichas, y vuelve a repartir por grupos a quienes ya ingresaron. No cambia la asistencia.</p>
+  <form method="post" class="bar"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="reiniciar"><input name="confirma" placeholder="Escribe REINICIAR" autocomplete="off"><button class="btn ghost">Reiniciar</button></form></div>
+  <script>
+  (function(){const f=<?= json_encode($est['fase'] ? $est['fase']['fin'] : 0) ?>,off=<?= time() ?>-Date.now()/1000,el=document.getElementById("reloj");
+  function t(){if(!f){el.textContent="";return;}const s=Math.max(0,Math.round(f-(Date.now()/1000+off)));el.textContent=s?Math.floor(s/60)+":"+String(s%60).padStart(2,"0"):"Tiempo";}t();setInterval(t,1000);
+  setInterval(()=>{const a=document.activeElement;if(document.hidden||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))||document.querySelector("details[open]"))return;location.reload();},20000);})();
+  </script>
+<?php endif; ?>
+</div><a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener" aria-label="Hecho por Startin Lab">by <b>Startin*Lab</b></a></body></html>
