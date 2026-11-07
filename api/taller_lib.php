@@ -74,6 +74,14 @@ function taller_db(): PDO {
     PRIMARY KEY (grupo, celula)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
   try { $pdo->exec('ALTER TABLE taller_fichas ADD COLUMN IF NOT EXISTS landing MEDIUMTEXT NULL, ADD COLUMN IF NOT EXISTS landing_editado DATETIME NULL'); } catch (Throwable $e) {}
+  // Historial: todo lo que la célula escribe, genera, pregunta y vota queda guardado (no se borra al reiniciar).
+  $pdo->exec("CREATE TABLE IF NOT EXISTS taller_historial (
+    id INT AUTO_INCREMENT PRIMARY KEY, ronda INT NOT NULL DEFAULT 1, grupo TINYINT NOT NULL, celula TINYINT NOT NULL,
+    tipo VARCHAR(12) NOT NULL, campo VARCHAR(40) NOT NULL DEFAULT '', valor MEDIUMTEXT, registro_id INT NULL,
+    creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX (ronda, grupo, celula), INDEX (tipo)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+  // Copia completa de cada ronda antes de reiniciar o borrar las pruebas.
+  $pdo->exec("CREATE TABLE IF NOT EXISTS taller_archivo (id INT AUTO_INCREMENT PRIMARY KEY, ronda INT NOT NULL, motivo VARCHAR(60) NOT NULL DEFAULT '', datos LONGTEXT NOT NULL, creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
   // Votación de la puesta en común: una persona, un voto por la idea que presenta su grupo.
   $pdo->exec('CREATE TABLE IF NOT EXISTS taller_votos (registro_id INT PRIMARY KEY, grupo TINYINT NOT NULL, celula TINYINT NOT NULL, creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX (grupo, celula)) ENGINE=InnoDB');
   $listo = true;
@@ -260,10 +268,14 @@ function taller_prueba_n(PDO $pdo): int {
 }
 
 /** Vuelve a empezar: sin células, fases ni fichas; quienes ya ingresaron reciben grupo de nuevo. */
-function taller_reiniciar(PDO $pdo): void {
+function taller_reiniciar(PDO $pdo, string $motivo = 'reinicio'): void {
   taller_db();
+  // Antes de limpiar, se guarda la ronda completa y se abre una nueva: nada de lo escrito se pierde.
+  $ronda = taller_ronda($pdo);
+  $pdo->prepare('INSERT INTO taller_archivo (ronda, motivo, datos) VALUES (?,?,?)')->execute([$ronda, $motivo, json_encode(taller_exportar($pdo, $ronda), JSON_UNESCAPED_UNICODE)]);
   $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
   $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas'); $pdo->exec('DELETE FROM taller_votos');
+  taller_kv_set($pdo, 'ronda', (string)($ronda + 1));
   foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
 }
 
@@ -284,9 +296,16 @@ function taller_prueba_crear(PDO $pdo): void {
 
 /** Borra las personas de prueba y deja el taller en cero. */
 function taller_prueba_borrar(PDO $pdo): int {
+  taller_db();
+  // Primero se archiva la ronda de ensayo (con sus fichas y landings); luego se borran las personas ficticias.
+  $ronda = taller_ronda($pdo);
+  $pdo->prepare('INSERT INTO taller_archivo (ronda, motivo, datos) VALUES (?,?,?)')->execute([$ronda, 'ensayo (personas de prueba)', json_encode(taller_exportar($pdo, $ronda), JSON_UNESCAPED_UNICODE)]);
   $n = $pdo->exec("DELETE FROM registros WHERE codigo LIKE '" . TALLER_PRUEBA . "%'");
   try { $pdo->exec('DELETE e FROM envios e LEFT JOIN registros r ON r.id=e.registro_id WHERE r.id IS NULL'); } catch (Throwable $e) {}
-  taller_reiniciar($pdo);
+  $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
+  $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas'); $pdo->exec('DELETE FROM taller_votos');
+  taller_kv_set($pdo, 'ronda', (string)($ronda + 1));
+  foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
   return (int)$n;
 }
 
@@ -315,4 +334,44 @@ function taller_landing(PDO $pdo, int $g, int $c): ?array {
   $r = $q->fetch(); if (!$r || !$r['landing']) return null;
   $l = json_decode((string)$r['landing'], true); if (!is_array($l)) return null;
   $l['_editado'] = $r['landing_editado']; return $l;
+}
+
+/** Ronda en curso (cada reinicio abre una nueva; el evento real queda en la última). */
+function taller_ronda(PDO $pdo): int {
+  $r = (int)taller_kv($pdo, 'ronda', '0');
+  if ($r) return $r;
+  $r = 1 + (int)$pdo->query('SELECT COALESCE(MAX(ronda),0) FROM taller_archivo')->fetchColumn();
+  taller_kv_set($pdo, 'ronda', (string)$r); return $r;
+}
+
+/** Guarda un movimiento en el historial (ficha, landing, chat o voto). */
+function taller_registrar(PDO $pdo, int $g, int $c, string $tipo, string $campo, string $valor, ?int $registroId = null): void {
+  try { $pdo->prepare('INSERT INTO taller_historial (ronda, grupo, celula, tipo, campo, valor, registro_id) VALUES (?,?,?,?,?,?,?)')->execute([taller_ronda($pdo), $g, $c, $tipo, mb_substr($campo, 0, 40), $valor, $registroId]); }
+  catch (Throwable $e) { error_log('historial: ' . $e->getMessage()); }
+}
+
+/** Todo el laboratorio de una ronda: por grupo y célula, reto, ficha final, landing, votos e historial (sin nombres). */
+function taller_exportar(PDO $pdo, ?int $ronda = null): array {
+  taller_db(); $ronda = $ronda ?: taller_ronda($pdo);
+  $org = []; foreach ($pdo->query('SELECT id, organizacion FROM registros')->fetchAll() as $x) $org[(int)$x['id']] = $x['organizacion'];
+  $hist = $pdo->prepare('SELECT grupo, celula, tipo, campo, valor, registro_id, creado FROM taller_historial WHERE ronda=? ORDER BY id'); $hist->execute([$ronda]);
+  $porCel = [];
+  foreach ($hist->fetchAll() as $h) {
+    $v = $h['tipo'] === 'landing' || $h['tipo'] === 'chat' ? (json_decode((string)$h['valor'], true) ?? $h['valor']) : $h['valor'];
+    $porCel[(int)$h['grupo']][(int)$h['celula']][] = ['tipo' => $h['tipo'], 'campo' => $h['campo'], 'valor' => $v, 'organizacion' => $org[(int)$h['registro_id']] ?? null, 'fecha' => $h['creado']];
+  }
+  $out = ['laboratorio' => 'Laboratorio de IA aplicada a procesos de inclusión · 5° Encuentro Diversidades e Inclusión', 'ronda' => $ronda, 'exportado' => date('c'), 'grupos' => []];
+  foreach (TALLER_GRUPOS as $g => $d) {
+    $votos = taller_votos($pdo, $g); $dest = (int)taller_kv($pdo, "destacada_$g", '0'); $cels = [];
+    $n = max(taller_celulas($pdo, $g), !empty($porCel[$g]) ? max(array_keys($porCel[$g])) : 0);
+    for ($c = 1; $c <= $n; $c++) {
+      $q = $pdo->prepare('SELECT organizacion FROM registros WHERE asistio=1 AND taller_grupo=? AND taller_celula=?'); $q->execute([$g, $c]);
+      $todas = $q->fetchAll(PDO::FETCH_COLUMN); $orgs = array_values(array_unique($todas));
+      $l = taller_landing($pdo, $g, $c); if ($l) unset($l['_editado']);
+      $cels[] = ['celula' => $c, 'reto' => $d['retos'][($c - 1) % 5], 'personas' => count($todas), 'organizaciones' => $orgs,
+        'ficha' => taller_ficha($pdo, $g, $c), 'landing' => $l, 'votos' => $votos[$c] ?? 0, 'presenta' => $dest === $c, 'historial' => $porCel[$g][$c] ?? []];
+    }
+    $out['grupos'][] = ['grupo' => $g, 'eje' => $d['eje'], 'pregunta' => $d['pregunta'], 'celulas' => $cels];
+  }
+  return $out;
 }
