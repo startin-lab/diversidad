@@ -45,10 +45,10 @@ const TALLER_FASES = [
     'prompt' => 'Esta es la barrera que identificamos: {barrera} Ayúdanos a analizar posibles causas, a quién podría afectar y qué sesgos o riesgos debemos considerar. Propón tres oportunidades de mejora y señala qué información debemos validar con las personas involucradas.'],
   'experimentacion' => ['n' => 3, 'nombre' => 'Experimentación', 'min' => 18, 'campo' => 'solucion',
     'pregunta' => '¿Qué podemos crear o mejorar con IA para empezar a resolver esta barrera?',
-    'pasos' => ['Elijan una oportunidad de mejora del análisis.', 'Pidan a Pliego una solución sencilla: una guía, una lista de chequeo, un mensaje accesible, un asistente de orientación o una mejora de proceso.', 'Hagan al menos un ajuste para que sea útil y aplicable.', 'Completen la solución, el prompt reutilizable y el primer paso.'],
+    'pasos' => ['Elijan una oportunidad de mejora del análisis.', 'Pidan a Pliego una solución sencilla: una guía, una lista de chequeo, un mensaje accesible, un asistente de orientación o una mejora de proceso.', 'Hagan al menos un ajuste para que sea útil y aplicable.', 'Completen la solución y el primer paso en la ficha.', 'Creen la landing de su solución con Pliego y ajústenla con sus palabras.'],
     'prompt' => 'Queremos responder a esta barrera: {barrera} Ayúdanos a diseñar una solución sencilla apoyada en IA que podamos probar en nuestra organización. Describe cómo funcionaría, a quién beneficiaría, qué debemos revisar para evitar sesgos y cuál sería el primer paso para probarla.'],
-  'plenaria' => ['n' => 4, 'nombre' => 'Puesta en común', 'min' => 8,
-    'texto' => 'Voten en su celular la idea que presenta su grupo. La célula elegida la comparte en un minuto.'],
+  'plenaria' => ['n' => 4, 'nombre' => 'Votemos la idea', 'min' => 8,
+    'texto' => 'Cada persona vota en su celular por la idea de otra célula de su grupo. La elegida se presenta en un minuto.'],
   'cierre' => ['n' => 5, 'nombre' => 'Cierre', 'min' => 2,
     'texto' => 'Registra una acción que podrías impulsar en tu organización en el Muro de compromisos.'],
 ];
@@ -73,6 +73,7 @@ function taller_db(): PDO {
     agente_n INT NOT NULL DEFAULT 0, editado DATETIME NULL,
     PRIMARY KEY (grupo, celula)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+  try { $pdo->exec('ALTER TABLE taller_fichas ADD COLUMN IF NOT EXISTS landing MEDIUMTEXT NULL, ADD COLUMN IF NOT EXISTS landing_editado DATETIME NULL'); } catch (Throwable $e) {}
   // Votación de la puesta en común: una persona, un voto por la idea que presenta su grupo.
   $pdo->exec('CREATE TABLE IF NOT EXISTS taller_votos (registro_id INT PRIMARY KEY, grupo TINYINT NOT NULL, celula TINYINT NOT NULL, creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX (grupo, celula)) ENGINE=InnoDB');
   $listo = true;
@@ -301,7 +302,17 @@ function taller_opciones(PDO $pdo, int $g): array {
   $votos = taller_votos($pdo, $g); $op = [];
   for ($i = 1; $i <= taller_celulas($pdo, $g); $i++) {
     $f = taller_ficha($pdo, $g, $i);
-    $op[] = ['celula' => $i, 'reto' => TALLER_GRUPOS[$g]['retos'][($i - 1) % 5], 'solucion' => $f['solucion'], 'barrera' => $f['barrera'], 'primer_paso' => $f['primer_paso'], 'votos' => $votos[$i] ?? 0];
+    $lp = taller_landing($pdo, $g, $i);
+    $op[] = ['celula' => $i, 'reto' => TALLER_GRUPOS[$g]['retos'][($i - 1) % 5], 'solucion' => $f['solucion'], 'barrera' => $f['barrera'], 'primer_paso' => $f['primer_paso'], 'votos' => $votos[$i] ?? 0,
+      'landing' => $lp ? ['titulo' => $lp['titulo'], 'url' => "landing.php?g=$g&c=$i"] : null];
   }
   return $op;
+}
+
+/** Landing de una célula (estructura generada por Pliego), o null si aún no existe. */
+function taller_landing(PDO $pdo, int $g, int $c): ?array {
+  $q = $pdo->prepare('SELECT landing, landing_editado FROM taller_fichas WHERE grupo=? AND celula=?'); $q->execute([$g, $c]);
+  $r = $q->fetch(); if (!$r || !$r['landing']) return null;
+  $l = json_decode((string)$r['landing'], true); if (!is_array($l)) return null;
+  $l['_editado'] = $r['landing_editado']; return $l;
 }

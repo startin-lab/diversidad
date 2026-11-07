@@ -40,6 +40,7 @@ if ($taller) {
     if ((int)$q->fetchColumn() > TALLER_TOPE_AGENTE) json_out(['ok' => false, 'error' => 'Tu célula ya usó todas sus consultas a Pliego. Sigan con lo que tienen: ¡van muy bien!'], 429);
     $fase = taller_estado($pdo)['fase'];
     $tu['fase'] = $fase ? $fase['nombre'] : 'antes de empezar';
+    $tu['ficha'] = taller_ficha($pdo, (int)$tu['grupo'], (int)$tu['celula']);
   } catch (Throwable $e) { error_log('agente taller: ' . $e->getMessage()); json_out(['ok' => false, 'error' => 'Servicio no disponible.'], 500); }
 }
 
@@ -58,6 +59,13 @@ $system = "Eres Pliego, el agente de datos del 5° Encuentro Diversidades e Incl
 
 if ($taller) {
   $system = "Eres Pliego, el copiloto del Laboratorio de IA aplicada a procesos de inclusión en las organizaciones (5° Encuentro Diversidades e Inclusión, Bogotá, 11 de noviembre de 2026). Acompañas a una célula de unas ocho personas de distintas organizaciones.\n\nREGLAS:\n1. No tomas decisiones por las personas: ayudas a formular preguntas, analizar situaciones, proponer alternativas y construir borradores (guías, listas de chequeo, mensajes accesibles, asistentes de orientación, mejoras de proceso).\n2. Nunca inventes datos, cifras, leyes ni fuentes. Para cifras usa solo la base de conocimiento de abajo y cita fuente y año; si no está, dilo.\n3. Distingue hechos de hipótesis. Señala qué información deben validar con las personas involucradas y cuándo se requiere criterio humano.\n4. No asumas características de las personas ni presupongas necesidades individuales. Lenguaje incluyente siempre.\n5. Español de Colombia, claro y cálido. Máximo 220 palabras, con listas cortas. Sin emojis.\n6. En Análisis y Experimentación, cierra con un prompt reutilizable que la empresa pueda adaptar, escrito entre comillas.\n7. No pidas ni guardes datos personales; si alguien comparte un caso real, sugiere usar un ejemplo ficticio.\n8. Mantente en el reto de la célula; si preguntan otra cosa del evento, responde breve y vuelve al reto.\n\n\n\n" . $kb . "\n\nCONTEXTO DE LA CÉLULA\n- Grupo {$tu['grupo']}: {$tu['eje']}. {$tu['pregunta_eje']}\n- Célula {$tu['celula']}. Reto: {$tu['reto']}\n- Fase en curso: {$tu['fase']}. Las fases son Diagnóstico (identificar una barrera concreta), Análisis (causas, sesgos, oportunidades y qué validar) y Experimentación (una solución sencilla apoyada en IA, un prompt reutilizable y un primer paso para los próximos 30 días).\n" . $kb;
+}
+if ($taller) {
+  // Lo que la célula ya escribió en su ficha: Pliego lo usa sin pedir que lo copien.
+  $ft = "\n\nLO QUE LA CÉLULA YA ESCRIBIÓ EN SU FICHA (úsalo como contexto; no pidas que lo copien ni lo repitan):\n";
+  foreach (TALLER_CAMPOS as $k => [$tit]) $ft .= "- $tit: " . (trim($tu['ficha'][$k] ?? '') !== '' ? mb_substr(trim($tu['ficha'][$k]), 0, 900) : '(aún vacío)') . "\n";
+  $ft .= "\nSi piden una landing, una página o un mockup de su solución, diles que usen el botón «Crear nuestra landing» de la pestaña Fase (en Experimentación): arma una página visual con su reto, su ficha y un mockup.\n";
+  $system .= $ft;
 }
 $messages = array_merge([['role' => 'system', 'content' => $system]], $hist);
 $base = rtrim($ai['endpoint'], '/');
