@@ -69,6 +69,20 @@ textarea,input[type=text]{width:100%;border-radius:14px;border:2px solid rgba(25
 
 /* Pliego: conversación a pantalla completa, como un chat. */
 .panel.chat-panel{padding:0;display:flex;flex-direction:column;overflow:hidden}
+.chat-top{flex:none;display:flex;align-items:center;gap:8px;padding:8px 12px 8px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--muted)}.chat-top b{color:#fff}
+.chat-top button{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:var(--ink3);border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:.85rem;cursor:pointer;min-height:38px}
+.chat-top button svg{width:16px;height:16px}
+/* Landing de la célula */
+.landing{margin-top:16px;background:var(--paper);color:var(--ink);border-radius:22px;padding:16px;position:relative;overflow:hidden}
+.landing::before{content:"";position:absolute;right:0;top:0;width:46px;height:46px;background:linear-gradient(225deg,var(--ink) 0 50%,var(--g) 50%)}
+.landing>*{position:relative}.landing .k{font-weight:900;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#4B537F}
+.landing h3{font:900 1.35rem/1.1 var(--f);margin:6px 0 6px}.landing p{margin:0 0 12px;font-size:.95rem}
+.landing .btn{width:100%;margin-top:8px}.landing .btn.ver{background:var(--ink)}
+.landing textarea{background:#fff;color:var(--ink);border-color:#D8DBEA;min-height:70px}
+.landing .err{color:#B3261E;font-weight:800;font-size:.9rem;margin-top:8px}
+.armando{display:flex;align-items:center;gap:12px}.armando i{flex:none;width:44px;height:44px;background:var(--g);clip-path:polygon(0 0,100% 0,0 100%);animation:dobla 1.2s ease-in-out infinite}
+@keyframes dobla{50%{clip-path:polygon(0 0,100% 100%,0 100%)}}
+.verlanding{display:inline-flex;margin-top:10px;font-weight:800;color:var(--g);text-decoration:underline}
 .mensajes{flex:1;min-height:0;overflow:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
 .burbuja{max-width:88%;padding:11px 14px;border-radius:20px;font-size:.98rem;line-height:1.45;word-wrap:break-word}
 .burbuja.u{align-self:flex-end;background:var(--g);color:var(--ink);border-bottom-right-radius:6px;font-weight:600;white-space:pre-wrap}
@@ -156,6 +170,7 @@ body.trabajo.en-pliego .startin-credit{display:none}
   <section class="panel" id="p-fase" role="tabpanel" aria-labelledby="t-fase"></section>
   <section class="panel" id="p-ficha" role="tabpanel" aria-labelledby="t-ficha" hidden><h2>Ficha de la célula</h2><div class="avance"><i><b id="avBar" style="width:0"></b></i><span class="muted" id="avTxt"></span></div><p class="muted" style="margin:0 0 12px">Es de toda la célula: lo que escriban aquí lo ven todos y se guarda solo.</p><div id="campos"></div></section>
   <section class="panel chat-panel" id="p-pliego" role="tabpanel" aria-labelledby="t-pliego" hidden>
+    <div class="chat-top"><span><b>Pliego</b> · ya conoce su reto y su ficha</span><button type="button" id="nuevoChat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nuevo chat</button></div>
     <div class="mensajes" id="mensajes" aria-live="polite"></div>
     <form class="compositor" id="ask"><div class="fila"><label for="askIn" class="sr">Mensaje para Pliego</label><textarea id="askIn" rows="1" placeholder="Escríbele a Pliego…" maxlength="1200" enterkeyhint="send"></textarea><button class="enviar" id="enviar" aria-label="Enviar" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
       <div class="pie"><span id="quedan">Pliego ayuda a pensar; las decisiones son de ustedes.</span><a class="credito-in" href="https://startinlab.org/" target="_blank" rel="noopener">by <b>Startin*Lab</b></a></div></form>
@@ -216,8 +231,9 @@ function pintar(){const j=data,u=j.ubicacion,e=j.estado;document.body.dataset.g=
   $("#faseK").textContent=!f?`Grupo ${u.grupo} · Célula ${u.celula}`:(f.n>=1&&f.n<=3?`Fase ${f.n} de 3 · Grupo ${u.grupo} · Célula ${u.celula}`:`Grupo ${u.grupo} · Célula ${u.celula}`);
   $("#faseNom").textContent=f?f.nombre:"Aún no empieza";
   $("#pliegues").innerHTML=e.fases.map((x,i)=>`<i class="${f&&i<f.n?"ok":""}${f&&i===f.n?" ya":""}"></i>`).join("");
-  const ff=(f?f.id:"-")+"|"+JSON.stringify(f&&j.prompts?j.prompts[f.id]:"")+"|"+JSON.stringify(j.plenaria||"");
-  if(ff!==firmaFase){const sc=$("#p-fase").scrollTop;firmaFase=ff;pintarFase();$("#p-fase").scrollTop=f&&faseVista!==f.id?0:sc;}
+  const ff=(f?f.id:"-")+"|"+JSON.stringify(f&&j.prompts?j.prompts[f.id]:"")+"|"+JSON.stringify(j.plenaria||"")+"|"+JSON.stringify(j.landing||"")+armando+landErr;
+  const editandoFase=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#p-fase")&&document.activeElement.tagName==="TEXTAREA";
+  if(ff!==firmaFase&&!editandoFase){const sc=$("#p-fase").scrollTop;firmaFase=ff;pintarFase();$("#p-fase").scrollTop=f&&faseVista!==f.id?0:sc;}
   const fy=JSON.stringify(u)+j.nombre;if(fy!==firmaYo){firmaYo=fy;pintarYo();}
   pintarFicha();pintarQuedan();tick();
   if(nueva){verTab(tab);if(tab==="pliego")pintarChat(true);}
@@ -243,10 +259,13 @@ function pintarFase(){const f=data.estado.fase,u=data.ubicacion;let h=`<div clas
     const p=data.prompts&&data.prompts[f.id];
     if(p)h+=`<div class="prompt"><div class="k">Prompt sugerido para Pliego</div><p>${esc(p)}</p><div class="acc"><button class="btn" type="button" id="usar">Preguntar a Pliego</button><button class="btn line" type="button" id="copiar" style="color:var(--ink)">Copiar</button></div></div>`;
     if(f.campo)h+=`<div class="acc" style="margin-top:12px"><button class="btn ink" type="button" id="irFicha">Escribir en la ficha</button></div>`;
+    if(f.id==="experimentacion")h+=tarjetaLanding(true);else if(data.landing&&(f.id==="plenaria"||f.id==="cierre"))h+=tarjetaLanding(false);
     if(data.plenaria)h+=votacion(f);
     if(f.id==="cierre")h+=`<div class="acc" style="margin-top:12px"><a class="btn" href="../#evento">Dejar mi compromiso</a></div>`;}
   $("#p-fase").innerHTML=h;
   $("#p-fase").querySelectorAll("[data-votar]").forEach(b=>b.onclick=()=>votar(+b.dataset.votar,b));
+  if($("#crearLanding"))$("#crearLanding").onclick=()=>crearLanding("");
+  if($("#ajustarLanding"))$("#ajustarLanding").onclick=()=>{const v=$("#instrLanding").value.trim();if(!v){$("#instrLanding").focus();return;}crearLanding(v);};
   const p=data.prompts&&f&&data.prompts[f.id];
   if($("#usar"))$("#usar").onclick=()=>{verTab("pliego");preguntar(p);};
   if($("#copiar"))$("#copiar").onclick=async()=>{try{await navigator.clipboard.writeText(p);$("#copiar").textContent="¡Copiado!";}catch(e){}};
@@ -255,15 +274,29 @@ function pintarFase(){const f=data.estado.fase,u=data.ubicacion;let h=`<div clas
 // Puesta en común: cada persona vota por la idea que presenta su grupo; quien facilita la confirma.
 function votacion(f){const pl=data.plenaria,u=data.ubicacion;
   if(pl.destacada){const o=pl.opciones.find(x=>x.celula===pl.destacada)||{};
-    return`<div class="presenta" role="status"><div class="k">Presenta el Grupo ${+u.grupo}</div><div class="cel">Célula ${+pl.destacada}</div><div class="s">${esc(o.solucion||o.barrera||o.reto||"")}</div>${o.primer_paso?`<div class="pp"><b>Primer paso:</b> ${esc(o.primer_paso)}</div>`:""}${pl.destacada===u.celula?`<div class="es-tuya">¡Es la idea de tu célula! Prepárense para contarla en un minuto.</div>`:""}</div>`;}
+    return`<div class="presenta" role="status"><div class="k">Presenta el Grupo ${+u.grupo}</div><div class="cel">Célula ${+pl.destacada}</div><div class="s">${esc(o.solucion||o.barrera||o.reto||"")}</div>${o.primer_paso?`<div class="pp"><b>Primer paso:</b> ${esc(o.primer_paso)}</div>`:""}${o.landing?`<a class="btn ver" style="margin-top:12px;background:var(--ink);width:100%" href="${esc(o.landing.url)}" target="_blank" rel="noopener">Ver la landing</a>`:""}${pl.destacada===u.celula?`<div class="es-tuya">¡Es la idea de tu célula! Prepárense para contarla en un minuto.</div>`:""}</div>`;}
   if(f.id!=="plenaria")return"";
   const total=pl.opciones.reduce((a,o)=>a+o.votos,0)||0;
   if(pl.opciones.length<2)return`<div class="presenta"><div class="k">Grupo ${+u.grupo}</div><div class="cel">Célula ${+u.celula}</div><div class="s">Su grupo tiene una sola célula: ustedes presentan la idea del grupo.</div></div>`;
   return`<h2 style="margin-top:18px">Elijan la idea que presenta su grupo</h2><p class="muted" style="margin:-4px 0 12px">Vota por la idea de otra célula del Grupo ${+u.grupo}: por la tuya no se puede. Puedes cambiar tu voto hasta que la persona facilitadora confirme.</p>`+
     pl.opciones.map(o=>{const mia=o.celula===u.celula,voto=pl.mi_voto===o.celula,pct=total?Math.round(o.votos/total*100):0;
-      return`<div class="opcion${mia?" mia":""}${voto?" voto":""}"><div class="cab"><b>Célula ${o.celula}</b>${mia?`<span class="tag g">Tu célula</span>`:""}${voto?`<span class="tag">Tu voto</span>`:""}</div><div class="r">${esc(o.reto)}</div><div class="s">${o.solucion?esc(o.solucion):`<span class="muted">Aún no escriben su solución en la ficha.</span>`}</div>${o.primer_paso?`<div class="pp"><b>Primer paso:</b> ${esc(o.primer_paso)}</div>`:""}
+      return`<div class="opcion${mia?" mia":""}${voto?" voto":""}"><div class="cab"><b>Célula ${o.celula}</b>${mia?`<span class="tag g">Tu célula</span>`:""}${voto?`<span class="tag">Tu voto</span>`:""}</div><div class="r">${esc(o.reto)}</div><div class="s">${o.solucion?esc(o.solucion):`<span class="muted">Aún no escriben su solución en la ficha.</span>`}</div>${o.primer_paso?`<div class="pp"><b>Primer paso:</b> ${esc(o.primer_paso)}</div>`:""}${o.landing?`<a class="verlanding" href="${esc(o.landing.url)}" target="_blank" rel="noopener">Ver su landing: ${esc(o.landing.titulo)}</a>`:""}
         <div class="barra-voto" aria-label="${o.votos} votos"><i><b style="width:${pct}%"></b></i><span>${o.votos} ${o.votos===1?"voto":"votos"}</span></div>${mia?`<p class="muted" style="margin:0;text-align:center">Es tu célula: no puedes votar por ella.</p>`:`<button class="btn${voto?"":" ink"}" type="button" data-votar="${o.celula}" ${voto?"aria-pressed=\"true\"":""}>${voto?"✓ Votaste por esta":"Votar por esta idea"}</button>`}</div>`;}).join("");}
 async function votar(cel,b){b.disabled=true;b.textContent="Votando…";try{const j=await api({c:code,accion:"votar",celula:cel});if(j.ok){firmaFase="";recibir(j);}else{b.textContent=j.error||"No se pudo votar";}}catch(e){b.textContent="Sin conexión. Intenta de nuevo.";}finally{b.disabled=false;}}
+
+// ---- Landing de la solución (Experimentación) ----
+let armando=false,landErr="";
+function tarjetaLanding(editable){const L=data.landing;
+  if(armando)return`<div class="landing" role="status"><div class="armando"><i aria-hidden="true"></i><div><b>Pliego está armando su landing…</b><br><span style="font-size:.9rem">Toma su reto, la ficha y lo que han conversado. Puede tardar hasta un minuto.</span></div></div></div>`;
+  if(!L)return editable?`<div class="landing"><div class="k">Su solución, en una landing</div><h3>Que se vea lo que imaginan</h3><p>Pliego toma su reto, la ficha y lo que han conversado, y arma una página con el problema, la solución, cómo funciona y un mockup de lo que imaginan. Luego la ajustan con sus palabras.</p><button class="btn" type="button" id="crearLanding">Crear nuestra landing</button>${landErr?`<div class="err" role="alert">${esc(landErr)}</div>`:""}</div>`:"";
+  return`<div class="landing"><div class="k">Landing de su célula</div><h3>${esc(L.titulo)}</h3><p>${esc(L.lema)}</p><a class="btn ver" href="${esc(L.url)}" target="_blank" rel="noopener">Ver nuestra landing</a>${editable?`<label for="instrLanding" style="display:block;font-weight:800;margin-top:14px">¿Qué le cambiamos?</label><textarea id="instrLanding" maxlength="600" placeholder="Ej.: hazlo un chatbot, más sencillo, pensado para personas mayores…"></textarea><button class="btn" type="button" id="ajustarLanding">Ajustar la landing</button>`:""}${landErr?`<div class="err" role="alert">${esc(landErr)}</div>`:""}</div>`;}
+async function crearLanding(instr){if(armando)return;armando=true;landErr="";firmaFase="";pintar();
+  try{const r=await fetch("../api/landing.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({c:code,instruccion:instr,contexto:hist.filter(m=>!m.p&&!m.err).slice(-8).map(m=>({role:m.role,content:m.content}))})});
+    const raw=await r.text();const j=JSON.parse(raw.slice(Math.max(0,raw.indexOf("{"))));
+    if(j.ok){data.landing={titulo:j.landing.titulo,lema:j.landing.lema,url:j.url};const t=$("#toast");t.innerHTML=`<div class="toast" role="status">¡Listo! Su landing «${esc(j.landing.titulo)}» está lista.</div>`;setTimeout(()=>t.innerHTML="",5000);}
+    else landErr=j.error||"No se pudo crear la landing.";}
+  catch(e){landErr="Sin conexión o Pliego tardó demasiado. Intenta de nuevo.";}
+  armando=false;firmaFase="";pintar();cargar();}
 
 function pintarYo(){const j=data,u=j.ubicacion;
   $("#p-yo").innerHTML=`<div class="yo"><div class="k">Hola, ${esc(j.nombre)}</div><div class="cel">Célula ${+u.celula}</div><div style="font-weight:900">Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="reto">Reto: ${esc(u.reto)}</div></div>
@@ -298,8 +331,8 @@ function burbuja(m,i){if(m.role==="user")return`<div class="burbuja u">${esc(m.c
   return`<div class="burbuja a${m.err?" err":""}"><div class="quien"><i>P</i>Pliego</div>${md(m.content)}${m.err?"":`<button class="copiar" type="button" data-i="${i}">Copiar</button>`}</div>`;}
 function pintarChat(abajo){const box=$("#mensajes");const f=data&&data.estado.fase;
   if(!hist.length){const p=data&&f&&data.prompts&&data.prompts[f.id];
-    box.innerHTML=`<div class="bienvenida-chat"><div class="av">P</div><h3>Hola, soy Pliego</h3><p class="muted">Conozco el reto de tu célula. Pregúntame lo que necesiten para avanzar.</p><div class="chips">${p?`<button type="button" data-q="fase"><b>Prompt de ${esc(f.nombre)}</b>Usar el prompt sugerido de la fase</button>`:""}<button type="button" data-q="¿Qué barreras de inclusión podríamos no estar viendo en nuestro reto?"><b>Explorar</b>¿Qué barreras podríamos no estar viendo?</button><button type="button" data-q="Ayúdanos a escribir un prompt reutilizable para que una empresa trabaje nuestro reto."><b>Llevar a la empresa</b>Escribir un prompt reutilizable</button></div></div>`;
-    box.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>preguntar(b.dataset.q==="fase"?data.prompts[data.estado.fase.id]:b.dataset.q));return;}
+    box.innerHTML=`<div class="bienvenida-chat"><div class="av">P</div><h3>Hola, soy Pliego</h3><p class="muted">Conozco el reto de tu célula y lo que ya escribieron en la ficha: no tienen que copiar nada. Pregúntame lo que necesiten para avanzar.</p><div class="chips">${p?`<button type="button" data-q="fase"><b>Prompt de ${esc(f.nombre)}</b>Usar el prompt sugerido de la fase</button>`:""}<button type="button" data-q="¿Qué barreras de inclusión podríamos no estar viendo en nuestro reto?"><b>Explorar</b>¿Qué barreras podríamos no estar viendo?</button><button type="button" data-q="Ayúdanos a escribir un prompt reutilizable para que una empresa trabaje nuestro reto."><b>Llevar a la empresa</b>Escribir un prompt reutilizable</button>${f&&f.id==="experimentacion"?`<button type="button" data-q="landing"><b>Hacerlo visual</b>Crear la landing de nuestra solución</button>`:""}</div></div>`;
+    box.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{if(b.dataset.q==="landing"){verTab("fase");crearLanding("");return;}preguntar(b.dataset.q==="fase"?data.prompts[data.estado.fase.id]:b.dataset.q);});return;}
   box.innerHTML=hist.map(burbuja).join("");
   box.querySelectorAll(".copiar").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(hist[+b.dataset.i].content);b.textContent="¡Copiado!";}catch(e){}});
   if(abajo)alFinal();}
@@ -324,6 +357,7 @@ $("#ask").addEventListener("submit",e=>{e.preventDefault();const v=caja.value;if
 function verTab(t){tab=t;["fase","ficha","pliego","yo"].forEach(x=>{$("#t-"+x).setAttribute("aria-selected",x===t);$("#p-"+x).hidden=x!==t;});
   document.body.classList.toggle("en-pliego",t==="pliego");if(t==="pliego")pintarChat(true);}
 ["fase","ficha","pliego","yo"].forEach(x=>$("#t-"+x).onclick=()=>verTab(x));
+$("#nuevoChat").onclick=()=>{if(esperando)return;if(hist.length&&!confirm("¿Empezar un chat nuevo? Esta conversación se borra de este celular. La ficha no cambia."))return;hist=[];ss("dvs_taller_chat","[]");pintarChat(true);caja.focus();};
 function tick(){if(!data||!data.ubicacion||!data.ubicacion.celula)return;const f=data.estado.fase,el=$("#reloj"),arco=$("#arco");
   if(!f){el.textContent="–";arco.style.strokeDashoffset=169.6;$("#barra").classList.remove("fin");return;}
   const tot=f.min*60,s=Math.max(0,Math.round(f.fin-(Date.now()/1000+off)));

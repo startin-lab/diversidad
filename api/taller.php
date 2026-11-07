@@ -16,7 +16,7 @@ try {
       $cel = []; $n = 0; foreach ($q->fetchAll() as $x) { $n += (int)$x['n']; if ($x['c']) $cel[(int)$x['c']] = (int)$x['n']; }
       $dest = (int)taller_kv($pdo, "destacada_$g", '0');
       $grupos[] = ['grupo' => $g, 'eje' => $d['eje'], 'personas' => $n, 'celulas' => $cel, 'votos' => taller_votos($pdo, $g),
-        'destacada' => $dest ? ['celula' => $dest, 'reto' => $d['retos'][($dest - 1) % 5]] + taller_ficha($pdo, $g, $dest) : null];
+        'destacada' => $dest ? ['celula' => $dest, 'reto' => $d['retos'][($dest - 1) % 5], 'landing' => (($lp = taller_landing($pdo, $g, $dest)) ? ['titulo' => $lp['titulo'], 'lema' => $lp['lema']] : null)] + taller_ficha($pdo, $g, $dest) : null];
     }
     json_out(['ok' => true, 'estado' => $estado, 'grupos' => $grupos]);
   }
@@ -65,6 +65,8 @@ try {
     foreach (['diagnostico', 'analisis', 'experimentacion'] as $f) $out['prompts'][$f] = taller_prompt($f, $u, $ficha);
     $q = $pdo->prepare('SELECT agente_n FROM taller_fichas WHERE grupo=? AND celula=?'); $q->execute([$g, $c]);
     $out['agente_restante'] = max(0, TALLER_TOPE_AGENTE - (int)$q->fetchColumn());
+    $lp = taller_landing($pdo, $g, $c);
+    $out['landing'] = $lp ? ['titulo' => $lp['titulo'], 'lema' => $lp['lema'], 'url' => "landing.php?g=$g&c=$c", 'editado' => $lp['_editado']] : null;
     $fase = $estado['fase']['id'] ?? '';
     if ($fase === 'plenaria' || $fase === 'cierre') {
       $q = $pdo->prepare('SELECT celula FROM taller_votos WHERE registro_id=?'); $q->execute([(int)$r['id']]);
