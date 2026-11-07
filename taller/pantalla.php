@@ -60,6 +60,10 @@ body.muro .preg.xl{font-size:7vh;max-width:12ch}
 .nota{break-inside:avoid;margin:0 0 1.2vw;padding:2vh 1.2vw 1.6vh;border-radius:.6vh;color:var(--ink);position:relative;box-shadow:0 1.2vh 2.4vh rgba(0,0,0,.28);transform:rotate(var(--r,0deg));transform-origin:top center}
 .nota::after{content:"";position:absolute;right:0;bottom:0;width:3.2vh;height:3.2vh;background:linear-gradient(315deg,rgba(12,22,70,.35) 0 50%,rgba(255,255,255,.35) 50%)}
 .nota p{margin:0;font-weight:800;font-size:var(--fs,2.15vh);line-height:1.3}
+.nota .quien{display:flex;align-items:center;gap:.8vw;margin-bottom:1.2vh}
+.nota .av{flex:none;width:calc(var(--fs,2.15vh)*2.6);height:calc(var(--fs,2.15vh)*2.6);border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:calc(var(--fs,2.15vh)*.9);overflow:hidden;border:.35vh solid #fff;box-shadow:0 .4vh .8vh rgba(0,0,0,.2)}
+.nota .av img{width:100%;height:100%;object-fit:cover;display:block}
+.nota .quien b{display:block;font-size:calc(var(--fs,2.15vh)*.82);line-height:1.15}.nota .quien span{display:block;font-weight:700;font-size:calc(var(--fs,2.15vh)*.62);opacity:.85}
 .comunidad{display:flex;align-items:flex-end;justify-content:space-between;gap:.6vw;height:16vh;margin-top:auto}.comunidad img{height:100%;width:auto;max-width:18%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 .6vh .8vh rgba(0,0,0,.35))}.nota small{display:block;margin-top:1.2vh;font-weight:800;font-size:1.45vh;opacity:.8}
 .nota.nueva{animation:despliega .9s cubic-bezier(.2,.8,.2,1) both}
 .muro-vacio{display:grid;place-items:center;height:100%;font-weight:800;font-size:3vh;color:var(--muted);text-align:center}
@@ -149,7 +153,9 @@ async function cargarMuro(){const box=$("#muro");if(!box)return;try{const r=awai
   const primera=!Object.keys(vistosMuro).length,n=j.items.length;
   box.style.setProperty("--fs",n<=6?"3.4vh":n<=12?"2.7vh":n<=20?"2.2vh":"1.9vh");box.style.columns=n<=4?2:3;
   box.innerHTML=j.items.map((it,i)=>{const nueva=!primera&&!vistosMuro[it.id];const col=COLOR[it.pliegue]||RESERVA[it.id%RESERVA.length];const rot=((it.id*37)%5-2)*.6;
-    return`<div class="nota${nueva?" nueva":""}" style="background:${col};--r:${rot}deg"><p>${esc(it.texto)}</p><small>— ${it.nombre?esc(it.nombre)+" · ":""}${esc(it.organizacion)}</small></div>`;}).join("");
+    const ini=(it.nombre||it.organizacion||"·").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+    const av=`<div class="av">${it.foto?`<img src="../api/muro_foto.php?k=${+it.id}" alt="" onerror="this.parentNode.textContent='${esc(ini)}'">`:esc(ini)}</div>`;
+    return`<div class="nota${nueva?" nueva":""}" style="background:${col};--r:${rot}deg"><div class="quien">${av}<div>${it.nombre?`<b>${esc(it.nombre)}</b><span>${esc(it.organizacion)}</span>`:`<b>${esc(it.organizacion)}</b>`}</div></div><p>${esc(it.texto)}</p></div>`;}).join("");
   j.items.forEach(it=>vistosMuro[it.id]=1);}catch(e){}}
 setInterval(()=>{if(document.body.classList.contains("muro"))cargarMuro();},5000);
 function tick(){const el=$("#t");if(!d||!el)return;const f=d.estado.fase;if(!f)return;const tot=f.min*60,s=Math.max(0,Math.round(f.fin-(Date.now()/1000+off)));
