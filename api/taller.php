@@ -46,6 +46,7 @@ try {
     if ((int)taller_kv($pdo, "destacada_$g", '0')) json_out(['ok' => false, 'error' => 'Tu grupo ya eligió la idea que presenta.'], 409);
     $cel = (int)($in['celula'] ?? 0);
     if ($cel < 1 || $cel > taller_celulas($pdo, $g)) json_out(['ok' => false, 'error' => 'Esa célula no existe en tu grupo.'], 422);
+    if ($cel === $c) json_out(['ok' => false, 'error' => 'No puedes votar por tu propia célula: elige la idea de otra.'], 422);
     $pdo->prepare('INSERT INTO taller_votos (registro_id, grupo, celula) VALUES (?,?,?) ON DUPLICATE KEY UPDATE grupo=VALUES(grupo), celula=VALUES(celula), creado=NOW()')->execute([(int)$r['id'], $g, $cel]);
   } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '') {
     if (!$c) json_out(['ok' => false, 'error' => 'La ficha se abre cuando se formen las células.'], 409);
