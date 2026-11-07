@@ -50,7 +50,7 @@ const TALLER_FASES = [
   'plenaria' => ['n' => 4, 'nombre' => 'Votemos la idea', 'min' => 8,
     'texto' => 'Cada persona vota en su celular por la idea de otra célula de su grupo. La elegida se presenta en un minuto.'],
   'cierre' => ['n' => 5, 'nombre' => 'Cierre', 'min' => 2,
-    'texto' => 'Registra una acción que podrías impulsar en tu organización en el Muro de compromisos.'],
+    'texto' => 'Escribe una acción que impulsarás en tu organización. Entre todas y todos armamos el muro final.'],
 ];
 
 const TALLER_CAMPOS = [

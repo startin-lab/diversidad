@@ -117,6 +117,15 @@ textarea,input[type=text]{width:100%;border-radius:14px;border:2px solid rgba(25
 .presenta .k{font-weight:900;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase}.presenta .cel{font:900 clamp(3.4rem,20vw,5rem)/.85 var(--f);letter-spacing:-.04em;margin:6px 0 8px}.presenta .s{font-weight:800;font-size:1.05rem;line-height:1.35}.presenta .pp{margin-top:8px;font-size:.95rem}
 .presenta .es-tuya{margin-top:12px;background:var(--ink);color:#fff;border-radius:14px;padding:10px 12px;font-weight:800}
 
+/* Compromiso para el muro final */
+.comp{margin-top:16px;background:var(--g);color:var(--ink);border-radius:22px;padding:16px;position:relative;overflow:hidden}
+.comp::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25) 0 44%,transparent 44%);pointer-events:none}.comp>*:not(.sr){position:relative}
+.comp h3{font:900 1.35rem/1.1 var(--f);margin:0 0 6px}.comp p{margin:0 0 10px;font-size:.95rem}
+.comp textarea{background:#fff;color:var(--ink);border-color:rgba(12,22,70,.2);min-height:90px}
+.comp .chk{display:flex;gap:10px;align-items:center;margin:10px 0 2px;font-weight:700;font-size:.95rem}.comp .chk input{width:22px;height:22px;accent-color:var(--ink)}
+.comp .btn{width:100%;margin-top:10px;background:var(--ink)}.comp .nota-muro{background:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:1.05rem;line-height:1.35}
+.comp .nota-muro small{display:block;font-weight:700;color:#4B537F;margin-top:6px;font-size:.85rem}
+
 /* Mi célula */
 .yo{background:var(--g);color:var(--ink);border-radius:24px;padding:18px;position:relative;overflow:hidden}
 .yo::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.24) 0 42%,transparent 42%);pointer-events:none}
@@ -231,7 +240,7 @@ function pintar(){const j=data,u=j.ubicacion,e=j.estado;document.body.dataset.g=
   $("#faseK").textContent=!f?`Grupo ${u.grupo} · Célula ${u.celula}`:(f.n>=1&&f.n<=3?`Fase ${f.n} de 3 · Grupo ${u.grupo} · Célula ${u.celula}`:`Grupo ${u.grupo} · Célula ${u.celula}`);
   $("#faseNom").textContent=f?f.nombre:"Aún no empieza";
   $("#pliegues").innerHTML=e.fases.map((x,i)=>`<i class="${f&&i<f.n?"ok":""}${f&&i===f.n?" ya":""}"></i>`).join("");
-  const ff=(f?f.id:"-")+"|"+JSON.stringify(f&&j.prompts?j.prompts[f.id]:"")+"|"+JSON.stringify(j.plenaria||"")+"|"+JSON.stringify(j.landing||"")+armando+landErr;
+  const ff=(f?f.id:"-")+"|"+JSON.stringify(f&&j.prompts?j.prompts[f.id]:"")+"|"+JSON.stringify(j.plenaria||"")+"|"+JSON.stringify(j.landing||"")+armando+landErr+"|"+JSON.stringify(compromiso===undefined?"?":compromiso)+editandoComp+compErr;
   const editandoFase=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#p-fase")&&document.activeElement.tagName==="TEXTAREA";
   if(ff!==firmaFase&&!editandoFase){const sc=$("#p-fase").scrollTop;firmaFase=ff;pintarFase();$("#p-fase").scrollTop=f&&faseVista!==f.id?0:sc;}
   const fy=JSON.stringify(u)+j.nombre;if(fy!==firmaYo){firmaYo=fy;pintarYo();}
@@ -261,10 +270,12 @@ function pintarFase(){const f=data.estado.fase,u=data.ubicacion;let h=`<div clas
     if(f.campo)h+=`<div class="acc" style="margin-top:12px"><button class="btn ink" type="button" id="irFicha">Escribir en la ficha</button></div>`;
     if(f.id==="experimentacion")h+=tarjetaLanding(true);else if(data.landing&&(f.id==="plenaria"||f.id==="cierre"))h+=tarjetaLanding(false);
     if(data.plenaria)h+=votacion(f);
-    if(f.id==="cierre")h+=`<div class="acc" style="margin-top:12px"><a class="btn" href="../#evento">Dejar mi compromiso</a></div>`;}
+    if(f.id==="cierre")h+=tarjetaCompromiso();}
   $("#p-fase").innerHTML=h;
   $("#p-fase").querySelectorAll("[data-votar]").forEach(b=>b.onclick=()=>votar(+b.dataset.votar,b));
   if($("#crearLanding"))$("#crearLanding").onclick=()=>crearLanding("");
+  if($("#pegarComp"))$("#pegarComp").onclick=pegarCompromiso;if($("#editarComp"))$("#editarComp").onclick=()=>{editandoComp=true;firmaFase="";pintar();};
+  if(f&&f.id==="cierre"&&compromiso===undefined)cargarCompromiso();
   if($("#ajustarLanding"))$("#ajustarLanding").onclick=()=>{const v=$("#instrLanding").value.trim();if(!v){$("#instrLanding").focus();return;}crearLanding(v);};
   const p=data.prompts&&f&&data.prompts[f.id];
   if($("#usar"))$("#usar").onclick=()=>{verTab("pliego");preguntar(p);};
@@ -297,6 +308,21 @@ async function crearLanding(instr){if(armando)return;armando=true;landErr="";fir
     else landErr=j.error||"No se pudo crear la landing.";}
   catch(e){landErr="Sin conexión o Pliego tardó demasiado. Intenta de nuevo.";}
   armando=false;firmaFase="";pintar();cargar();}
+
+// ---- Compromiso para el muro final (Cierre) ----
+let compromiso,editandoComp=false,compErr="";
+async function cargarCompromiso(){compromiso=null;try{const r=await fetch("../api/muro.php?n=10&c="+encodeURIComponent(code),{cache:"no-store"});const j=await r.json();if(j.ok)compromiso=j.mio||null;}catch(e){}firmaFase="";pintar();}
+function tarjetaCompromiso(){const n=esc(data.nombre);
+  if(compromiso&&!editandoComp)return`<div class="comp"><h3>Tu compromiso está en el muro</h3><div class="nota-muro">${esc(compromiso.texto)}<small>— ${compromiso.nombre?esc(compromiso.nombre)+" · ":""}tu organización</small></div><button class="btn" type="button" id="editarComp">Editar mi compromiso</button></div>`;
+  return`<div class="comp"><h3>Dobla tu compromiso</h3><p>Aparecerá en el muro final, en la pantalla del auditorio.</p><label for="compIn" class="sr">Tu compromiso</label><textarea id="compIn" maxlength="200" placeholder="Mi organización se compromete a…">${compromiso?esc(compromiso.texto):""}</textarea>
+    <label class="chk"><input type="checkbox" id="compNom" ${compromiso&&compromiso.nombre?"checked":""}> Mostrar mi nombre (${n}) en el muro</label><p style="font-size:.82rem;margin:2px 0 0">Si no lo marcas, solo aparece tu organización.</p>
+    <button class="btn" type="button" id="pegarComp">Pegar en el muro</button>${compErr?`<p role="alert" style="color:#8E1B14;font-weight:800;margin-top:8px">${esc(compErr)}</p>`:""}</div>`;}
+async function pegarCompromiso(){const t=$("#compIn").value.trim();if(t.length<8){compErr="Escribe un compromiso un poco más largo.";firmaFase="";pintar();return;}
+  const b=$("#pegarComp");b.disabled=true;b.textContent="Pegando…";
+  try{const r=await fetch("../api/muro.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({c:code,texto:t,mostrar_nombre:$("#compNom").checked})});const j=await r.json();
+    if(j.ok){compromiso=j.mio;editandoComp=false;compErr="";const ts=$("#toast");ts.innerHTML=`<div class="toast" role="status">¡Listo! Tu compromiso ya está en el muro.</div>`;setTimeout(()=>ts.innerHTML="",4000);}else compErr=j.error||"No se pudo pegar.";}
+  catch(e){compErr="Sin conexión. Intenta de nuevo.";}
+  document.activeElement&&document.activeElement.blur&&document.activeElement.blur();firmaFase="";pintar();}
 
 function pintarYo(){const j=data,u=j.ubicacion;
   $("#p-yo").innerHTML=`<div class="yo"><div class="k">Hola, ${esc(j.nombre)}</div><div class="cel">Célula ${+u.celula}</div><div style="font-weight:900">Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="reto">Reto: ${esc(u.reto)}</div></div>
