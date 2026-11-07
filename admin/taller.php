@@ -108,7 +108,7 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
   <div class="grid" style="margin-top:14px">
     <div class="card"><h2 style="margin-top:0">1. Reparto</h2>
       <p><b><?= count($gente) ?></b> personas con ingreso registrado. <?php foreach (TALLER_GRUPOS as $g => $d) { $n = 0; foreach ($porG[$g] ?? [] as $ps) $n += count($ps); echo "Grupo $g: <b>$n</b>. "; } ?></p>
-      <p class="muted">Quienes pidieron intérprete de LSC van al grupo <?= taller_grupo_lsc() ?> y, al formar, juntas a la célula 1. Las células tienen máximo <?= TALLER_MAX_CELULA ?> personas y hay hasta <?= TALLER_MAX_CELULAS ?> por grupo.</p>
+      <p class="muted">Quienes pidieron intérprete de LSC van al grupo <?= taller_grupo_lsc() ?> y, al formar, juntas a la célula 1. Cada grupo se divide siempre en 5 células, una por reto (con 90 personas: 30 por grupo y 6 por célula). Quien llega tarde entra a la célula más pequeña.</p>
       <form method="post" onsubmit="return confirm(<?= h(json_encode($formado ? '¿Formar las células de nuevo? Se rehace el reparto de células y las fichas ya escritas pueden quedar con otra gente.' : '¿Formar las células ahora con las personas que ya ingresaron? Quien llegue después entra a la célula más pequeña de su grupo.')) ?>)">
         <input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="formar"><button class="btn"><?= $formado ? 'Formar células de nuevo' : 'Formar células' ?></button></form>
     </div>
