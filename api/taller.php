@@ -15,7 +15,7 @@ try {
       $q = $pdo->prepare('SELECT taller_celula c, COUNT(*) n FROM registros WHERE asistio=1 AND taller_grupo=? GROUP BY taller_celula ORDER BY taller_celula'); $q->execute([$g]);
       $cel = []; $n = 0; foreach ($q->fetchAll() as $x) { $n += (int)$x['n']; if ($x['c']) $cel[(int)$x['c']] = (int)$x['n']; }
       $dest = (int)taller_kv($pdo, "destacada_$g", '0');
-      $grupos[] = ['grupo' => $g, 'eje' => $d['eje'], 'personas' => $n, 'celulas' => $cel,
+      $grupos[] = ['grupo' => $g, 'eje' => $d['eje'], 'personas' => $n, 'celulas' => $cel, 'votos' => taller_votos($pdo, $g),
         'destacada' => $dest ? ['celula' => $dest, 'reto' => $d['retos'][($dest - 1) % 5]] + taller_ficha($pdo, $g, $dest) : null];
     }
     json_out(['ok' => true, 'estado' => $estado, 'grupos' => $grupos]);
@@ -40,7 +40,15 @@ try {
   $u = taller_ubicacion((int)$r['taller_grupo'], (int)$r['taller_celula']);
   $g = (int)$r['taller_grupo']; $c = (int)$r['taller_celula'];
 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '') {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '' && ($in['accion'] ?? '') === 'votar') {
+    $f = taller_kv($pdo, 'fase', '');
+    if (!$c || $f !== 'plenaria') json_out(['ok' => false, 'error' => 'La votación se abre en la puesta en común.'], 409);
+    if ((int)taller_kv($pdo, "destacada_$g", '0')) json_out(['ok' => false, 'error' => 'Tu grupo ya eligió la idea que presenta.'], 409);
+    $cel = (int)($in['celula'] ?? 0);
+    if ($cel < 1 || $cel > taller_celulas($pdo, $g)) json_out(['ok' => false, 'error' => 'Esa célula no existe en tu grupo.'], 422);
+    if ($cel === $c) json_out(['ok' => false, 'error' => 'No puedes votar por tu propia célula: elige la idea de otra.'], 422);
+    $pdo->prepare('INSERT INTO taller_votos (registro_id, grupo, celula) VALUES (?,?,?) ON DUPLICATE KEY UPDATE grupo=VALUES(grupo), celula=VALUES(celula), creado=NOW()')->execute([(int)$r['id'], $g, $cel]);
+  } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '') {
     if (!$c) json_out(['ok' => false, 'error' => 'La ficha se abre cuando se formen las células.'], 409);
     $campo = (string)($in['campo'] ?? '');
     if (!isset(TALLER_CAMPOS[$campo])) json_out(['ok' => false, 'error' => 'Campo desconocido.'], 422);
@@ -57,6 +65,11 @@ try {
     foreach (['diagnostico', 'analisis', 'experimentacion'] as $f) $out['prompts'][$f] = taller_prompt($f, $u, $ficha);
     $q = $pdo->prepare('SELECT agente_n FROM taller_fichas WHERE grupo=? AND celula=?'); $q->execute([$g, $c]);
     $out['agente_restante'] = max(0, TALLER_TOPE_AGENTE - (int)$q->fetchColumn());
+    $fase = $estado['fase']['id'] ?? '';
+    if ($fase === 'plenaria' || $fase === 'cierre') {
+      $q = $pdo->prepare('SELECT celula FROM taller_votos WHERE registro_id=?'); $q->execute([(int)$r['id']]);
+      $out['plenaria'] = ['opciones' => taller_opciones($pdo, $g), 'mi_voto' => (int)$q->fetchColumn() ?: null, 'destacada' => (int)taller_kv($pdo, "destacada_$g", '0') ?: null];
+    }
   }
   json_out($out);
 } catch (Throwable $e) {

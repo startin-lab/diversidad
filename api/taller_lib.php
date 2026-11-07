@@ -48,7 +48,7 @@ const TALLER_FASES = [
     'pasos' => ['Elijan una oportunidad de mejora del análisis.', 'Pidan a Pliego una solución sencilla: una guía, una lista de chequeo, un mensaje accesible, un asistente de orientación o una mejora de proceso.', 'Hagan al menos un ajuste para que sea útil y aplicable.', 'Completen la solución, el prompt reutilizable y el primer paso.'],
     'prompt' => 'Queremos responder a esta barrera: {barrera} Ayúdanos a diseñar una solución sencilla apoyada en IA que podamos probar en nuestra organización. Describe cómo funcionaría, a quién beneficiaría, qué debemos revisar para evitar sesgos y cuál sería el primer paso para probarla.'],
   'plenaria' => ['n' => 4, 'nombre' => 'Puesta en común', 'min' => 8,
-    'texto' => 'Cada grupo elige una idea destacada y la comparte en un minuto.'],
+    'texto' => 'Voten en su celular la idea que presenta su grupo. La célula elegida la comparte en un minuto.'],
   'cierre' => ['n' => 5, 'nombre' => 'Cierre', 'min' => 2,
     'texto' => 'Registra una acción que podrías impulsar en tu organización en el Muro de compromisos.'],
 ];
@@ -73,6 +73,8 @@ function taller_db(): PDO {
     agente_n INT NOT NULL DEFAULT 0, editado DATETIME NULL,
     PRIMARY KEY (grupo, celula)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+  // Votación de la puesta en común: una persona, un voto por la idea que presenta su grupo.
+  $pdo->exec('CREATE TABLE IF NOT EXISTS taller_votos (registro_id INT PRIMARY KEY, grupo TINYINT NOT NULL, celula TINYINT NOT NULL, creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX (grupo, celula)) ENGINE=InnoDB');
   $listo = true;
   return $pdo;
 }
@@ -260,7 +262,7 @@ function taller_prueba_n(PDO $pdo): int {
 function taller_reiniciar(PDO $pdo): void {
   taller_db();
   $pdo->exec('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL');
-  $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas');
+  $pdo->exec('DELETE FROM taller_kv'); $pdo->exec('DELETE FROM taller_fichas'); $pdo->exec('DELETE FROM taller_votos');
   foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
 }
 
@@ -285,4 +287,21 @@ function taller_prueba_borrar(PDO $pdo): int {
   try { $pdo->exec('DELETE e FROM envios e LEFT JOIN registros r ON r.id=e.registro_id WHERE r.id IS NULL'); } catch (Throwable $e) {}
   taller_reiniciar($pdo);
   return (int)$n;
+}
+
+/** Votos por célula de un grupo: [celula => n]. */
+function taller_votos(PDO $pdo, int $g): array {
+  $q = $pdo->prepare('SELECT v.celula, COUNT(*) n FROM taller_votos v JOIN registros r ON r.id=v.registro_id WHERE v.grupo=? GROUP BY v.celula'); $q->execute([$g]);
+  $out = []; foreach ($q->fetchAll() as $x) $out[(int)$x['celula']] = (int)$x['n'];
+  return $out;
+}
+
+/** Ideas de las células de un grupo para la puesta en común (solo el trabajo de la célula, sin nombres). */
+function taller_opciones(PDO $pdo, int $g): array {
+  $votos = taller_votos($pdo, $g); $op = [];
+  for ($i = 1; $i <= taller_celulas($pdo, $g); $i++) {
+    $f = taller_ficha($pdo, $g, $i);
+    $op[] = ['celula' => $i, 'reto' => TALLER_GRUPOS[$g]['retos'][($i - 1) % 5], 'solucion' => $f['solucion'], 'barrera' => $f['barrera'], 'primer_paso' => $f['primer_paso'], 'votos' => $votos[$i] ?? 0];
+  }
+  return $op;
 }

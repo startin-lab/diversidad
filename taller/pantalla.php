@@ -48,6 +48,9 @@ main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-
 .g .dest{margin:1.4vh 0 2vh;background:var(--paper);border-radius:1.6vh;padding:1.6vh 1.2vw;font-size:1.9vh;line-height:1.3;position:relative;z-index:1;overflow:hidden;flex:1;min-height:0}
 .g .dest .r{font-size:1.4vh;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#4B537F;display:block;margin-bottom:.6vh}.g .dest .pp{display:block;margin-top:.8vh;font-weight:800}
 
+.g .votos{margin:1.4vh 0 2vh;background:var(--ink);color:#fff;border-radius:1.6vh;padding:1.6vh 1.2vw;position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1.2vh}
+.g .votos .vt{font-weight:900;font-size:1.5vh;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.g .vf{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.8vw;font-weight:800;font-size:2vh}.g .vf i{height:1.6vh;border-radius:1vh;background:rgba(255,255,255,.14);overflow:hidden}.g .vf i b{display:block;height:100%;background:var(--c);transition:width .6s}.g .vf em{font-style:normal;font-size:2.6vh;font-weight:900;min-width:3ch;text-align:right}
 .capa{position:fixed;inset:0;z-index:20;background:var(--sun);color:var(--ink);display:grid;place-content:center;text-align:center;perspective:120vh}
 .capa .h{transform-origin:top center;animation:despliega 1s cubic-bezier(.2,.8,.2,1) both}
 .capa .h b{display:block;font-weight:900;letter-spacing:.16em;text-transform:uppercase;font-size:3vh}.capa .h div{font:900 22vh/.9 var(--f);letter-spacing:-.05em}
@@ -86,7 +89,7 @@ function pintar(){const e=d.estado,f=e.fase;
       $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_T}</div><b>Entra a Mi taller</b><span>diversidad.startinlab.org/taller</span></div>`;}
     else if(m==="cierre"){$("#izq").innerHTML=`<div class="k">Cierre</div><div class="preg xl">Ahora, dobla tu compromiso.</div><div class="sub">Escribe una acción que impulsarás en tu organización en el <b>Muro de compromisos</b>.</div>`;
       $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_C}</div><b>Muro de compromisos</b><span>diversidad.startinlab.org</span></div>`;}
-    else{$("#izq").innerHTML=`<div class="k">${f.n>=1&&f.n<=3?"Fase "+f.n+" de 3 · ":""}${esc(f.nombre)}</div><div class="preg">${esc(f.pregunta||f.texto||"")}</div><div class="sub">${f.pregunta?`Escríbanla en la ficha de su célula y lleven el post-it al <b>backing de ${esc(f.nombre)}</b>. Pliego los acompaña desde el celular.`:"Cada grupo comparte su idea destacada en un minuto."}</div>`;
+    else{$("#izq").innerHTML=`<div class="k">${f.n>=1&&f.n<=3?"Fase "+f.n+" de 3 · ":""}${esc(f.nombre)}</div><div class="preg">${esc(f.pregunta||f.texto||"")}</div><div class="sub">${f.pregunta?`Escríbanla en la ficha de su célula y lleven el post-it al <b>backing de ${esc(f.nombre)}</b>. Pliego los acompaña desde el celular.`:(f.id==="plenaria"?"Abran <b>Mi taller</b> y voten. Cuando la persona facilitadora confirme, aquí aparece la célula que presenta.":"")}</div>`;
       $("#der").innerHTML=reloj();}
   }
   if(f&&faseVista!==undefined&&faseVista!==f.id)aviso(f);faseVista=f?f.id:null;
@@ -96,8 +99,10 @@ function pintar(){const e=d.estado,f=e.fase;
     const prev=vistos[x.grupo]||0;
     let h=`<div class="cab"><div><div class="lab">Grupo ${x.grupo}</div><h2>${esc(x.eje)}</h2></div><div class="num${x.personas>prev&&prev?" salta":""}">${x.personas}<small>personas</small></div></div>`;
     if(cs.length&&!plen)h+=`<div class="cels">${cs.map(([c,n])=>`<span>Célula ${c} · ${n}</span>`).join("")}</div>`;
-    if(plen&&x.destacada){const t=x.destacada;h+=`<div class="dest"><span class="r">★ Célula ${t.celula} · ${esc(t.reto)}</span>${esc(t.solucion||t.barrera||"")}${t.primer_paso?`<span class="pp">Primer paso: ${esc(t.primer_paso)}</span>`:""}</div>`;}
-    else if(plen){h+=`<div class="vacio">Eligiendo su idea destacada…</div>`;}
+    if(plen&&x.destacada){const t=x.destacada;h+=`<div class="dest"><span class="r">★ Presenta la célula ${t.celula} · ${esc(t.reto)}</span>${esc(t.solucion||t.barrera||"")}${t.primer_paso?`<span class="pp">Primer paso: ${esc(t.primer_paso)}</span>`:""}</div>`;}
+    else if(plen){// Votos en vivo mientras el grupo elige.
+      const vs=Object.keys(x.celulas).map(c=>[+c,(x.votos&&x.votos[c])||0]),tot=vs.reduce((a,v)=>a+v[1],0);
+      h+=`<div class="votos"><div class="vt">Votando la idea que presenta…</div>${vs.map(([c,n])=>`<div class="vf"><span>Célula ${c}</span><i><b style="width:${tot?Math.round(n/tot*100):0}%"></b></i><em>${n}</em></div>`).join("")}</div>`;}
     else if(!x.personas){h+=`<div class="vacio">Esperando a las primeras personas…</div>`;}
     else{// Pocas figuras, separadas: representan al grupo; el número grande dice cuántas personas hay.
       const n=Math.min(x.personas,5),nuevo=x.personas>prev&&prev>=5;
