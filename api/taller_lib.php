@@ -3,10 +3,10 @@ declare(strict_types=1);
 // Laboratorio de IA aplicada a procesos de inclusión (9:30–10:30).
 // Reparto: al registrar el ingreso, cada persona entra al grupo grande con menos gente (1, 2, 3, 1, 2, 3…).
 // Quienes pidieron intérprete de LSC van todos al grupo del intérprete. Al iniciar el taller,
-// «Formar células» divide cada grupo en células de máximo 9 personas (hasta 5 por grupo), mezclando organizaciones.
+// «Formar células» divide cada grupo SIEMPRE en 5 células, una por reto (90 personas → 30 por grupo → 6 por célula),
+// mezclando organizaciones. Quien llega tarde entra a la célula más pequeña de su grupo.
 require_once __DIR__ . '/lib.php';
 
-const TALLER_MAX_CELULA = 9;
 const TALLER_MAX_CELULAS = 5;
 const TALLER_TOPE_AGENTE = 60; // consultas a Pliego por célula
 
@@ -141,8 +141,8 @@ function taller_asignar(PDO $pdo, int $id): array {
           if ($mejor === null || $clave < $mejor) $mejor = $clave;
         }
         $c = $mejor[2];
-        // Si todas las células ya llegaron a 10 (una más del máximo), quien llega tarde abre una nueva.
-        if ($mejor[0] > TALLER_MAX_CELULA && $k < TALLER_MAX_CELULAS) $c = $k = $k + 1;
+        // Si el grupo tenía menos de 5 personas al formar, quien llega abre la célula que falta hasta cubrir los 5 retos.
+        if ($k < TALLER_MAX_CELULAS && $mejor[0] > 0) $c = $k = $k + 1;
         if ($lsc && $g === taller_grupo_lsc()) taller_kv_set($pdo, 'celula_lsc', (string)$c);
       }
       if ($k > taller_celulas($pdo, $g)) taller_kv_set($pdo, "celulas_$g", (string)$k);
@@ -169,7 +169,7 @@ function taller_ubicacion(int $g, int $c): array {
 }
 
 /** Cuántas células abre un grupo según las personas presentes. */
-function taller_k(int $n): int { return $n ? min(TALLER_MAX_CELULAS, max(1, (int)ceil($n / TALLER_MAX_CELULA))) : 0; }
+function taller_k(int $n): int { return min(TALLER_MAX_CELULAS, $n); } // siempre 5 retos; menos solo si hay menos de 5 personas
 
 /** Divide cada grupo en células equilibradas. Rehace el reparto de células si ya existía. */
 function taller_formar(PDO $pdo): array {

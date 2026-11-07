@@ -267,7 +267,7 @@ async function votar(cel,b){b.disabled=true;b.textContent="Votando…";try{const
 
 function pintarYo(){const j=data,u=j.ubicacion;
   $("#p-yo").innerHTML=`<div class="yo"><div class="k">Hola, ${esc(j.nombre)}</div><div class="cel">Célula ${+u.celula}</div><div style="font-weight:900">Grupo ${+u.grupo} · ${esc(u.eje)}</div><div class="reto">Reto: ${esc(u.reto)}</div></div>
-    <div class="datos"><div><b>Pregunta de tu grupo</b><span>${esc(u.pregunta_eje)}</span></div><div><b>Cómo funciona</b><span>Participantes → 3 grandes grupos → células. Tu célula trabaja este reto en tres fases: Diagnóstico, Análisis y Experimentación.</span></div><div><b>Código de tu escarapela</b><span>${esc(j.codigo)}</span></div></div>
+    <div class="datos"><div><b>Pregunta de tu grupo</b><span>${esc(u.pregunta_eje)}</span></div><div><b>Cómo funciona</b><span>Participantes → 3 grandes grupos → células. Cada grupo se divide en 5 células, una por reto. Tu célula trabaja este reto en tres fases: Diagnóstico, Análisis y Experimentación.</span></div><div><b>Código de tu escarapela</b><span>${esc(j.codigo)}</span></div></div>
     <div class="acc" style="margin-top:16px"><button class="btn line" type="button" id="salir2">Salir de Mi taller</button></div>`;
   $("#salir2").onclick=salir;}
 
