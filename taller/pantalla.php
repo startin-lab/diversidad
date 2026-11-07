@@ -54,6 +54,9 @@ main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-
 .capa::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3) 0 40%,transparent 40%),linear-gradient(225deg,rgba(0,0,0,.08) 0 30%,transparent 30%)}
 @keyframes despliega{from{transform:rotateX(-88deg);opacity:0}}
 .capa.sale{animation:sale .6s ease-in forwards}@keyframes sale{to{opacity:0}}
+.full{position:fixed;left:1.2vw;bottom:1.2vh;z-index:40;display:inline-flex;align-items:center;gap:.6vw;border:0;border-radius:999px;padding:1.2vh 1.4vw;background:var(--sun);color:var(--ink);font:900 1.8vh/1 var(--f);cursor:pointer;box-shadow:0 1vh 3vh rgba(0,0,0,.35);transition:opacity .4s,transform .2s}
+.full svg{width:2.4vh;height:2.4vh}.full:hover{transform:scale(1.04)}.full:focus-visible{outline:.4vh solid #fff;outline-offset:.4vh}
+body.quieto .full{opacity:0;pointer-events:none}body.quieto.en-full{cursor:none}
 .startin-credit{position:fixed;right:1vw;bottom:.8vh;font:600 1.2vh/1.2 var(--f);color:#6D6D7C;text-decoration:none;background:rgba(255,255,255,.9);border-radius:999px;padding:.4vh .8vw;z-index:30}.startin-credit b{color:#16162B;font-weight:800}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style></head><body>
@@ -61,6 +64,7 @@ main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-
 <main><div id="izq"></div><div id="der"></div></main>
 <section class="grupos" id="grupos"></section>
 <div id="capa"></div>
+<button class="full" id="full" type="button" aria-label="Ver en pantalla completa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Pantalla completa</span></button>
 <a class="startin-credit" href="https://startinlab.org/" target="_blank" rel="noopener">by <b>Startin*Lab</b></a>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
@@ -105,5 +109,17 @@ function pintar(){const e=d.estado,f=e.fase;
 function tick(){const el=$("#t");if(!d||!el)return;const f=d.estado.fase;if(!f)return;const tot=f.min*60,s=Math.max(0,Math.round(f.fin-(Date.now()/1000+off)));
   el.textContent=s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:"¡Tiempo!";$("#tl").textContent=s?(s<60?"último minuto":"minutos"):"";
   $("#arco").style.strokeDashoffset=276.5*(1-s/tot);$("#reloj").classList.toggle("fin",s>0&&s<60);$("#reloj").classList.toggle("cero",!s);}
-setInterval(tick,1000);setInterval(cargar,4000);cargar();})();
+setInterval(tick,1000);setInterval(cargar,4000);cargar();
+// Pantalla completa para transmitir: botón o tecla F. El botón y el cursor se esconden si el mouse no se mueve,
+// y la pantalla del PC no se apaga mientras esta página esté abierta.
+const bf=$("#full"),txt=bf.querySelector("span");let quieto;
+function esFull(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+async function alternar(){try{if(esFull()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}else{const el=document.documentElement;await (el.requestFullscreen||el.webkitRequestFullscreen).call(el);}}catch(e){}}
+function actualizar(){const f=esFull();document.body.classList.toggle("en-full",f);txt.textContent=f?"Salir de pantalla completa":"Pantalla completa";bf.setAttribute("aria-label",txt.textContent);mover();}
+function mover(){document.body.classList.remove("quieto");clearTimeout(quieto);quieto=setTimeout(()=>document.body.classList.add("quieto"),esFull()?2500:6000);}
+bf.onclick=alternar;document.addEventListener("fullscreenchange",actualizar);document.addEventListener("webkitfullscreenchange",actualizar);
+addEventListener("keydown",e=>{if((e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey)alternar();});
+["mousemove","pointerdown","keydown"].forEach(ev=>addEventListener(ev,mover));mover();
+let lock=null;async function despierta(){try{if("wakeLock" in navigator&&!lock){lock=await navigator.wakeLock.request("screen");lock.addEventListener("release",()=>lock=null);}}catch(e){}}
+despierta();document.addEventListener("visibilitychange",()=>{if(!document.hidden)despierta();});})();
 </script></body></html>
