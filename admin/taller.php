@@ -59,14 +59,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (isset($_GET['csv'])) {
-  header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="fichas-laboratorio-ia.csv"');
+  header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="fichas-laboratorio-ia-ronda-' . taller_ronda($pdo) . '.csv"');
   $o = fopen('php://output', 'w'); fwrite($o, "\xEF\xBB\xBF");
-  fputcsv($o, array_merge(['Grupo', 'Eje', 'Célula', 'Reto'], array_column(TALLER_CAMPOS, 0), ['Destacada']), ';');
-  foreach (TALLER_GRUPOS as $g => $d) for ($i = 1; $i <= taller_celulas($pdo, $g); $i++) {
-    $f = taller_ficha($pdo, $g, $i);
-    fputcsv($o, array_merge([$g, $d['eje'], $i, $d['retos'][($i - 1) % 5]], array_values($f), [(int)taller_kv($pdo, "destacada_$g", '0') === $i ? 'Sí' : '']), ';');
-  }
+  fputcsv($o, array_merge(['Grupo', 'Eje', 'Célula', 'Reto'], array_column(TALLER_CAMPOS, 0), ['Landing', 'Lema', 'Enlace de la landing', 'Votos', 'Presenta']), ';');
+  $base = rtrim((string)(cfg()['site_url'] ?? 'https://diversidad.startinlab.org'), '/');
+  foreach (TALLER_GRUPOS as $g => $d) { $vt = taller_votos($pdo, $g); for ($i = 1; $i <= taller_celulas($pdo, $g); $i++) {
+    $f = taller_ficha($pdo, $g, $i); $l = taller_landing($pdo, $g, $i);
+    fputcsv($o, array_merge([$g, $d['eje'], $i, $d['retos'][($i - 1) % 5]], array_values($f), [$l['titulo'] ?? '', $l['lema'] ?? '', $l ? "$base/taller/landing.php?g=$g&c=$i" : '', $vt[$i] ?? 0, (int)taller_kv($pdo, "destacada_$g", '0') === $i ? 'Sí' : '']), ';');
+  } }
   exit;
+}
+// Todo el laboratorio (ronda en curso o una archivada): fichas, landings, votos e historial completo, sin nombres.
+if (isset($_GET['exportar'])) {
+  $id = (int)$_GET['exportar'];
+  if ($id > 0) { $q = $pdo->prepare('SELECT ronda, datos FROM taller_archivo WHERE id=?'); $q->execute([$id]); $a = $q->fetch(); if (!$a) volver('Esa copia no existe.'); $json = $a['datos']; $nom = 'ronda-' . $a['ronda'] . '-archivada'; }
+  else { $json = json_encode(taller_exportar($pdo), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); $nom = 'ronda-' . taller_ronda($pdo); }
+  header('Content-Type: application/json; charset=utf-8'); header('Content-Disposition: attachment; filename="laboratorio-ia-' . $nom . '.json"');
+  echo $json; exit;
 }
 
 $flash = $_SESSION['flash_t'] ?? ''; unset($_SESSION['flash_t']);
@@ -102,7 +111,7 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
     <?php endforeach; ?></div><?php endforeach; ?>
 <?php else: ?>
   <div class="bar" style="justify-content:space-between"><div><h1>Laboratorio de IA · Taller</h1><p class="muted" style="margin:0">9:30 – 10:30 · Las personas reciben grupo al registrar su ingreso. Datos personales protegidos (Ley 1581 de 2012).</p></div>
-  <div class="bar"><a class="btn ghost" href="./">Volver al panel</a><a class="btn ghost" href="../taller/pantalla.php" target="_blank" rel="noopener">Pantalla del auditorio</a><a class="btn ghost" href="?imprimir=1">Lista imprimible</a><a class="btn ghost" href="?csv=1">Fichas en CSV</a></div></div>
+  <div class="bar"><a class="btn ghost" href="./">Volver al panel</a><a class="btn ghost" href="../taller/pantalla.php" target="_blank" rel="noopener">Pantalla del auditorio</a><a class="btn ghost" href="?imprimir=1">Lista imprimible</a><a class="btn ghost" href="?csv=1">Fichas en CSV</a><a class="btn" href="?exportar=0">Descargar todo el laboratorio</a></div></div>
   <?php if ($flash) echo '<p class="card flash">' . h($flash) . '</p>'; ?>
 
   <div class="grid" style="margin-top:14px">
@@ -152,15 +161,24 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
     <p style="margin-top:0">Crea 50 personas ficticias para ensayar todo el flujo sin tocar a los inscritos reales. No reciben correos. Las 44 primeras quedan con ingreso y repartidas en grupos; las otras 6 las puedes validar en la mesa de entrada para ver cómo llega alguien tarde.</p>
     <form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="prueba_crear"><button class="btn">Crear 50 personas de prueba</button></form>
   <?php else: $pq = $pdo->query("SELECT codigo, asistio, taller_grupo g, taller_celula c FROM registros WHERE codigo LIKE '" . TALLER_PRUEBA . "%' ORDER BY codigo")->fetchAll(); ?>
-    <p style="margin-top:0"><b>Modo prueba activo: <?= $np ?> personas ficticias.</b> Bórralas al terminar: también cuentan en las cifras del panel.</p>
+    <p style="margin-top:0"><b>Modo prueba activo: <?= $np ?> personas ficticias.</b> Bórralas al terminar: también cuentan en las cifras del panel. Al borrarlas se guarda una copia de lo que produjeron.</p>
     <p><b>Sin ingreso (valídalas en <a href="../ingreso/" target="_blank" rel="noopener">la mesa de entrada</a>):</b> <?php foreach ($pq as $p) if (!$p['asistio']) echo '<code>' . h($p['codigo']) . '</code> '; ?></p>
     <p><b>Abre «Mi taller» como si fueras una de ellas:</b> <?php $vis = []; foreach ($pq as $p) if ($p['asistio'] && $p['g'] && !isset($vis[$p['g']])) { $vis[$p['g']] = 1; echo '<a class="btn ghost" target="_blank" rel="noopener" href="../taller/?c=' . h($p['codigo']) . '">Grupo ' . (int)$p['g'] . ' · ' . h($p['codigo']) . '</a> '; } ?></p>
     <form method="post" onsubmit="return confirm('¿Borrar las personas de prueba y dejar el taller en cero (sin células, fases ni fichas)? Los inscritos reales no se tocan.')"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="prueba_borrar"><button class="btn">Borrar personas de prueba y reiniciar</button></form>
   <?php endif; ?>
   </div>
 
+  <h2 id="datos">Lo que produce el laboratorio</h2>
+  <?php $ronda = taller_ronda($pdo); $hn = $pdo->prepare('SELECT tipo, COUNT(*) n FROM taller_historial WHERE ronda=? GROUP BY tipo'); $hn->execute([$ronda]); $hc = $hn->fetchAll(PDO::FETCH_KEY_PAIR);
+    $arch = $pdo->query('SELECT id, ronda, motivo, creado, LENGTH(datos) b FROM taller_archivo ORDER BY id DESC LIMIT 12')->fetchAll(); ?>
+  <div class="card"><p style="margin-top:0">Todo queda guardado: cada cambio de la ficha, cada landing (con lo que pidieron cambiar), cada pregunta y respuesta de Pliego y cada voto, con fecha y hora. <b>Ronda en curso: <?= $ronda ?></b> · <?= (int)($hc['ficha'] ?? 0) ?> cambios de ficha · <?= (int)($hc['landing'] ?? 0) ?> landings · <?= (int)($hc['chat'] ?? 0) ?> conversaciones con Pliego · <?= (int)($hc['voto'] ?? 0) ?> votos.</p>
+    <p class="muted">El archivo no lleva nombres de personas: solo grupo, célula y organización.</p>
+    <p><a class="btn" href="?exportar=0">Descargar la ronda en curso</a></p>
+    <?php if ($arch): ?><p style="margin-bottom:4px"><b>Rondas guardadas antes de reiniciar o borrar pruebas:</b></p><ul style="margin:0;padding-left:18px"><?php foreach ($arch as $a) echo '<li>Ronda ' . (int)$a['ronda'] . ' · ' . h($a['motivo']) . ' · ' . h($a['creado']) . ' · <a href="?exportar=' . (int)$a['id'] . '">descargar</a></li>'; ?></ul><?php endif; ?>
+  </div>
+
   <h2>Reiniciar el taller</h2>
-  <div class="card"><p class="muted" style="margin-top:0">Úsalo solo si hiciste pruebas: borra células, fases y fichas, y vuelve a repartir por grupos a quienes ya ingresaron. No cambia la asistencia.</p>
+  <div class="card"><p class="muted" style="margin-top:0">Úsalo solo si hiciste pruebas: deja en cero células, fases, fichas y votos, y vuelve a repartir por grupos a quienes ya ingresaron. No cambia la asistencia. Antes de limpiar se guarda una copia completa de la ronda, que puedes descargar arriba.</p>
   <form method="post" class="bar"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="reiniciar"><input name="confirma" placeholder="Escribe REINICIAR" autocomplete="off"><button class="btn ghost">Reiniciar</button></form></div>
   <script>
   (function(){const f=<?= json_encode($est['fase'] ? $est['fase']['fin'] : 0) ?>,off=<?= time() ?>-Date.now()/1000,el=document.getElementById("reloj");

@@ -31,10 +31,10 @@ if ($taller) {
   $code = strtoupper(preg_replace('/[^A-Z0-9\-]/i', '', (string)($in['c'] ?? '')));
   try {
     $pdo = taller_db();
-    $q = $pdo->prepare('SELECT taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
+    $q = $pdo->prepare('SELECT id, taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
     $p = $q->fetch();
     if (!$p || !(int)$p['taller_celula']) json_out(['ok' => false, 'error' => 'Pliego se activa cuando se forme tu célula.'], 409);
-    $tu = taller_ubicacion((int)$p['taller_grupo'], (int)$p['taller_celula']);
+    $tu = taller_ubicacion((int)$p['taller_grupo'], (int)$p['taller_celula']); $tu['registro_id'] = (int)$p['id'];
     $pdo->prepare('INSERT INTO taller_fichas (grupo, celula, agente_n) VALUES (?,?,1) ON DUPLICATE KEY UPDATE agente_n=agente_n+1')->execute([$tu['grupo'], $tu['celula']]);
     $q = $pdo->prepare('SELECT agente_n FROM taller_fichas WHERE grupo=? AND celula=?'); $q->execute([$tu['grupo'], $tu['celula']]);
     if ((int)$q->fetchColumn() > TALLER_TOPE_AGENTE) json_out(['ok' => false, 'error' => 'Tu célula ya usó todas sus consultas a Pliego. Sigan con lo que tienen: ¡van muy bien!'], 429);
@@ -91,4 +91,5 @@ $j = json_decode($res, true);
 $answer = trim((string)($j['choices'][0]['message']['content'] ?? ''));
 if ($answer === '') json_out(['ok' => false, 'error' => 'Respuesta vacía.'], 502);
 try { db()->prepare('INSERT INTO agente_log (pregunta, respuesta, tokens) VALUES (?,?,?)')->execute([mb_substr($ultima, 0, 400), $answer, (int)($j['usage']['total_tokens'] ?? 0)]); } catch (Throwable $e) {}
+if ($taller) taller_registrar(db(), (int)$tu['grupo'], (int)$tu['celula'], 'chat', 'pliego', json_encode(['pregunta' => $ultima, 'respuesta' => $answer], JSON_UNESCAPED_UNICODE), $tu['registro_id']);
 json_out(['ok' => true, 'answer' => $answer]);

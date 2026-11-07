@@ -14,7 +14,7 @@ if (empty($ai['api_key']) || str_starts_with($ai['api_key'], '__')) json_out(['o
 
 try {
   $pdo = taller_db();
-  $q = $pdo->prepare('SELECT taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
+  $q = $pdo->prepare('SELECT id, taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
   $p = $q->fetch();
   if (!$p || !(int)$p['taller_celula']) json_out(['ok' => false, 'error' => 'La landing se activa cuando se forme tu célula.'], 409);
   $u = taller_ubicacion((int)$p['taller_grupo'], (int)$p['taller_celula']);
@@ -108,6 +108,7 @@ $landing = [
 ];
 try {
   $pdo->prepare('UPDATE taller_fichas SET landing=?, landing_editado=NOW() WHERE grupo=? AND celula=?')->execute([json_encode($landing, JSON_UNESCAPED_UNICODE), $g, $c]);
+  taller_registrar($pdo, $g, $c, 'landing', $instr !== '' ? 'ajuste' : 'nueva', json_encode(['instruccion' => $instr, 'landing' => $landing], JSON_UNESCAPED_UNICODE), (int)$p['id']);
   // Si la ficha tenía vacíos la solución, el prompt o el primer paso, se completan con la landing.
   foreach (['solucion' => $landing['solucion'], 'prompt' => $landing['prompt'], 'primer_paso' => $landing['primer_paso']] as $k => $v)
     if (trim($ficha[$k]) === '' && $v !== '') $pdo->prepare("UPDATE taller_fichas SET $k=? WHERE grupo=? AND celula=?")->execute([$v, $g, $c]);

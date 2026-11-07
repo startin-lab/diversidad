@@ -48,12 +48,15 @@ try {
     if ($cel < 1 || $cel > taller_celulas($pdo, $g)) json_out(['ok' => false, 'error' => 'Esa célula no existe en tu grupo.'], 422);
     if ($cel === $c) json_out(['ok' => false, 'error' => 'No puedes votar por tu propia célula: elige la idea de otra.'], 422);
     $pdo->prepare('INSERT INTO taller_votos (registro_id, grupo, celula) VALUES (?,?,?) ON DUPLICATE KEY UPDATE grupo=VALUES(grupo), celula=VALUES(celula), creado=NOW()')->execute([(int)$r['id'], $g, $cel]);
+    taller_registrar($pdo, $g, $c, 'voto', 'celula ' . $cel, (string)$cel, (int)$r['id']);
   } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '') {
     if (!$c) json_out(['ok' => false, 'error' => 'La ficha se abre cuando se formen las células.'], 409);
     $campo = (string)($in['campo'] ?? '');
     if (!isset(TALLER_CAMPOS[$campo])) json_out(['ok' => false, 'error' => 'Campo desconocido.'], 422);
     $valor = clean((string)($in['valor'] ?? ''), 1500);
+    $antes = taller_ficha($pdo, $g, $c)[$campo];
     $pdo->prepare("INSERT INTO taller_fichas (grupo, celula, $campo, editado) VALUES (?,?,?,NOW()) ON DUPLICATE KEY UPDATE $campo=VALUES($campo), editado=NOW()")->execute([$g, $c, $valor]);
+    if (trim($valor) !== trim($antes)) taller_registrar($pdo, $g, $c, 'ficha', $campo, $valor, (int)$r['id']);
   }
 
   $out = ['ok' => true, 'codigo' => $r['codigo'], 'nombre' => explode(' ', trim((string)$r['nombres']))[0], 'ingreso' => (bool)$r['asistio'], 'ubicacion' => $u ?: null, 'estado' => $estado];
