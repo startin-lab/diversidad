@@ -41,6 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     taller_kv_set($pdo, "destacada_$g", $actual === $cel ? null : (string)$cel);
     volver($actual === $cel ? "Se quitó la destacada del grupo $g." : "Célula $cel es la destacada del grupo $g.");
   }
+  if ($a === 'facilitar') {
+    $id = (int)($_POST['id'] ?? 0); $si = !empty($_POST['si']);
+    $q = $pdo->prepare('SELECT nombres FROM registros WHERE id=?'); $q->execute([$id]); $nom = $q->fetchColumn();
+    if ($nom === false) volver('Esa persona no existe.');
+    taller_facilitar($pdo, $id, $si);
+    volver($si ? "$nom quedó en el equipo que facilita: no entra al reparto ni a la votación." : "$nom volvió a participar en el reparto.");
+  }
   if ($a === 'reiniciar') {
     if (trim((string)($_POST['confirma'] ?? '')) !== 'REINICIAR') volver('No se reinició: escribe REINICIAR para confirmar.');
     taller_reiniciar($pdo);
@@ -79,7 +86,10 @@ if (isset($_GET['exportar'])) {
 }
 
 $flash = $_SESSION['flash_t'] ?? ''; unset($_SESSION['flash_t']);
-$gente = $pdo->query('SELECT codigo, nombres, organizacion, ajustes, taller_grupo g, taller_celula c FROM registros WHERE asistio=1 ORDER BY taller_grupo, taller_celula, nombres')->fetchAll();
+$gente = $pdo->query("SELECT codigo, nombres, organizacion, ajustes, taller_grupo g, taller_celula c FROM registros WHERE asistio=1 AND taller_rol='' ORDER BY taller_grupo, taller_celula, nombres")->fetchAll();
+$equipo = $pdo->query("SELECT id, codigo, nombres, organizacion, asistio FROM registros WHERE taller_rol='facilitador' ORDER BY nombres")->fetchAll();
+$buscar = clean((string)($_GET['buscar'] ?? ''), 80); $hallados = [];
+if (mb_strlen($buscar) >= 3) { $q = $pdo->prepare("SELECT id, codigo, nombres, organizacion, asistio, taller_rol FROM registros WHERE nombres LIKE ? OR codigo=? ORDER BY nombres LIMIT 10"); $q->execute(['%' . $buscar . '%', strtoupper($buscar)]); $hallados = $q->fetchAll(); }
 $porG = []; foreach ($gente as $p) $porG[(int)$p['g']][(int)$p['c']][] = $p;
 $est = taller_estado($pdo); $formado = $est['formado']; $imprimir = isset($_GET['imprimir']);
 ?><!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Taller · Panel · 5° Encuentro</title>
@@ -152,6 +162,18 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
     <?php endforeach; if (empty($porG[$g])) echo '<p class="muted">Todavía nadie.</p>'; ?>
     </div>
   <?php endforeach; ?>
+  </div>
+
+  <h2 id="equipo">Equipo que facilita</h2>
+  <div class="card"><p class="muted" style="margin-top:0">Registran su ingreso como cualquier persona, pero no entran al reparto de grupos ni a las células, y no votan. En «Mi taller» ven la pantalla de facilitación.</p>
+    <?php if ($equipo): ?><ul style="margin:0 0 10px;padding-left:18px"><?php foreach ($equipo as $p): ?><li><b><?= h($p['nombres']) ?></b> · <span class="muted"><?= h($p['organizacion']) ?> · <?= h($p['codigo']) ?> · <?= $p['asistio'] ? 'ya ingresó' : 'aún no ingresa' ?></span>
+      <form method="post" style="display:inline"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="facilitar"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>"><button class="btn ghost" style="padding:4px 12px">Quitar</button></form></li><?php endforeach; ?></ul>
+    <?php else: ?><p>Nadie marcado todavía.</p><?php endif; ?>
+    <form method="get" action="#equipo" class="bar"><label>Buscar por nombre o código <input name="buscar" value="<?= h($buscar) ?>" placeholder="Nombre o 5E-XXXXXX" required minlength="3"></label><button class="btn ghost">Buscar</button></form>
+    <?php if ($buscar !== ''): ?><?php if (!$hallados) echo '<p class="muted">No hay inscripciones con ese nombre o código.</p>'; foreach ($hallados as $p): ?>
+      <div class="bar" style="margin-top:6px"><span><b><?= h($p['nombres']) ?></b> · <span class="muted"><?= h($p['organizacion']) ?> · <?= h($p['codigo']) ?></span></span>
+      <?php if ($p['taller_rol'] === 'facilitador'): ?><span class="muted">ya facilita</span><?php else: ?><form method="post"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="facilitar"><input type="hidden" name="id" value="<?= (int)$p['id'] ?>"><input type="hidden" name="si" value="1"><button class="btn">Marcar como facilitación</button></form><?php endif; ?></div>
+    <?php endforeach; endif; ?>
   </div>
 
   <h2 id="prueba">Ensayar el taller</h2>

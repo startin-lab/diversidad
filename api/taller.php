@@ -25,7 +25,7 @@ try {
   $doc = $_SERVER['REQUEST_METHOD'] === 'POST' ? preg_replace('/[^0-9A-Za-z]/', '', (string)($in['doc'] ?? '')) : '';
   if ($doc !== '') {
     if (strlen($doc) < 5) json_out(['ok' => false, 'error' => 'Revisa el número de documento.'], 422);
-    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula FROM registros WHERE documento_hash=?');
+    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula, taller_rol FROM registros WHERE documento_hash=?');
     $q->execute([hash('sha256', $doc . '|' . cfg()['enc_key_hex'])]);
     $r = $q->fetch();
     if (!$r) { usleep(600000); json_out(['ok' => false, 'error' => 'No encontramos ese documento. Prueba con el código de tu escarapela.'], 404); }
@@ -33,7 +33,7 @@ try {
     $code = strtoupper(preg_replace('/[^A-Z0-9\-]/i', '', (string)($in['c'] ?? '')));
     if (!preg_match('/^5E-?([A-Z0-9]{6})$/', $code, $m)) json_out(['ok' => false, 'error' => 'Escribe el código de tu escarapela (5E-XXXXXX) o tu cédula.'], 422);
     $code = '5E-' . $m[1];
-    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula FROM registros WHERE codigo=?'); $q->execute([$code]);
+    $q = $pdo->prepare('SELECT id, codigo, nombres, asistio, taller_grupo, taller_celula, taller_rol FROM registros WHERE codigo=?'); $q->execute([$code]);
     $r = $q->fetch();
     if (!$r) { usleep(300000); json_out(['ok' => false, 'error' => 'No encontramos ese código. Revísalo en tu escarapela.'], 404); }
   }
@@ -42,7 +42,8 @@ try {
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && $doc === '' && ($in['accion'] ?? '') === 'votar') {
     $f = taller_kv($pdo, 'fase', '');
-    if (!$c || $f !== 'plenaria') json_out(['ok' => false, 'error' => 'La votación se abre en la puesta en común.'], 409);
+    if (($r['taller_rol'] ?? '') === 'facilitador') json_out(['ok' => false, 'error' => 'Quienes facilitan el laboratorio no votan.'], 403);
+    if (!$c || $f !== 'plenaria') json_out(['ok' => false, 'error' => 'La votación se abre en «Votemos la idea».'], 409);
     if ((int)taller_kv($pdo, "destacada_$g", '0')) json_out(['ok' => false, 'error' => 'Tu grupo ya eligió la idea que presenta.'], 409);
     $cel = (int)($in['celula'] ?? 0);
     if ($cel < 1 || $cel > taller_celulas($pdo, $g)) json_out(['ok' => false, 'error' => 'Esa célula no existe en tu grupo.'], 422);
@@ -59,7 +60,7 @@ try {
     if (trim($valor) !== trim($antes)) taller_registrar($pdo, $g, $c, 'ficha', $campo, $valor, (int)$r['id']);
   }
 
-  $out = ['ok' => true, 'codigo' => $r['codigo'], 'nombre' => explode(' ', trim((string)$r['nombres']))[0], 'ingreso' => (bool)$r['asistio'], 'ubicacion' => $u ?: null, 'estado' => $estado];
+  $out = ['ok' => true, 'codigo' => $r['codigo'], 'nombre' => explode(' ', trim((string)$r['nombres']))[0], 'ingreso' => (bool)$r['asistio'], 'facilitador' => ($r['taller_rol'] ?? '') === 'facilitador', 'ubicacion' => $u ?: null, 'estado' => $estado];
   if ($c) {
     $ficha = taller_ficha($pdo, $g, $c);
     $out['ficha'] = $ficha;
