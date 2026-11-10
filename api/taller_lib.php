@@ -66,6 +66,8 @@ function taller_db(): PDO {
   $pdo = db();
   if ($listo) return $pdo;
   try { $pdo->exec('ALTER TABLE registros ADD COLUMN IF NOT EXISTS taller_grupo TINYINT NULL, ADD COLUMN IF NOT EXISTS taller_celula TINYINT NULL'); } catch (Throwable $e) {}
+  // Quienes lideran el laboratorio: registran su ingreso, pero no entran al reparto, a las células ni a la votación.
+  try { $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS taller_rol VARCHAR(20) NOT NULL DEFAULT ''"); } catch (Throwable $e) {}
   $pdo->exec('CREATE TABLE IF NOT EXISTS taller_kv (k VARCHAR(40) PRIMARY KEY, v VARCHAR(255) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
   $pdo->exec("CREATE TABLE IF NOT EXISTS taller_fichas (
     grupo TINYINT NOT NULL, celula TINYINT NOT NULL,
@@ -119,9 +121,13 @@ function taller_asignar(PDO $pdo, int $id): array {
   taller_db();
   taller_lock($pdo);
   try {
-    $q = $pdo->prepare('SELECT id, organizacion, ajustes, asistio, taller_grupo, taller_celula FROM registros WHERE id=?'); $q->execute([$id]);
+    $q = $pdo->prepare('SELECT id, organizacion, ajustes, asistio, taller_grupo, taller_celula, taller_rol FROM registros WHERE id=?'); $q->execute([$id]);
     $r = $q->fetch();
     if (!$r || !(int)$r['asistio']) return [];
+    if ($r['taller_rol'] === 'facilitador') {
+      if ($r['taller_grupo'] !== null || $r['taller_celula'] !== null) $pdo->prepare('UPDATE registros SET taller_grupo=NULL, taller_celula=NULL WHERE id=?')->execute([$id]);
+      return ['facilitador' => true];
+    }
     $g = (int)$r['taller_grupo']; $c = (int)$r['taller_celula'];
     $org = taller_org((string)$r['organizacion']);
     $lsc = taller_es_lsc($r['ajustes']);
@@ -184,7 +190,7 @@ function taller_k(int $n): int { return min(TALLER_MAX_CELULAS, $n); } // siempr
 function taller_formar(PDO $pdo): array {
   taller_db();
   // Quien ingresó sin grupo (por ejemplo, marcado a mano antes del módulo) recibe uno primero.
-  foreach ($pdo->query('SELECT id FROM registros WHERE asistio=1 AND taller_grupo IS NULL ORDER BY id')->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
+  foreach ($pdo->query("SELECT id FROM registros WHERE asistio=1 AND taller_grupo IS NULL AND taller_rol='' ORDER BY id")->fetchAll(PDO::FETCH_COLUMN) as $id) taller_asignar($pdo, (int)$id);
   taller_lock($pdo);
   $res = [];
   try {
@@ -374,4 +380,12 @@ function taller_exportar(PDO $pdo, ?int $ronda = null): array {
     $out['grupos'][] = ['grupo' => $g, 'eje' => $d['eje'], 'pregunta' => $d['pregunta'], 'celulas' => $cels];
   }
   return $out;
+}
+
+/** Marca o desmarca a una persona como parte del equipo que facilita (sale del reparto y de la votación). */
+function taller_facilitar(PDO $pdo, int $id, bool $si): void {
+  taller_db();
+  $pdo->prepare('UPDATE registros SET taller_rol=?, taller_grupo=IF(?, NULL, taller_grupo), taller_celula=IF(?, NULL, taller_celula) WHERE id=?')->execute([$si ? 'facilitador' : '', $si ? 1 : 0, $si ? 1 : 0, $id]);
+  if ($si) $pdo->prepare('DELETE FROM taller_votos WHERE registro_id=?')->execute([$id]);
+  else taller_asignar($pdo, $id);
 }
