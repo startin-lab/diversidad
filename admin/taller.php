@@ -76,6 +76,22 @@ if (isset($_GET['csv'])) {
   } }
   exit;
 }
+// Compromisos para seguimiento: cada uno con su origen, la empresa y la persona que lo escribió.
+// El correo solo sale cuando la persona autorizó que la contacten para el seguimiento.
+if (isset($_GET['compromisos'])) {
+  // Mismo arreglo que hace api/muro.php: columnas de seguimiento y vínculo de los compromisos de la inscripción con su persona.
+  try { $pdo->query('SELECT nombre, registro_id, mostrar_foto, seguimiento, origen FROM compromisos LIMIT 0'); }
+  catch (Throwable $e) { $pdo->exec("ALTER TABLE compromisos ADD COLUMN IF NOT EXISTS nombre VARCHAR(120) NOT NULL DEFAULT '', ADD COLUMN IF NOT EXISTS registro_id INT NULL, ADD COLUMN IF NOT EXISTS mostrar_foto TINYINT(1) NOT NULL DEFAULT 0, ADD COLUMN IF NOT EXISTS seguimiento TINYINT(1) NOT NULL DEFAULT 0, ADD COLUMN IF NOT EXISTS origen VARCHAR(12) NOT NULL DEFAULT '', ADD INDEX IF NOT EXISTS (registro_id)"); }
+  $pdo->exec("UPDATE compromisos SET origen='taller' WHERE registro_id IS NOT NULL AND origen=''");
+  $pdo->exec("UPDATE compromisos k JOIN registros r ON r.compromiso=k.texto AND r.organizacion=k.organizacion SET k.registro_id=r.id, k.origen='inscripcion' WHERE k.registro_id IS NULL AND k.origen=''");
+  header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="compromisos-seguimiento-' . date('Y-m-d') . '.csv"');
+  $o = fopen('php://output', 'w'); fwrite($o, "\xEF\xBB\xBF");
+  fputcsv($o, ['Fecha', 'Origen', 'Compromiso', 'Organización', 'Persona', 'Código de escarapela', 'Autoriza seguimiento', 'Correo (solo con autorización)', 'Pliegue', 'En el muro con nombre y foto', 'Visible en el muro'], ';', '"', '\\');
+  $orig = ['inscripcion' => 'Inscripción', 'taller' => 'Laboratorio', 'portal' => 'Portal'];
+  foreach ($pdo->query('SELECT k.creado, k.origen, k.texto, k.organizacion, k.pliegue, k.mostrar_foto, k.seguimiento, k.aprobado, r.nombres, r.codigo, r.correo FROM compromisos k LEFT JOIN registros r ON r.id=k.registro_id ORDER BY k.id')->fetchAll() as $k)
+    fputcsv($o, [$k['creado'], $orig[$k['origen']] ?? 'Portal', $k['texto'], $k['organizacion'], $k['nombres'] ?? '', $k['codigo'] ?? '', $k['seguimiento'] ? 'Sí' : 'No', $k['seguimiento'] ? ($k['correo'] ?? '') : '', $k['pliegue'], $k['mostrar_foto'] ? 'Sí' : 'No', $k['aprobado'] ? 'Sí' : 'No'], ';', '"', '\\');
+  exit;
+}
 // Todo el laboratorio (ronda en curso o una archivada): fichas, landings, votos e historial completo, sin nombres.
 if (isset($_GET['exportar'])) {
   $id = (int)$_GET['exportar'];
@@ -195,7 +211,8 @@ table.print{border-collapse:collapse;width:100%;font-size:12pt}table.print td,ta
     $arch = $pdo->query('SELECT id, ronda, motivo, creado, LENGTH(datos) b FROM taller_archivo ORDER BY id DESC LIMIT 12')->fetchAll(); ?>
   <div class="card"><p style="margin-top:0">Todo queda guardado: cada cambio de la ficha, cada landing (con lo que pidieron cambiar), cada pregunta y respuesta de Pliego y cada voto, con fecha y hora. <b>Ronda en curso: <?= $ronda ?></b> · <?= (int)($hc['ficha'] ?? 0) ?> cambios de ficha · <?= (int)($hc['landing'] ?? 0) ?> landings · <?= (int)($hc['chat'] ?? 0) ?> conversaciones con Pliego · <?= (int)($hc['voto'] ?? 0) ?> votos.</p>
     <p class="muted">El archivo no lleva nombres de personas: solo grupo, célula y organización.</p>
-    <p><a class="btn" href="?exportar=0">Descargar la ronda en curso</a></p>
+    <p class="bar"><a class="btn" href="?exportar=0">Descargar la ronda en curso</a><a class="btn ghost" href="?compromisos=1">Compromisos para seguimiento (CSV)</a></p>
+    <p class="muted" style="margin-top:0">El CSV de compromisos trae cada compromiso con su origen (inscripción, laboratorio o portal), la empresa y la persona. El correo solo aparece si la persona autorizó el seguimiento.</p>
     <?php if ($arch): ?><p style="margin-bottom:4px"><b>Rondas guardadas antes de reiniciar o borrar pruebas:</b></p><ul style="margin:0;padding-left:18px"><?php foreach ($arch as $a) echo '<li>Ronda ' . (int)$a['ronda'] . ' · ' . h($a['motivo']) . ' · ' . h($a['creado']) . ' · <a href="?exportar=' . (int)$a['id'] . '">descargar</a></li>'; ?></ul><?php endif; ?>
   </div>
 

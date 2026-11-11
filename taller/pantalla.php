@@ -51,12 +51,14 @@ main{display:grid;grid-template-columns:1fr 38vh;gap:3vw;align-items:center;min-
 body.voto{grid-template-rows:auto auto 1fr}
 /* Muro final de compromisos (Cierre) */
 body.muro{grid-template-rows:auto 1fr}body.muro .grupos{display:none}
-body.muro main{grid-template-columns:30vw 1fr;align-items:stretch;gap:2.4vw}
+body.muro main{grid-template-columns:30vw 1fr;grid-template-rows:minmax(0,1fr);align-items:stretch;gap:2.4vw}
+body.muro #der{min-height:0;height:100%;overflow:hidden}
 body.muro #izq{display:flex;flex-direction:column;gap:2vh;justify-content:flex-start;padding-top:2vh;height:100%}
 body.muro .preg.xl{font-size:7vh;max-width:12ch}
 .mq{display:flex;gap:1.4vw;align-items:center}.mq .qr{width:19vh;padding:1.6vh}.mq .qr b{font-size:1.6vh}.mq .qr span{display:none}
 .cifras{display:flex;gap:2vw}.cifras div{font:900 7vh/.9 var(--f);color:var(--sun)}.cifras small{display:block;font-size:1.5vh;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.6vh}
-.muro-notas{columns:3;column-gap:1.2vw;height:100%;overflow:hidden;position:relative;mask-image:linear-gradient(#000 88%,transparent)}
+.muro-notas{height:100%;overflow-y:auto;position:relative;scrollbar-width:none;mask-image:linear-gradient(transparent 0,#000 2.5vh,#000 92%,transparent)}.muro-notas::-webkit-scrollbar{display:none}
+.muro-col{columns:3;column-gap:1.2vw;padding:2.5vh 0 6vh}
 .nota{break-inside:avoid;margin:0 0 1.2vw;padding:2vh 1.2vw 1.6vh;border-radius:.6vh;color:var(--ink);position:relative;box-shadow:0 1.2vh 2.4vh rgba(0,0,0,.28);transform:rotate(var(--r,0deg));transform-origin:top center}
 .nota::after{content:"";position:absolute;right:0;bottom:0;width:3.2vh;height:3.2vh;background:linear-gradient(315deg,rgba(12,22,70,.35) 0 50%,rgba(255,255,255,.35) 50%)}
 .nota p{margin:0;font-weight:800;font-size:var(--fs,2.15vh);line-height:1.3}
@@ -120,7 +122,7 @@ function pintar(){const e=d.estado,f=e.fase;
     if(m==="inicio"){$("#izq").innerHTML=`<div class="k">${e.formado?"Las células están listas":"Bienvenida"}</div><div class="preg xl">De identificar barreras a experimentar soluciones.</div><div class="sub">${e.formado?"Reúnete con tu célula. <b>Tu reto ya está en tu celular.</b>":"Escanea el código, entra con tu escarapela o tu cédula y descubre <b>tu grupo, tu célula y tu reto</b>."}</div>`;
       $("#der").innerHTML=`<div class="qr"><div id="qr">${QR_T}</div><b>Entra a Mi taller</b><span>diversidad.startinlab.org/taller</span></div>`;}
     else if(m==="cierre"){$("#izq").innerHTML=`<div class="k">Cierre · Muro de compromisos</div><div class="preg xl">Ahora, dobla tu compromiso.</div><div class="sub">Escríbelo en <b>Mi taller</b>, en la pestaña Fase. Aparece aquí al instante.</div><div class="mq"><div class="qr"><div id="qr">${QR_T}</div><b>Mi taller</b></div><div class="cifras"><div id="mTot">0<small>compromisos</small></div><div id="mOrg">0<small>organizaciones</small></div></div></div><div class="comunidad" aria-hidden="true">${[0,3,6,1,8].map(i=>`<img src="../assets/fig/${FIG[i]}.webp?v=x" alt="">`).join("")}</div>`;
-      $("#der").innerHTML=`<div class="muro-notas" id="muro"></div>`;vistosMuro={};cargarMuro();}
+      $("#der").innerHTML=`<div class="muro-notas" id="muro"></div>`;vistosMuro={};firmaMuro="";cargarMuro();}
     else{$("#izq").innerHTML=`<div class="k">${f.n>=1&&f.n<=3?"Fase "+f.n+" de 3 · ":""}${esc(f.nombre)}</div><div class="preg">${f.id==="plenaria"?"¿Qué idea presenta cada grupo?":esc(f.pregunta||f.texto||"")}</div><div class="sub">${f.pregunta?`Escríbanla en la ficha de su célula y lleven el post-it al <b>backing de ${esc(f.nombre)}</b>. Pliego los acompaña desde el celular.`:(f.id==="plenaria"?"Abran <b>Mi taller</b> y voten por la idea de otra célula de su grupo. Cuando la persona facilitadora confirme, aquí aparece la que presenta.":"")}</div>`;
       $("#der").innerHTML=reloj();}
   }
@@ -147,16 +149,32 @@ function pintar(){const e=d.estado,f=e.fase;
 // Muro final: notas de papel con el color del pliegue de cada persona; las nuevas se despliegan.
 const COLOR={"Personas mayores":"#F0A04B","Género y cuidado":"#E6DDBF","Educación inclusiva":"#5DBB52","Discapacidad y trabajo":"#E0736B","La ley ya cambió":"#62C3CA","Población afrodescendiente":"#C98A57","Pueblos indígenas y Rrom":"#E2A93B","Personas LGBTIQ+":"#B48AE6","Migración y conflicto":"#7FA7F2"};
 const RESERVA=["#FFC20E","#13A79A","#EE7DB9","#F7F4EE","#F0A04B","#62C3CA"];let vistosMuro={};
-async function cargarMuro(){const box=$("#muro");if(!box)return;try{const r=await fetch("../api/muro.php?n=30",{cache:"no-store"});const j=await r.json();if(!j.ok)return;
+// El muro muestra TODOS los compromisos. Si no caben, se desplaza solo: baja despacio, hace una pausa y vuelve
+// arriba. Cuando llega uno nuevo, sube para mostrarlo. Con el mouse o la rueda también se mueve (pausa el automático).
+let firmaMuro="",manual=0,fase="arriba",desde=performance.now(),pos=0,ultimo=0;
+async function cargarMuro(){const box=$("#muro");if(!box)return;try{const r=await fetch("../api/muro.php?n=400",{cache:"no-store"});const j=await r.json();if(!j.ok)return;
   $("#mTot").firstChild.textContent=j.total;$("#mOrg").firstChild.textContent=j.organizaciones;
-  if(!j.items.length){box.innerHTML=`<div class="muro-vacio">El muro espera el primer compromiso…</div>`;return;}
-  const primera=!Object.keys(vistosMuro).length,n=j.items.length;
-  box.style.setProperty("--fs",n<=6?"3.4vh":n<=12?"2.7vh":n<=20?"2.2vh":"1.9vh");box.style.columns=n<=4?2:3;
-  box.innerHTML=j.items.map((it,i)=>{const nueva=!primera&&!vistosMuro[it.id];const col=COLOR[it.pliegue]||RESERVA[it.id%RESERVA.length];const rot=((it.id*37)%5-2)*.6;
+  if(!j.items.length){box.innerHTML=`<div class="muro-vacio">El muro espera el primer compromiso…</div>`;firmaMuro="";return;}
+  const firma=j.items.map(it=>it.id+":"+it.texto+":"+it.nombre+":"+(it.foto?1:0)).join("|");if(firma===firmaMuro)return;firmaMuro=firma;
+  const primera=!Object.keys(vistosMuro).length,n=j.items.length;let hayNuevas=false;
+  box.style.setProperty("--fs",n<=6?"3.4vh":n<=12?"2.7vh":"2.3vh");
+  const html=j.items.map((it,i)=>{const nueva=!primera&&!vistosMuro[it.id];if(nueva)hayNuevas=true;const col=COLOR[it.pliegue]||RESERVA[it.id%RESERVA.length];const rot=((it.id*37)%5-2)*.6;
     const ini=(it.nombre||it.organizacion||"·").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
     const av=`<div class="av">${it.foto?`<img src="../api/muro_foto.php?k=${+it.id}" alt="" onerror="this.parentNode.textContent='${esc(ini)}'">`:esc(ini)}</div>`;
     return`<div class="nota${nueva?" nueva":""}" style="background:${col};--r:${rot}deg"><div class="quien">${av}<div>${it.nombre?`<b>${esc(it.nombre)}</b><span>${esc(it.organizacion)}</span>`:`<b>${esc(it.organizacion)}</b>`}</div></div><p>${esc(it.texto)}</p></div>`;}).join("");
+  const sc=box.scrollTop;box.innerHTML=`<div class="muro-col" style="columns:${n<=4?2:3}">${html}</div>`;
+  if(hayNuevas){box.scrollTo({top:0,behavior:reducido?"auto":"smooth"});fase="arriba";desde=performance.now();}else box.scrollTop=sc;
   j.items.forEach(it=>vistosMuro[it.id]=1);}catch(e){}}
+function moverMuro(){const t=performance.now(),box=$("#muro"),paso=ultimo?Math.min(1.5,(t-ultimo)/1000):0;ultimo=t;
+  if(box&&document.body.classList.contains("muro")&&t>manual){const max=box.scrollHeight-box.clientHeight;
+    if(max>4){const dt=t-desde;
+      // La posición se lleva aparte: el navegador redondea a cero los avances de menos de un píxel.
+      if(fase==="arriba"&&dt>5000){fase="bajando";desde=t;pos=box.scrollTop;}
+      else if(fase==="bajando"){if(reducido){if(dt>8000){pos=Math.min(max,pos+box.clientHeight*.8);box.scrollTop=pos;desde=t;}}else{pos=Math.min(max,pos+paso*Math.max(24,box.clientHeight/22));box.scrollTop=Math.round(pos);}if(pos>=max-1){fase="abajo";desde=t;}}
+      else if(fase==="abajo"&&dt>4000){box.scrollTo({top:0,behavior:reducido?"auto":"smooth"});fase="arriba";desde=t;}}}}
+// Temporizador (no requestAnimationFrame): sigue funcionando aunque el navegador reduzca el dibujo de la página.
+setInterval(moverMuro,40);
+["wheel","touchstart","pointerdown","keydown"].forEach(ev=>addEventListener(ev,()=>{manual=performance.now()+15000;fase="arriba";desde=performance.now()+15000;},{passive:true}));
 setInterval(()=>{if(document.body.classList.contains("muro"))cargarMuro();},5000);
 function tick(){const el=$("#t");if(!d||!el)return;const f=d.estado.fase;if(!f)return;const tot=f.min*60,s=Math.max(0,Math.round(f.fin-(Date.now()/1000+off)));
   el.textContent=s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:"¡Tiempo!";$("#tl").textContent=s?(s<60?"último minuto":"minutos"):"";
